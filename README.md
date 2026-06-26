@@ -10,7 +10,7 @@ styles.css
 assets/
   logo.svg
   footer-logo.svg
-  artist-cover.svg
+  artist-cover.png
   favicon.svg
 ```
 
@@ -18,7 +18,7 @@ assets/
 
 1. `assets/logo.svg` — экспортировать настоящий логотип из Figma в SVG.
 2. `assets/footer-logo.svg` — экспортировать большой футерный логотип из Figma в SVG.
-3. `assets/artist-cover.svg` — заменить на реальные изображения художников в `.webp`, `.jpg` или `.png`.
+3. `assets/artist-cover.png` — заменить на реальные изображения художников в `.webp`, `.jpg` или `.png`.
 4. Шрифт: сейчас используется fallback `CoFo Robert Sans, CoFo Sans, Arial, Helvetica, sans-serif`. Для публикации нужна лицензированная web-версия шрифта.
 
 ## Как заменить обложку художника
@@ -32,7 +32,7 @@ assets/artist-cover.webp
 И в `index.html` замени:
 
 ```html
-src="assets/artist-cover.svg"
+src="assets/artist-cover.png"
 ```
 
 на:

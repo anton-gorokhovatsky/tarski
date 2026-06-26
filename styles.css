@@ -1,6 +1,5 @@
 /*
-  Tarski static site — first HTML/CSS draft.
-  Replace placeholder SVGs in assets/ with exported production assets.
+  Tarski static site — tuned to the current Figma desktop layout.
 */
 
 :root {
@@ -8,6 +7,7 @@
   --text: #000;
   --page-padding-x: 45px;
   --content-width: 890px;
+  --menu-width: 199px;
   --font-sans: "CoFo Robert Sans", "CoFo Sans", Arial, Helvetica, sans-serif;
 }
 
@@ -40,6 +40,8 @@ body {
   font-size: 20px;
   line-height: 1.25;
   text-rendering: geometricPrecision;
+  -webkit-font-smoothing: antialiased;
+  font-feature-settings: "dlig" 1, "frac" 1;
 }
 
 img {
@@ -72,23 +74,51 @@ a:hover {
 
 .brand {
   display: block;
-  width: 430px;
+  width: 315px;
   max-width: 62vw;
 }
 
+.brand img {
+  width: 100%;
+  height: auto;
+}
+
 .main-nav {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  width: 199px;
-  padding-top: 1px;
+  width: var(--menu-width);
   font-size: 16px;
-  line-height: 1.25;
+  line-height: 20px;
+  font-weight: 400;
+  font-feature-settings: "case" 1, "zero" 1, "ordn" 1, "ss01" 1, "ss02" 1, "ss04" 1, "ss05" 1, "ss06" 1, "ss07" 1, "ss08" 1, "numr" 1, "dlig" 1, "frac" 1;
 }
 
 .main-nav a {
+  position: relative;
+  display: block;
   width: max-content;
+  padding-left: 22px;
   text-decoration: none;
+}
+
+.main-nav a + a {
+  margin-top: 5px;
+}
+
+.main-nav a::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0;
+  transform: translateY(-50%);
+}
+
+.main-nav a.is-active::before,
+.main-nav a[aria-current="true"]::before {
+  opacity: 1;
 }
 
 .main-nav a:hover {
@@ -100,19 +130,21 @@ a:hover {
 }
 
 .superlead {
-  padding: 100px 0;
+  padding: 300px 0 100px;
 }
 
 .superlead p {
   max-width: var(--content-width);
   margin: 0;
-  font-size: clamp(38px, 3.2vw, 46px);
+  font-size: 46px;
   line-height: 1.255;
+  font-weight: 400;
   letter-spacing: -0.02em;
 }
 
 .section {
   margin: 0;
+  scroll-margin-top: 32px;
 }
 
 .section-offset {
@@ -129,7 +161,7 @@ ul {
 
 h1 {
   margin: 0 0 20px;
-  font-size: clamp(38px, 3.2vw, 46px);
+  font-size: 46px;
   line-height: 1.25;
   font-weight: 400;
   letter-spacing: -0.02em;
@@ -137,7 +169,7 @@ h1 {
 
 h2 {
   margin: 80px 0 40px;
-  font-size: clamp(30px, 2.6vw, 36px);
+  font-size: 36px;
   line-height: 1.25;
   font-weight: 400;
   letter-spacing: -0.015em;
@@ -157,8 +189,9 @@ p + ul {
 }
 
 .lead {
-  font-size: clamp(23px, 2vw, 26px);
+  font-size: 26px;
   line-height: 1.25;
+  font-weight: 400;
   letter-spacing: -0.01em;
 }
 
@@ -237,6 +270,15 @@ ul {
   font-size: 20px;
 }
 
+@media (min-width: 961px) {
+  .main-nav {
+    position: fixed;
+    top: 27px;
+    right: var(--page-padding-x);
+    z-index: 10;
+  }
+}
+
 @media (max-width: 960px) {
   :root {
     --page-padding-x: 24px;
@@ -247,11 +289,20 @@ ul {
   }
 
   .brand {
-    width: 340px;
+    width: 315px;
   }
 
   .content {
     width: 100%;
+  }
+
+  .superlead {
+    padding: 120px 0 88px;
+  }
+
+  .superlead p,
+  h1 {
+    font-size: clamp(38px, 7vw, 46px);
   }
 }
 
@@ -275,15 +326,36 @@ ul {
   }
 
   .brand {
-    width: min(100%, 330px);
+    width: min(100%, 315px);
     max-width: none;
   }
 
   .main-nav {
     width: auto;
+    display: flex;
     flex-flow: row wrap;
     gap: 8px 18px;
     font-size: 16px;
+    line-height: 20px;
+  }
+
+  .main-nav a {
+    padding-left: 0;
+  }
+
+  .main-nav a + a {
+    margin-top: 0;
+  }
+
+  .main-nav a::before {
+    display: none;
+  }
+
+  .main-nav a.is-active,
+  .main-nav a[aria-current="true"] {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.14em;
   }
 
   .superlead {
