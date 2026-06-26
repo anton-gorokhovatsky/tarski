@@ -242,6 +242,7 @@ ul {
 
 .artist-card__role {
   margin: 0 0 20px;
+  color: #6b6b6b;
   font-size: 20px;
   font-weight: 600;
 }
