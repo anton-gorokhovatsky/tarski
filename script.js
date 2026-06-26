@@ -6,20 +6,21 @@
     .filter(Boolean);
 
   const mobileMenu = document.querySelector('[data-mobile-menu]');
-  const mobileButton = mobileMenu?.querySelector('.mobile-menu-button');
   const mobilePanel = mobileMenu?.querySelector('.mobile-menu-panel');
   const mobileQuery = window.matchMedia('(max-width: 720px)');
 
   let currentActiveId = null;
+  let scrollTimer = null;
 
-  const scrollActiveMobileLinkIntoView = () => {
-    if (!mobilePanel || !mobileQuery.matches || mobilePanel.hidden) return;
+  const scrollActiveMobileLinkIntoView = (behavior = 'smooth') => {
+    if (!mobilePanel || !mobileMenu || !mobileQuery.matches) return;
+    if (!mobileMenu.classList.contains('is-visible')) return;
 
     const activeMobileLink = mobilePanel.querySelector('a.is-active');
     if (!activeMobileLink) return;
 
     activeMobileLink.scrollIntoView({
-      behavior: 'smooth',
+      behavior,
       block: 'nearest',
       inline: 'center'
     });
@@ -40,7 +41,8 @@
     });
 
     if (hasChanged) {
-      scrollActiveMobileLinkIntoView();
+      window.clearTimeout(scrollTimer);
+      scrollTimer = window.setTimeout(() => scrollActiveMobileLinkIntoView('smooth'), 40);
     }
   };
 
@@ -59,37 +61,11 @@
     setActive(current.id);
   };
 
-  const closeMobileMenu = () => {
-    if (!mobileMenu || !mobileButton || !mobilePanel) return;
-    mobileMenu.classList.remove('is-open');
-    mobileButton.setAttribute('aria-expanded', 'false');
-    mobileButton.setAttribute('aria-label', 'Открыть меню');
-    mobilePanel.hidden = true;
-  };
-
-  const openMobileMenu = () => {
-    if (!mobileMenu || !mobileButton || !mobilePanel) return;
-    mobilePanel.hidden = false;
-    mobileMenu.classList.add('is-open');
-    mobileButton.setAttribute('aria-expanded', 'true');
-    mobileButton.setAttribute('aria-label', 'Закрыть меню');
-    requestAnimationFrame(scrollActiveMobileLinkIntoView);
-  };
-
-  const toggleMobileMenu = () => {
-    if (!mobileMenu?.classList.contains('is-open')) {
-      openMobileMenu();
-    } else {
-      closeMobileMenu();
-    }
-  };
-
   const updateMobileMenuVisibility = () => {
     if (!mobileMenu) return;
 
     if (!mobileQuery.matches) {
       mobileMenu.classList.remove('is-visible');
-      closeMobileMenu();
       return;
     }
 
@@ -99,8 +75,8 @@
 
     mobileMenu.classList.toggle('is-visible', shouldShow);
 
-    if (!shouldShow) {
-      closeMobileMenu();
+    if (shouldShow) {
+      scrollActiveMobileLinkIntoView('auto');
     }
   };
 
@@ -115,19 +91,5 @@
   window.addEventListener('resize', () => {
     updateActive();
     updateMobileMenuVisibility();
-  });
-
-  mobileButton?.addEventListener('click', toggleMobileMenu);
-
-  mobilePanel?.addEventListener('click', (event) => {
-    if (event.target.closest('a')) {
-      closeMobileMenu();
-    }
-  });
-
-  document.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape') {
-      closeMobileMenu();
-    }
   });
 })();
