@@ -426,7 +426,7 @@ ul {
   }
 }
 
-/* Mobile floating menu — “senior mask”: glass capsule stays intact, only the scrolling content is edge-masked. */
+/* Mobile floating menu — “senior mask”: glass capsule stays intact, only the scrolling content is strongly edge-masked. */
 .mobile-floating-menu {
   display: none;
 }
@@ -471,8 +471,11 @@ ul {
   }
 
   .mobile-menu-scroller {
-    --mask-left: 46px;
-    --mask-right: 46px;
+    /* Strong edge mask: a short fully-hidden zone plus a longer fade into the readable area. */
+    --mask-left-clear: 28px;
+    --mask-left-full: 92px;
+    --mask-right-clear: 28px;
+    --mask-right-full: 92px;
     display: flex;
     align-items: center;
     gap: 30px;
@@ -490,25 +493,31 @@ ul {
     mask-image: linear-gradient(
       to right,
       transparent 0,
-      #000 var(--mask-left),
-      #000 calc(100% - var(--mask-right)),
+      transparent var(--mask-left-clear),
+      #000 var(--mask-left-full),
+      #000 calc(100% - var(--mask-right-full)),
+      transparent calc(100% - var(--mask-right-clear)),
       transparent 100%
     );
     -webkit-mask-image: linear-gradient(
       to right,
       transparent 0,
-      #000 var(--mask-left),
-      #000 calc(100% - var(--mask-right)),
+      transparent var(--mask-left-clear),
+      #000 var(--mask-left-full),
+      #000 calc(100% - var(--mask-right-full)),
+      transparent calc(100% - var(--mask-right-clear)),
       transparent 100%
     );
   }
 
   .mobile-menu-panel.is-at-start .mobile-menu-scroller {
-    --mask-left: 0px;
+    --mask-left-clear: 0px;
+    --mask-left-full: 0px;
   }
 
   .mobile-menu-panel.is-at-end .mobile-menu-scroller {
-    --mask-right: 0px;
+    --mask-right-clear: 0px;
+    --mask-right-full: 0px;
   }
 
   .mobile-menu-panel:not(.has-overflow) .mobile-menu-scroller {
@@ -565,8 +574,10 @@ ul {
   }
 
   .mobile-menu-scroller {
-    --mask-left: 40px;
-    --mask-right: 40px;
+    --mask-left-clear: 22px;
+    --mask-left-full: 78px;
+    --mask-right-clear: 22px;
+    --mask-right-full: 78px;
     gap: 26px;
     padding: 0 22px;
     font-size: 22px;

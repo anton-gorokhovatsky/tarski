@@ -1,31 +1,16 @@
-# Tarski static site
+# Tarski static site — update v8
 
-Статичный сайт для GitHub Pages: чистые HTML/CSS/JS без сборщика.
+Static GitHub Pages site.
 
-## Что внутри
+## Update notes
 
-- `index.html` — разметка страницы
-- `styles.css` — вся визуальная система и адаптив
-- `script.js` — активное состояние меню, sticky mobile-menu, автопрокрутка активного пункта
-- `assets/` — логотипы, обложка, favicon, SVG-индикатор меню
+- Mobile floating navigation keeps the glass capsule intact.
+- The scrolling menu text now uses a stronger “senior mask”: a fully hidden edge zone plus a longer fade, so cropped menu labels disappear more decisively at both sides.
+- Active menu indicator still uses the custom Tarski/Gravitas `i` dot shape.
 
-## Обновление GitHub Pages
+## Files to replace on GitHub
 
-1. Замени в репозитории файлы:
-   - `index.html`
-   - `styles.css`
-   - `script.js`
-   - `assets/menu-shape.svg`
-2. Сделай commit changes.
-3. GitHub Pages обновится через 1–2 минуты.
-
-## Mobile menu v7
-
-На мобильной версии:
-
-- базовое меню в шапке остается вертикальным;
-- после скролла появляется закрепленная horizontal glass-плашка;
-- активный пункт синхронизируется со скроллом контента;
-- плашка автоматически прокручивает активный пункт в видимую область;
-- контент внутри плашки использует edge mask: на старте мягко маскируется только правый край, в середине оба края, в конце только левый край;
-- индикатор активного пункта использует форму точки из буквы `i` логотипа Tarski.
+- `index.html`
+- `styles.css`
+- `script.js`
+- `assets/menu-shape.svg`
