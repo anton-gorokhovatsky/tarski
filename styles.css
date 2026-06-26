@@ -252,6 +252,7 @@ ul {
   margin: 0 0 20px;
   font-size: 20px;
   font-weight: 500;
+  color: #6b6b6b;
 }
 
 .artist-card__links {
@@ -480,7 +481,7 @@ ul {
   }
 }
 
-/* Mobile floating menu — “senior mask”: glass capsule stays intact, only the scrolling content is strongly edge-masked. */
+/* Mobile floating menu — two glass pills: section scroll-spy + separate mail action. */
 .mobile-floating-menu {
   display: none;
 }
@@ -492,7 +493,9 @@ ul {
     left: 0;
     right: 0;
     z-index: 80;
-    display: block;
+    display: flex;
+    align-items: center;
+    gap: 8px;
     padding: max(8px, env(safe-area-inset-top)) var(--page-padding-x) 8px;
     opacity: 0;
     pointer-events: none;
@@ -506,11 +509,9 @@ ul {
     transform: translateY(0);
   }
 
-  .mobile-menu-panel {
-    width: 100%;
+  .mobile-menu-panel,
+  .mobile-mail-pill {
     height: 58px;
-    position: relative;
-    overflow: hidden;
     border: 1px solid rgba(255, 255, 255, 0.66);
     border-radius: 999px;
     background:
@@ -522,6 +523,26 @@ ul {
       inset 0 -1px 0 rgba(255, 255, 255, 0.24);
     backdrop-filter: blur(26px) saturate(190%);
     -webkit-backdrop-filter: blur(26px) saturate(190%);
+  }
+
+  .mobile-menu-panel {
+    flex: 1 1 auto;
+    min-width: 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .mobile-mail-pill {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 20px;
+    font-size: 24px;
+    line-height: 1;
+    font-weight: 400;
+    text-decoration: none;
+    white-space: nowrap;
   }
 
   .mobile-menu-scroller {
@@ -591,11 +612,6 @@ ul {
     text-decoration: none;
   }
 
-  .mobile-menu-panel a.nav-mail {
-    margin-left: 18px;
-    padding-left: 0;
-  }
-
   .mobile-menu-panel a::before {
     content: "";
     position: absolute;
@@ -608,17 +624,14 @@ ul {
     transform: translateY(-50%);
   }
 
-  .mobile-menu-panel a.nav-mail::before {
-    display: none;
-  }
-
   .mobile-menu-panel a.is-active::before,
   .mobile-menu-panel a[aria-current="true"]::before {
     opacity: 1;
   }
 
   @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-    .mobile-menu-panel {
+    .mobile-menu-panel,
+    .mobile-mail-pill {
       background: rgba(242, 242, 242, 0.96);
     }
   }
@@ -630,8 +643,14 @@ ul {
     padding-right: 12px;
   }
 
-  .mobile-menu-panel {
+  .mobile-menu-panel,
+  .mobile-mail-pill {
     height: 54px;
+  }
+
+  .mobile-mail-pill {
+    padding: 0 16px;
+    font-size: 22px;
   }
 
   .mobile-menu-scroller {
