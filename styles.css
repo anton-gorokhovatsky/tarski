@@ -178,7 +178,7 @@ h3 {
   margin: 20px 0;
   font-size: 20px;
   line-height: 1.25;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 p + p,
@@ -264,12 +264,42 @@ ul {
   height: auto;
 }
 
-.site-footer p {
-  padding: 20px 0;
+.site-footer__texts {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  align-items: stretch;
+}
+
+.site-footer__year,
+.site-footer__disclaimer {
+  margin: 0;
   font-size: 20px;
+  line-height: 1.25;
+  text-align: center;
+}
+
+.site-footer__year {
+  padding-top: 20px;
+}
+
+.site-footer__disclaimer {
+  padding-bottom: 20px;
 }
 
 @media (min-width: 961px) {
+  .site-header {
+    padding-bottom: 0;
+  }
+
+  .superlead {
+    min-height: calc(100vh - 20px - 134px);
+    display: flex;
+    align-items: flex-end;
+    padding: 0 0 78px;
+  }
+
   .main-nav {
     position: fixed;
     top: 27px;
@@ -410,6 +440,11 @@ ul {
 
   .site-footer {
     padding-top: 120px;
+  }
+
+  .site-footer__year,
+  .site-footer__disclaimer {
+    font-size: 16px;
   }
 }
 
