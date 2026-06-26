@@ -351,7 +351,7 @@ ul {
   .site-header {
     flex-direction: column;
     gap: 28px;
-    padding-bottom: 56px;
+    padding-bottom: 0;
   }
 
   .brand {
@@ -387,7 +387,12 @@ ul {
   }
 
   .superlead {
-    padding: 64px 0 72px;
+    /* Mobile first screen mirrors desktop: header + superlead compose one viewport.
+       The superlead is held near the bottom edge; “О нас” starts after the first scroll. */
+    min-height: max(300px, calc(100svh - 16px - 133px - 28px - 95px));
+    display: flex;
+    align-items: flex-end;
+    padding: 0 0 clamp(44px, 8svh, 72px);
   }
 
   .superlead p,
@@ -452,6 +457,10 @@ ul {
   .superlead p,
   h1 {
     font-size: 36px;
+  }
+
+  .superlead {
+    padding-bottom: clamp(36px, 7svh, 56px);
   }
 
   .lead {
