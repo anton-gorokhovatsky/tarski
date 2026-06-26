@@ -6,7 +6,7 @@ Static GitHub Pages site.
 
 - Mobile floating navigation keeps the glass capsule intact.
 - The scrolling menu text now uses a stronger “senior mask”: a fully hidden edge zone plus a longer fade, so cropped menu labels disappear more decisively at both sides.
-- Active menu indicator still uses the custom Tarski/Gravitas `i` dot shape.
+- Active menu indicator now renders the full SVG favicon-like mark, not as a CSS mask.
 
 ## Files to replace on GitHub
 
