@@ -426,7 +426,7 @@ ul {
   }
 }
 
-/* Mobile floating menu — appears after the inline menu has scrolled away */
+/* Mobile floating menu — “senior mask”: glass capsule stays intact, only the scrolling content is edge-masked. */
 .mobile-floating-menu {
   display: none;
 }
@@ -453,18 +453,14 @@ ul {
   }
 
   .mobile-menu-panel {
-    display: flex;
-    align-items: center;
-    gap: 30px;
     width: 100%;
     height: 58px;
-    padding: 0 20px;
-    overflow-x: auto;
-    overflow-y: hidden;
+    position: relative;
+    overflow: hidden;
     border: 1px solid rgba(255, 255, 255, 0.66);
     border-radius: 999px;
     background:
-      linear-gradient(135deg, rgba(255, 255, 255, 0.70), rgba(255, 255, 255, 0.36));
+      linear-gradient(135deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.38));
     color: #000;
     box-shadow:
       0 18px 48px rgba(0, 0, 0, 0.12),
@@ -472,15 +468,55 @@ ul {
       inset 0 -1px 0 rgba(255, 255, 255, 0.24);
     backdrop-filter: blur(26px) saturate(190%);
     -webkit-backdrop-filter: blur(26px) saturate(190%);
+  }
+
+  .mobile-menu-scroller {
+    --mask-left: 46px;
+    --mask-right: 46px;
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    width: 100%;
+    height: 100%;
+    padding: 0 26px;
+    overflow-x: auto;
+    overflow-y: hidden;
     font-size: 24px;
     line-height: 1;
     font-weight: 400;
     white-space: nowrap;
     scrollbar-width: none;
     -webkit-overflow-scrolling: touch;
+    mask-image: linear-gradient(
+      to right,
+      transparent 0,
+      #000 var(--mask-left),
+      #000 calc(100% - var(--mask-right)),
+      transparent 100%
+    );
+    -webkit-mask-image: linear-gradient(
+      to right,
+      transparent 0,
+      #000 var(--mask-left),
+      #000 calc(100% - var(--mask-right)),
+      transparent 100%
+    );
   }
 
-  .mobile-menu-panel::-webkit-scrollbar {
+  .mobile-menu-panel.is-at-start .mobile-menu-scroller {
+    --mask-left: 0px;
+  }
+
+  .mobile-menu-panel.is-at-end .mobile-menu-scroller {
+    --mask-right: 0px;
+  }
+
+  .mobile-menu-panel:not(.has-overflow) .mobile-menu-scroller {
+    mask-image: none;
+    -webkit-mask-image: none;
+  }
+
+  .mobile-menu-scroller::-webkit-scrollbar {
     display: none;
   }
 
@@ -525,9 +561,14 @@ ul {
   }
 
   .mobile-menu-panel {
-    gap: 26px;
     height: 54px;
-    padding: 0 18px;
+  }
+
+  .mobile-menu-scroller {
+    --mask-left: 40px;
+    --mask-right: 40px;
+    gap: 26px;
+    padding: 0 22px;
     font-size: 22px;
   }
 }

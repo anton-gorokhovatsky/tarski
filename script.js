@@ -7,13 +7,26 @@
 
   const mobileMenu = document.querySelector('[data-mobile-menu]');
   const mobilePanel = mobileMenu?.querySelector('.mobile-menu-panel');
+  const mobileScroller = mobileMenu?.querySelector('[data-mobile-menu-scroller]') || mobilePanel;
   const mobileQuery = window.matchMedia('(max-width: 720px)');
 
   let currentActiveId = null;
   let scrollTimer = null;
 
+  const updateMobileScrollerMask = () => {
+    if (!mobilePanel || !mobileScroller) return;
+
+    const maxScroll = Math.max(0, mobileScroller.scrollWidth - mobileScroller.clientWidth);
+    const atStart = mobileScroller.scrollLeft <= 2;
+    const atEnd = mobileScroller.scrollLeft >= maxScroll - 2;
+
+    mobilePanel.classList.toggle('has-overflow', maxScroll > 2);
+    mobilePanel.classList.toggle('is-at-start', atStart);
+    mobilePanel.classList.toggle('is-at-end', atEnd || maxScroll <= 2);
+  };
+
   const scrollActiveMobileLinkIntoView = (behavior = 'smooth') => {
-    if (!mobilePanel || !mobileMenu || !mobileQuery.matches) return;
+    if (!mobilePanel || !mobileScroller || !mobileMenu || !mobileQuery.matches) return;
     if (!mobileMenu.classList.contains('is-visible')) return;
 
     const activeMobileLink = mobilePanel.querySelector('a.is-active');
@@ -24,6 +37,8 @@
       block: 'nearest',
       inline: 'center'
     });
+
+    window.setTimeout(updateMobileScrollerMask, behavior === 'smooth' ? 260 : 0);
   };
 
   const setActive = (id) => {
@@ -66,6 +81,7 @@
 
     if (!mobileQuery.matches) {
       mobileMenu.classList.remove('is-visible');
+      updateMobileScrollerMask();
       return;
     }
 
@@ -76,11 +92,13 @@
     mobileMenu.classList.toggle('is-visible', shouldShow);
 
     if (shouldShow) {
+      updateMobileScrollerMask();
       scrollActiveMobileLinkIntoView('auto');
     }
   };
 
   updateActive();
+  updateMobileScrollerMask();
   updateMobileMenuVisibility();
 
   window.addEventListener('scroll', () => {
@@ -88,8 +106,11 @@
     updateMobileMenuVisibility();
   }, { passive: true });
 
+  mobileScroller?.addEventListener('scroll', updateMobileScrollerMask, { passive: true });
+
   window.addEventListener('resize', () => {
     updateActive();
+    updateMobileScrollerMask();
     updateMobileMenuVisibility();
   });
 })();
