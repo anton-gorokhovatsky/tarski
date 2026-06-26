@@ -10,7 +10,25 @@
   const mobilePanel = mobileMenu?.querySelector('.mobile-menu-panel');
   const mobileQuery = window.matchMedia('(max-width: 720px)');
 
+  let currentActiveId = null;
+
+  const scrollActiveMobileLinkIntoView = () => {
+    if (!mobilePanel || !mobileQuery.matches || mobilePanel.hidden) return;
+
+    const activeMobileLink = mobilePanel.querySelector('a.is-active');
+    if (!activeMobileLink) return;
+
+    activeMobileLink.scrollIntoView({
+      behavior: 'smooth',
+      block: 'nearest',
+      inline: 'center'
+    });
+  };
+
   const setActive = (id) => {
+    const hasChanged = currentActiveId !== id;
+    currentActiveId = id;
+
     navLinks.forEach((link) => {
       const isActive = link.getAttribute('href') === `#${id}`;
       link.classList.toggle('is-active', isActive);
@@ -20,6 +38,10 @@
         link.removeAttribute('aria-current');
       }
     });
+
+    if (hasChanged) {
+      scrollActiveMobileLinkIntoView();
+    }
   };
 
   const updateActive = () => {
@@ -51,6 +73,7 @@
     mobileMenu.classList.add('is-open');
     mobileButton.setAttribute('aria-expanded', 'true');
     mobileButton.setAttribute('aria-label', 'Закрыть меню');
+    requestAnimationFrame(scrollActiveMobileLinkIntoView);
   };
 
   const toggleMobileMenu = () => {
