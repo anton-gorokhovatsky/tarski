@@ -387,7 +387,6 @@ ul {
 
 .site-footer__logo {
   width: 100%;
-  max-width: 1348px;
   height: auto;
   filter: var(--brand-filter);
 }
@@ -483,7 +482,7 @@ ul {
   }
 
   .brand {
-    width: min(100%, 315px);
+    width: 100%;
     max-width: none;
   }
 
@@ -521,7 +520,8 @@ ul {
   .superlead {
     /* Mobile first screen mirrors desktop: header + superlead compose one viewport.
        The superlead is held near the bottom edge; “О нас” starts after the first scroll. */
-    min-height: max(300px, calc(100svh - 16px - 133px - 28px - 110px));
+    --mobile-brand-height: calc((100vw - (var(--page-padding-x) * 2)) * 0.43137255);
+    min-height: max(300px, calc(100svh - 16px - var(--mobile-brand-height) - 28px - 110px));
     display: flex;
     align-items: flex-end;
     padding: 0 0 clamp(44px, 8svh, 72px);
