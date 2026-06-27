@@ -11,7 +11,6 @@
   --indicator-filter:
     drop-shadow(0 2px 1px rgba(0, 0, 0, 0.24))
     drop-shadow(0 9px 12px rgba(0, 0, 0, 0.14));
-  --indicator-glint: rgba(255, 255, 255, 0.58);
   --mobile-pill-border: rgba(255, 255, 255, 0.66);
   --mobile-pill-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.38));
   --mobile-pill-text: #000;
@@ -37,7 +36,6 @@
       invert(1)
       drop-shadow(0 2px 1px rgba(0, 0, 0, 0.5))
       drop-shadow(0 9px 14px rgba(0, 0, 0, 0.34));
-    --indicator-glint: rgba(255, 255, 255, 0.36);
     --mobile-pill-border: rgba(255, 255, 255, 0.16);
     --mobile-pill-bg: linear-gradient(135deg, rgba(46, 46, 46, 0.76), rgba(18, 18, 18, 0.58));
     --mobile-pill-text: #f2f2f2;
@@ -138,8 +136,7 @@ a:hover {
   font-feature-settings: "case" 1, "zero" 1, "ordn" 1, "ss01" 1, "ss02" 1, "ss04" 1, "ss05" 1, "ss06" 1, "ss07" 1, "ss08" 1, "numr" 1, "dlig" 1, "frac" 1;
 }
 
-.main-nav::before,
-.main-nav::after {
+.main-nav::before {
   content: "";
   position: absolute;
   pointer-events: none;
@@ -163,24 +160,8 @@ a:hover {
   transform-origin: 50% 64%;
 }
 
-.main-nav::after {
-  left: 5px;
-  top: calc(var(--nav-indicator-y) - 7px);
-  z-index: 2;
-  width: 6px;
-  height: 4px;
-  border-radius: 50%;
-  background: var(--indicator-glint);
-  filter: blur(0.2px);
-  transform: rotateZ(-22deg) scale(1);
-}
-
 .main-nav.is-indicator-moving::before {
   transform: translate3d(0, -50%, 0) rotateZ(7deg) scale(1.12);
-}
-
-.main-nav.is-indicator-moving::after {
-  transform: rotateZ(-22deg) translate3d(1px, -1px, 0) scale(1.08);
 }
 
 .main-nav a {
@@ -618,8 +599,7 @@ ul {
     overflow: hidden;
   }
 
-  .mobile-menu-panel::before,
-  .mobile-menu-panel::after {
+  .mobile-menu-panel::before {
     content: "";
     position: absolute;
     pointer-events: none;
@@ -642,24 +622,8 @@ ul {
     transform-origin: 50% 64%;
   }
 
-  .mobile-menu-panel::after {
-    left: 5px;
-    top: 50%;
-    z-index: 3;
-    width: 5px;
-    height: 3px;
-    border-radius: 50%;
-    background: var(--indicator-glint);
-    filter: blur(0.2px);
-    transform: translate3d(var(--mobile-indicator-x), -9px, 0) rotateZ(-22deg) scale(1);
-  }
-
   .mobile-menu-panel.is-indicator-moving::before {
     transform: translate3d(var(--mobile-indicator-x), -50%, 0) rotateZ(7deg) scale(1.12);
-  }
-
-  .mobile-menu-panel.is-indicator-moving::after {
-    transform: translate3d(calc(var(--mobile-indicator-x) + 1px), -10px, 0) rotateZ(-22deg) scale(1.08);
   }
 
   .mobile-mail-pill {
@@ -816,15 +780,7 @@ ul {
     transform: translate3d(0, -50%, 0) rotateZ(-3deg) scale(1);
   }
 
-  .main-nav.is-indicator-moving::after {
-    transform: rotateZ(-22deg) scale(1);
-  }
-
   .mobile-menu-panel.is-indicator-moving::before {
     transform: translate3d(var(--mobile-indicator-x), -50%, 0) rotateZ(-3deg) scale(1);
-  }
-
-  .mobile-menu-panel.is-indicator-moving::after {
-    transform: translate3d(var(--mobile-indicator-x), -9px, 0) rotateZ(-22deg) scale(1);
   }
 }
