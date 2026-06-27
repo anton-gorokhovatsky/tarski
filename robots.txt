@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://tarski.ru/sitemap.xml
