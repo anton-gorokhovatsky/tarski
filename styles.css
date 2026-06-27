@@ -20,6 +20,7 @@
     0 18px 48px rgba(0, 0, 0, 0.12),
     inset 0 1px 0 rgba(255, 255, 255, 0.34);
   --mobile-pill-fallback-bg: rgba(242, 242, 242, 0.96);
+  --cursor-trail-rgb: 0 0 0;
   --page-padding-x: 45px;
   --content-width: 890px;
   --menu-width: 199px;
@@ -44,6 +45,7 @@
       0 18px 48px rgba(0, 0, 0, 0.34),
       inset 0 1px 0 rgba(255, 255, 255, 0.1);
     --mobile-pill-fallback-bg: rgba(16, 16, 16, 0.96);
+    --cursor-trail-rgb: 242 242 242;
   }
 }
 
@@ -88,6 +90,15 @@ body {
 img {
   display: block;
   max-width: 100%;
+}
+
+.cursor-trail-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 9;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
 }
 
 a {

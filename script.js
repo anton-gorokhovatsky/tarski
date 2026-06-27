@@ -184,3 +184,182 @@
     updateMobileMenuVisibility();
   });
 })();
+
+(() => {
+  const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const finePointerQuery = window.matchMedia('(hover: hover) and (pointer: fine)');
+  const colorSchemeQuery = window.matchMedia('(prefers-color-scheme: dark)');
+
+  const trailDuration = 10000;
+  const minPointDistance = 3;
+  const maxPoints = 900;
+
+  let canvas = null;
+  let context = null;
+  let frameId = null;
+  let points = [];
+  let deviceScale = 1;
+  let trailRgb = '0, 0, 0';
+  let hasPointerPosition = false;
+
+  const shouldRun = () => finePointerQuery.matches && !reducedMotionQuery.matches;
+
+  const readTrailColor = () => {
+    const rawColor = getComputedStyle(document.documentElement)
+      .getPropertyValue('--cursor-trail-rgb')
+      .trim();
+
+    trailRgb = rawColor ? rawColor.split(/\s+/).join(', ') : '0, 0, 0';
+  };
+
+  const resizeCanvas = () => {
+    if (!canvas || !context) return;
+
+    deviceScale = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = Math.ceil(window.innerWidth * deviceScale);
+    canvas.height = Math.ceil(window.innerHeight * deviceScale);
+    context.setTransform(deviceScale, 0, 0, deviceScale, 0, 0);
+    points = [];
+    hasPointerPosition = false;
+  };
+
+  const scheduleRender = () => {
+    if (frameId === null) {
+      frameId = window.requestAnimationFrame(renderTrail);
+    }
+  };
+
+  const renderTrail = (now) => {
+    frameId = null;
+    if (!context) return;
+
+    context.clearRect(0, 0, window.innerWidth, window.innerHeight);
+
+    const cutoff = now - trailDuration;
+    while (points.length && points[0].time < cutoff) {
+      points.shift();
+    }
+
+    context.lineCap = 'round';
+    context.lineJoin = 'round';
+
+    for (let index = 1; index < points.length; index += 1) {
+      const previousPoint = points[index - 1];
+      const point = points[index];
+      if (point.startsStroke) continue;
+
+      const segmentAge = now - point.time;
+      const life = Math.max(0, 1 - segmentAge / trailDuration);
+      if (life <= 0) continue;
+
+      context.beginPath();
+      context.moveTo(previousPoint.x, previousPoint.y);
+      context.lineTo(point.x, point.y);
+      context.lineWidth = 0.9 + life * 0.8;
+      context.strokeStyle = `rgba(${trailRgb}, ${0.04 + life * 0.34})`;
+      context.stroke();
+    }
+
+    if (points.length) {
+      scheduleRender();
+    }
+  };
+
+  const rememberPoint = (event) => {
+    if (event.pointerType && event.pointerType !== 'mouse') return;
+
+    const now = window.performance.now();
+    const lastPoint = points[points.length - 1];
+    const distance = lastPoint
+      ? Math.hypot(event.clientX - lastPoint.x, event.clientY - lastPoint.y)
+      : Infinity;
+
+    if (distance < minPointDistance && hasPointerPosition) return;
+
+    points.push({
+      x: event.clientX,
+      y: event.clientY,
+      time: now,
+      startsStroke: !hasPointerPosition
+    });
+
+    hasPointerPosition = true;
+
+    if (points.length > maxPoints) {
+      points.splice(0, points.length - maxPoints);
+    }
+
+    scheduleRender();
+  };
+
+  const startNewStroke = (event) => {
+    if (event?.type === 'pointerout' && event.relatedTarget) return;
+
+    hasPointerPosition = false;
+  };
+
+  const clearTrail = () => {
+    points = [];
+    startNewStroke();
+    context?.clearRect(0, 0, window.innerWidth, window.innerHeight);
+  };
+
+  const enableTrail = () => {
+    if (canvas || !shouldRun()) return;
+
+    canvas = document.createElement('canvas');
+    canvas.className = 'cursor-trail-canvas';
+    canvas.setAttribute('aria-hidden', 'true');
+    context = canvas.getContext('2d');
+
+    if (!context) {
+      canvas = null;
+      return;
+    }
+
+    document.body.append(canvas);
+    readTrailColor();
+    resizeCanvas();
+
+    window.addEventListener('pointermove', rememberPoint, { passive: true });
+    window.addEventListener('pointerout', startNewStroke, { passive: true });
+    window.addEventListener('blur', startNewStroke);
+    window.addEventListener('resize', resizeCanvas);
+    document.addEventListener('visibilitychange', clearTrail);
+  };
+
+  const disableTrail = () => {
+    if (!canvas) return;
+
+    window.removeEventListener('pointermove', rememberPoint);
+    window.removeEventListener('pointerout', startNewStroke);
+    window.removeEventListener('blur', startNewStroke);
+    window.removeEventListener('resize', resizeCanvas);
+    document.removeEventListener('visibilitychange', clearTrail);
+
+    if (frameId !== null) {
+      window.cancelAnimationFrame(frameId);
+      frameId = null;
+    }
+
+    canvas.remove();
+    canvas = null;
+    context = null;
+    points = [];
+    startNewStroke();
+  };
+
+  const syncTrail = () => {
+    if (shouldRun()) {
+      enableTrail();
+    } else {
+      disableTrail();
+    }
+  };
+
+  reducedMotionQuery.addEventListener('change', syncTrail);
+  finePointerQuery.addEventListener('change', syncTrail);
+  colorSchemeQuery.addEventListener('change', readTrailColor);
+
+  syncTrail();
+})();
