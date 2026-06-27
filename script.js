@@ -280,8 +280,8 @@
         endX,
         endY
       );
-      context.lineWidth = 1.05 + life * 0.55;
-      context.strokeStyle = `rgba(${trailRgb}, ${0.06 + life * 0.28})`;
+      context.lineWidth = 1.15 + life * 0.65;
+      context.strokeStyle = `rgba(${trailRgb}, ${life * 0.95})`;
       context.stroke();
     }
 
