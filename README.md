@@ -24,13 +24,13 @@ Open `index.html` in a browser. No build step is required.
 4. Select `main` and `/ (root)`.
 5. Save and wait for GitHub Pages to publish the site.
 
-The default GitHub Pages address will be:
+The current public GitHub Pages address is:
 
 ```text
 https://anton-gorokhovatsky.github.io/tarski/
 ```
 
-The production domain is:
+The planned production domain is:
 
 ```text
 https://tarski.ru/
@@ -38,7 +38,7 @@ https://tarski.ru/
 
 ## Custom domain
 
-The repository contains a `CNAME` file with:
+The custom domain is temporarily paused while DNS is being moved. When ready, create a `CNAME` file in the repository root with:
 
 ```text
 tarski.ru

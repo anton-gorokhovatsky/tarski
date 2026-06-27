@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://tarski.ru/sitemap.xml
+Sitemap: https://anton-gorokhovatsky.github.io/tarski/sitemap.xml
