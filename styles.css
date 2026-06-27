@@ -503,16 +503,16 @@ ul {
   }
 
   .artists-list {
-    gap: 56px;
+    gap: 52px;
   }
 
   .artist-card {
     grid-template-columns: 1fr;
-    gap: 24px;
+    gap: 18px;
   }
 
   .artist-card__image {
-    width: min(100%, 284px);
+    width: min(72vw, 216px);
     height: auto;
   }
 
@@ -521,8 +521,12 @@ ul {
   }
 
   .artist-card__name {
-    font-size: 32px;
+    font-size: 30px;
     line-height: 1.12;
+  }
+
+  .artist-card__links {
+    margin-top: 24px;
   }
 
   .site-footer {
