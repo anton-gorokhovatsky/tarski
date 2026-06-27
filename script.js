@@ -191,8 +191,10 @@
   const colorSchemeQuery = window.matchMedia('(prefers-color-scheme: dark)');
 
   const trailDuration = 10000;
-  const minPointDistance = 3;
-  const maxPoints = 900;
+  const minPointDistance = 2;
+  const smoothingFactor = 0.68;
+  const curveSmoothing = 0.18;
+  const maxPoints = 1400;
 
   let canvas = null;
   let context = null;
@@ -240,7 +242,7 @@
       points.shift();
     }
 
-    context.lineCap = 'round';
+    context.lineCap = 'butt';
     context.lineJoin = 'round';
 
     for (let index = 1; index < points.length; index += 1) {
@@ -248,15 +250,31 @@
       const point = points[index];
       if (point.startsStroke) continue;
 
+      const anchorPoint = previousPoint.startsStroke || index < 2
+        ? previousPoint
+        : points[index - 2];
+      const nextPoint = points[index + 1];
+      const forwardPoint = nextPoint && !nextPoint.startsStroke ? nextPoint : point;
+      const controlStartX = previousPoint.x + (point.x - anchorPoint.x) * curveSmoothing;
+      const controlStartY = previousPoint.y + (point.y - anchorPoint.y) * curveSmoothing;
+      const controlEndX = point.x - (forwardPoint.x - previousPoint.x) * curveSmoothing;
+      const controlEndY = point.y - (forwardPoint.y - previousPoint.y) * curveSmoothing;
       const segmentAge = now - point.time;
       const life = Math.max(0, 1 - segmentAge / trailDuration);
       if (life <= 0) continue;
 
       context.beginPath();
       context.moveTo(previousPoint.x, previousPoint.y);
-      context.lineTo(point.x, point.y);
-      context.lineWidth = 0.9 + life * 0.8;
-      context.strokeStyle = `rgba(${trailRgb}, ${0.04 + life * 0.34})`;
+      context.bezierCurveTo(
+        controlStartX,
+        controlStartY,
+        controlEndX,
+        controlEndY,
+        point.x,
+        point.y
+      );
+      context.lineWidth = 1.05 + life * 0.55;
+      context.strokeStyle = `rgba(${trailRgb}, ${0.06 + life * 0.28})`;
       context.stroke();
     }
 
@@ -265,20 +283,24 @@
     }
   };
 
-  const rememberPoint = (event) => {
-    if (event.pointerType && event.pointerType !== 'mouse') return;
-
+  const addTrailPoint = (event) => {
     const now = window.performance.now();
     const lastPoint = points[points.length - 1];
+    const x = hasPointerPosition && lastPoint
+      ? lastPoint.x + (event.clientX - lastPoint.x) * smoothingFactor
+      : event.clientX;
+    const y = hasPointerPosition && lastPoint
+      ? lastPoint.y + (event.clientY - lastPoint.y) * smoothingFactor
+      : event.clientY;
     const distance = lastPoint
-      ? Math.hypot(event.clientX - lastPoint.x, event.clientY - lastPoint.y)
+      ? Math.hypot(x - lastPoint.x, y - lastPoint.y)
       : Infinity;
 
     if (distance < minPointDistance && hasPointerPosition) return;
 
     points.push({
-      x: event.clientX,
-      y: event.clientY,
+      x,
+      y,
       time: now,
       startsStroke: !hasPointerPosition
     });
@@ -290,6 +312,17 @@
     }
 
     scheduleRender();
+  };
+
+  const rememberPoint = (event) => {
+    if (event.pointerType && event.pointerType !== 'mouse') return;
+
+    const coalescedEvents = typeof event.getCoalescedEvents === 'function'
+      ? event.getCoalescedEvents()
+      : [event];
+    const moveEvents = coalescedEvents.length ? coalescedEvents : [event];
+
+    moveEvents.forEach(addTrailPoint);
   };
 
   const startNewStroke = (event) => {
