@@ -7,7 +7,6 @@
   --page-bg: #f2f2f2;
   --text: #000;
   --muted-text: #6b6b6b;
-  --image-placeholder: #dedede;
   --brand-filter: none;
   --menu-shape-filter: none;
   --mobile-pill-border: rgba(255, 255, 255, 0.66);
@@ -30,7 +29,6 @@
     --page-bg: #101010;
     --text: #f2f2f2;
     --muted-text: #a8a8a8;
-    --image-placeholder: #242424;
     --brand-filter: invert(1);
     --menu-shape-filter: invert(1);
     --mobile-pill-border: rgba(255, 255, 255, 0.16);
@@ -271,7 +269,6 @@ ul {
   width: 314px;
   height: 425px;
   object-fit: cover;
-  background: var(--image-placeholder);
 }
 
 .artist-card__body {
