@@ -245,6 +245,9 @@
     context.lineCap = 'butt';
     context.lineJoin = 'round';
 
+    const scrollX = window.scrollX;
+    const scrollY = window.scrollY;
+
     for (let index = 1; index < points.length; index += 1) {
       const previousPoint = points[index - 1];
       const point = points[index];
@@ -255,23 +258,27 @@
         : points[index - 2];
       const nextPoint = points[index + 1];
       const forwardPoint = nextPoint && !nextPoint.startsStroke ? nextPoint : point;
-      const controlStartX = previousPoint.x + (point.x - anchorPoint.x) * curveSmoothing;
-      const controlStartY = previousPoint.y + (point.y - anchorPoint.y) * curveSmoothing;
-      const controlEndX = point.x - (forwardPoint.x - previousPoint.x) * curveSmoothing;
-      const controlEndY = point.y - (forwardPoint.y - previousPoint.y) * curveSmoothing;
+      const controlStartX = previousPoint.x + (point.x - anchorPoint.x) * curveSmoothing - scrollX;
+      const controlStartY = previousPoint.y + (point.y - anchorPoint.y) * curveSmoothing - scrollY;
+      const controlEndX = point.x - (forwardPoint.x - previousPoint.x) * curveSmoothing - scrollX;
+      const controlEndY = point.y - (forwardPoint.y - previousPoint.y) * curveSmoothing - scrollY;
+      const startX = previousPoint.x - scrollX;
+      const startY = previousPoint.y - scrollY;
+      const endX = point.x - scrollX;
+      const endY = point.y - scrollY;
       const segmentAge = now - point.time;
       const life = Math.max(0, 1 - segmentAge / trailDuration);
       if (life <= 0) continue;
 
       context.beginPath();
-      context.moveTo(previousPoint.x, previousPoint.y);
+      context.moveTo(startX, startY);
       context.bezierCurveTo(
         controlStartX,
         controlStartY,
         controlEndX,
         controlEndY,
-        point.x,
-        point.y
+        endX,
+        endY
       );
       context.lineWidth = 1.05 + life * 0.55;
       context.strokeStyle = `rgba(${trailRgb}, ${0.06 + life * 0.28})`;
@@ -286,12 +293,14 @@
   const addTrailPoint = (event) => {
     const now = window.performance.now();
     const lastPoint = points[points.length - 1];
+    const pageX = event.clientX + window.scrollX;
+    const pageY = event.clientY + window.scrollY;
     const x = hasPointerPosition && lastPoint
-      ? lastPoint.x + (event.clientX - lastPoint.x) * smoothingFactor
-      : event.clientX;
+      ? lastPoint.x + (pageX - lastPoint.x) * smoothingFactor
+      : pageX;
     const y = hasPointerPosition && lastPoint
-      ? lastPoint.y + (event.clientY - lastPoint.y) * smoothingFactor
-      : event.clientY;
+      ? lastPoint.y + (pageY - lastPoint.y) * smoothingFactor
+      : pageY;
     const distance = lastPoint
       ? Math.hypot(x - lastPoint.x, y - lastPoint.y)
       : Infinity;
@@ -331,6 +340,13 @@
     hasPointerPosition = false;
   };
 
+  const handleScroll = () => {
+    if (!points.length) return;
+
+    startNewStroke();
+    scheduleRender();
+  };
+
   const clearTrail = () => {
     points = [];
     startNewStroke();
@@ -357,6 +373,7 @@
     window.addEventListener('pointermove', rememberPoint, { passive: true });
     window.addEventListener('pointerout', startNewStroke, { passive: true });
     window.addEventListener('blur', startNewStroke);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     window.addEventListener('resize', resizeCanvas);
     document.addEventListener('visibilitychange', clearTrail);
   };
@@ -367,6 +384,7 @@
     window.removeEventListener('pointermove', rememberPoint);
     window.removeEventListener('pointerout', startNewStroke);
     window.removeEventListener('blur', startNewStroke);
+    window.removeEventListener('scroll', handleScroll);
     window.removeEventListener('resize', resizeCanvas);
     document.removeEventListener('visibilitychange', clearTrail);
 
