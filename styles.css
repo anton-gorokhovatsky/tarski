@@ -654,16 +654,24 @@ ul {
   }
 
   .mobile-mail-pill {
-    flex: 0 0 auto;
+    flex: 0 0 50px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 0 16px;
-    font-size: 20px;
+    width: 50px;
+    padding: 0;
+    font-size: 0;
     line-height: 1;
     text-align: center;
     text-decoration: none;
     white-space: nowrap;
+  }
+
+  .mobile-mail-pill__icon {
+    display: block;
+    width: 28px;
+    height: auto;
+    filter: var(--brand-filter);
   }
 
   .mobile-menu-scroller {
@@ -766,8 +774,12 @@ ul {
   }
 
   .mobile-mail-pill {
-    padding: 0 14px;
-    font-size: 19px;
+    flex-basis: 48px;
+    width: 48px;
+  }
+
+  .mobile-mail-pill__icon {
+    width: 26px;
   }
 
   .mobile-menu-scroller {
