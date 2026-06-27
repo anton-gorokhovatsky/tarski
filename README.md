@@ -10,6 +10,8 @@ Static GitHub Pages site for Tarski.
 - `assets/` — logos, favicon and artist images.
 - `.nojekyll` — keeps GitHub Pages from running Jekyll over the site.
 
+The site supports automatic light and dark themes via the user's system `prefers-color-scheme` setting.
+
 ## Local preview
 
 Open `index.html` in a browser. No build step is required.
