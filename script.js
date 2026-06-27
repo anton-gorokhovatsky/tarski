@@ -186,6 +186,61 @@
 })();
 
 (() => {
+  const textItems = Array.from(document.querySelectorAll('main.content h1, main.content h2, main.content h3, main.content p, main.content ul'))
+    .filter((item) => !item.closest('.artist-card__links'));
+
+  if (!textItems.length) return;
+
+  let activeItem = null;
+  let frameId = null;
+
+  const setActiveText = (item) => {
+    if (activeItem === item) return;
+
+    activeItem?.classList.remove('is-text-focus-active');
+    activeItem = item;
+    activeItem?.classList.add('is-text-focus-active');
+  };
+
+  const updateTextFocus = () => {
+    frameId = null;
+
+    const focusY = window.innerHeight * (window.innerWidth <= 720 ? 0.46 : 0.52);
+    const visibilityPadding = window.innerHeight * 0.18;
+    let closestItem = null;
+    let closestDistance = Infinity;
+
+    textItems.forEach((item) => {
+      const rect = item.getBoundingClientRect();
+      if (rect.bottom < -visibilityPadding || rect.top > window.innerHeight + visibilityPadding) return;
+
+      const itemCenter = rect.top + rect.height / 2;
+      const distance = Math.abs(itemCenter - focusY);
+
+      if (distance < closestDistance) {
+        closestDistance = distance;
+        closestItem = item;
+      }
+    });
+
+    setActiveText(closestItem);
+  };
+
+  const scheduleTextFocusUpdate = () => {
+    if (frameId === null) {
+      frameId = window.requestAnimationFrame(updateTextFocus);
+    }
+  };
+
+  textItems.forEach((item) => item.classList.add('focus-text'));
+  document.documentElement.classList.add('has-text-focus');
+  updateTextFocus();
+
+  window.addEventListener('scroll', scheduleTextFocusUpdate, { passive: true });
+  window.addEventListener('resize', scheduleTextFocusUpdate);
+})();
+
+(() => {
   const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
   const finePointerQuery = window.matchMedia('(hover: hover) and (pointer: fine)');
   const colorSchemeQuery = window.matchMedia('(prefers-color-scheme: dark)');

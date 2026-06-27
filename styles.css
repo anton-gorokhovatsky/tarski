@@ -20,6 +20,7 @@
     0 18px 48px rgba(0, 0, 0, 0.12),
     inset 0 1px 0 rgba(255, 255, 255, 0.34);
   --mobile-pill-fallback-bg: rgba(242, 242, 242, 0.96);
+  --focus-text-muted: #b8b8b8;
   --cursor-trail-rgb: 0 0 0;
   --page-padding-x: 45px;
   --content-width: 890px;
@@ -45,6 +46,7 @@
       0 18px 48px rgba(0, 0, 0, 0.34),
       inset 0 1px 0 rgba(255, 255, 255, 0.1);
     --mobile-pill-fallback-bg: rgba(16, 16, 16, 0.96);
+    --focus-text-muted: #646464;
     --cursor-trail-rgb: 242 242 242;
   }
 }
@@ -109,6 +111,15 @@ a {
 
 a:hover {
   text-decoration-style: wavy;
+}
+
+.has-text-focus .focus-text {
+  color: var(--focus-text-muted);
+  transition: color 140ms ease;
+}
+
+.has-text-focus .focus-text.is-text-focus-active {
+  color: var(--text);
 }
 
 .page {
