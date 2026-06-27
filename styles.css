@@ -329,11 +329,55 @@ ul {
 
 .artist-card__links {
   display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-top: 4px;
-  font-size: 18px;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  margin-top: 0;
   line-height: 1.2;
+}
+
+.artist-card__link {
+  position: relative;
+  display: inline-flex;
+  width: 52px;
+  height: 44px;
+  align-items: center;
+  justify-content: center;
+  color: var(--text);
+  text-decoration: none;
+  opacity: 0.9;
+  transition:
+    opacity 180ms ease,
+    transform 180ms ease;
+}
+
+.artist-card__link::before {
+  content: "";
+  display: block;
+  width: 50px;
+  height: 40px;
+  background: currentColor;
+  -webkit-mask: var(--artist-link-icon) center / contain no-repeat;
+  mask: var(--artist-link-icon) center / contain no-repeat;
+}
+
+.artist-card__link--site {
+  --artist-link-icon: url("assets/link-site.svg");
+}
+
+.artist-card__link--instagram {
+  --artist-link-icon: url("assets/link-instagram.svg");
+  width: 58px;
+}
+
+.artist-card__link--instagram::before {
+  width: 56px;
+}
+
+.artist-card__link:hover {
+  opacity: 1;
+  text-decoration: none;
+  transform: translateY(-1px);
 }
 
 .site-footer {
@@ -538,8 +582,8 @@ ul {
   }
 
   .artist-card__links {
-    margin-top: 22px;
-    font-size: 20px;
+    gap: 10px;
+    margin-top: 20px;
   }
 
   .site-footer {
