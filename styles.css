@@ -438,6 +438,10 @@ ul {
 }
 
 @media (min-width: 961px) {
+  .brand {
+    transform: translateY(7px);
+  }
+
   .site-header {
     padding-bottom: 0;
   }
