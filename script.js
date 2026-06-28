@@ -238,6 +238,11 @@
         return makeFocusUnit(elements);
       }
 
+      if (item.matches('p') && item.nextElementSibling?.matches('ul')) {
+        groupedTextItems.add(item.nextElementSibling);
+        return makeFocusUnit([item, item.nextElementSibling]);
+      }
+
       return makeFocusUnit([item]);
     })
     .filter(Boolean);
