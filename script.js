@@ -189,12 +189,68 @@
   const standaloneTextItems = Array.from(document.querySelectorAll('main.content h1, main.content h2, main.content h3, main.content p, main.content ul'))
     .filter((item) => !item.closest('.artist-card'));
   const artistCards = Array.from(document.querySelectorAll('main.content .artist-card'));
-  const textItems = [...standaloneTextItems, ...artistCards].sort((first, second) => {
-    if (first === second) return 0;
-    return first.compareDocumentPosition(second) & Node.DOCUMENT_POSITION_PRECEDING ? 1 : -1;
+  const groupedTextItems = new Set();
+
+  const makeFocusUnit = (elements) => ({
+    anchor: elements[0],
+    elements,
+    getRect() {
+      return elements.reduce((bounds, element) => {
+        const rect = element.getBoundingClientRect();
+
+        if (!bounds) {
+          return {
+            top: rect.top,
+            right: rect.right,
+            bottom: rect.bottom,
+            left: rect.left
+          };
+        }
+
+        return {
+          top: Math.min(bounds.top, rect.top),
+          right: Math.max(bounds.right, rect.right),
+          bottom: Math.max(bounds.bottom, rect.bottom),
+          left: Math.min(bounds.left, rect.left)
+        };
+      }, null);
+    }
   });
 
-  if (!textItems.length) return;
+  const textUnits = standaloneTextItems
+    .map((item) => {
+      if (groupedTextItems.has(item)) return null;
+
+      if (item.matches('h3')) {
+        const elements = [item];
+        let sibling = item.nextElementSibling;
+
+        while (
+          sibling?.matches('p, ul') &&
+          !sibling.closest('.artist-card') &&
+          !sibling.classList.contains('lead-spaced')
+        ) {
+          elements.push(sibling);
+          groupedTextItems.add(sibling);
+          sibling = sibling.nextElementSibling;
+        }
+
+        return makeFocusUnit(elements);
+      }
+
+      return makeFocusUnit([item]);
+    })
+    .filter(Boolean);
+
+  const focusUnits = [
+    ...textUnits,
+    ...artistCards.map((card) => makeFocusUnit([card]))
+  ].sort((first, second) => {
+    if (first.anchor === second.anchor) return 0;
+    return first.anchor.compareDocumentPosition(second.anchor) & Node.DOCUMENT_POSITION_PRECEDING ? 1 : -1;
+  });
+
+  if (!focusUnits.length) return;
 
   let activeItem = null;
   let frameId = null;
@@ -202,9 +258,9 @@
   const setActiveText = (item) => {
     if (activeItem === item) return;
 
-    activeItem?.classList.remove('is-text-focus-active');
+    activeItem?.elements.forEach((element) => element.classList.remove('is-text-focus-active'));
     activeItem = item;
-    activeItem?.classList.add('is-text-focus-active');
+    activeItem?.elements.forEach((element) => element.classList.add('is-text-focus-active'));
   };
 
   const updateTextFocus = () => {
@@ -215,11 +271,12 @@
     let closestItem = null;
     let closestDistance = Infinity;
 
-    textItems.forEach((item) => {
-      const rect = item.getBoundingClientRect();
+    focusUnits.forEach((item) => {
+      const rect = item.getRect();
+      if (!rect) return;
       if (rect.bottom < -visibilityPadding || rect.top > window.innerHeight + visibilityPadding) return;
 
-      const itemCenter = rect.top + rect.height / 2;
+      const itemCenter = rect.top + (rect.bottom - rect.top) / 2;
       const distance = Math.abs(itemCenter - focusY);
 
       if (distance < closestDistance) {
@@ -237,7 +294,7 @@
     }
   };
 
-  textItems.forEach((item) => item.classList.add('focus-text'));
+  focusUnits.forEach((item) => item.elements.forEach((element) => element.classList.add('focus-text')));
   document.documentElement.classList.add('has-text-focus');
   updateTextFocus();
 
