@@ -335,9 +335,7 @@ ul {
   width: var(--artist-image-width);
   height: var(--artist-image-height);
   object-fit: cover;
-  transition:
-    opacity 160ms ease,
-    filter 160ms ease;
+  transition: opacity 160ms ease;
 }
 
 .artist-card__body {
@@ -427,7 +425,6 @@ ul {
 
 .has-text-focus .artist-card.focus-text .artist-card__image {
   opacity: var(--artist-image-muted-opacity);
-  filter: grayscale(1);
 }
 
 .has-text-focus .artist-card.focus-text.is-text-focus-active .artist-card__role {
