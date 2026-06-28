@@ -186,8 +186,13 @@
 })();
 
 (() => {
-  const textItems = Array.from(document.querySelectorAll('main.content h1, main.content h2, main.content h3, main.content p, main.content ul'))
-    .filter((item) => !item.closest('.artist-card__links'));
+  const standaloneTextItems = Array.from(document.querySelectorAll('main.content h1, main.content h2, main.content h3, main.content p, main.content ul'))
+    .filter((item) => !item.closest('.artist-card'));
+  const artistCards = Array.from(document.querySelectorAll('main.content .artist-card'));
+  const textItems = [...standaloneTextItems, ...artistCards].sort((first, second) => {
+    if (first === second) return 0;
+    return first.compareDocumentPosition(second) & Node.DOCUMENT_POSITION_PRECEDING ? 1 : -1;
+  });
 
   if (!textItems.length) return;
 
