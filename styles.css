@@ -568,15 +568,15 @@ ul {
 
 .editorial-index {
   margin-top: 34px;
-  border-top: 1px solid var(--rule);
+  display: grid;
+  row-gap: 30px;
 }
 
 .editorial-index__item {
   display: grid;
   grid-template-columns: minmax(180px, 0.56fr) minmax(0, 1fr);
   column-gap: clamp(32px, 5vw, 78px);
-  padding: 22px 0 24px;
-  border-bottom: 1px solid var(--rule);
+  padding: 0;
 }
 
 .editorial-index__item h3,
@@ -1001,12 +1001,13 @@ ul {
 
   .editorial-index {
     margin-top: 28px;
+    row-gap: 30px;
   }
 
   .editorial-index__item,
   .editorial-index--program .editorial-index__item {
     display: block;
-    padding: 20px 0 22px;
+    padding: 0;
   }
 
   .editorial-index__item h3 {
