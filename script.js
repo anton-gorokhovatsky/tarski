@@ -14,7 +14,7 @@
   let currentActiveId = null;
   let scrollTimer = null;
   const indicatorTimers = new WeakMap();
-  const desktopCoverIndicatorY = -8;
+  const desktopCoverIndicatorY = 10;
   const mobileCoverIndicatorX = 22;
 
   const pulseIndicator = (container) => {
@@ -33,7 +33,7 @@
     const activeLink = mainNav.querySelector('a.is-active[href^="#"]');
     if (!activeLink) {
       mainNav.style.setProperty('--nav-indicator-y', `${desktopCoverIndicatorY}px`);
-      mainNav.style.setProperty('--nav-indicator-opacity', '0.58');
+      mainNav.style.setProperty('--nav-indicator-opacity', '0.72');
       return;
     }
 

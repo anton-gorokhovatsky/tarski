@@ -188,8 +188,8 @@ a:hover {
 }
 
 .main-nav {
-  --nav-indicator-y: -8px;
-  --nav-indicator-opacity: 0.58;
+  --nav-indicator-y: 10px;
+  --nav-indicator-opacity: 0.72;
   position: relative;
   width: var(--menu-width);
   font-size: 16px;
@@ -224,6 +224,19 @@ a:hover {
 
 .main-nav.is-indicator-moving::before {
   transform: translate3d(0, -50%, 0) rotateZ(7deg) scale(1.12);
+}
+
+.main-nav .nav-label {
+  position: relative;
+  z-index: 3;
+  display: block;
+  width: max-content;
+  padding-left: 30px;
+  color: var(--text);
+}
+
+.main-nav .nav-label + a {
+  margin-top: 5px;
 }
 
 .main-nav a {
@@ -660,6 +673,10 @@ ul {
   }
 
   .main-nav::before {
+    display: none;
+  }
+
+  .main-nav .nav-label {
     display: none;
   }
 
