@@ -551,7 +551,7 @@ ul {
     min-height: calc(100vh - 20px - 134px);
     display: flex;
     align-items: flex-end;
-    padding: 0 0 78px;
+    padding: 0 0 92px;
   }
 
   .main-nav {
@@ -604,7 +604,7 @@ ul {
 
   .site-header {
     flex-direction: column;
-    gap: 28px;
+    gap: 18px;
     padding-bottom: 0;
   }
 
@@ -614,17 +614,22 @@ ul {
   }
 
   .main-nav {
-    width: auto;
+    width: 100%;
     display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 5px;
+    flex-flow: row wrap;
+    align-items: baseline;
+    gap: 7px 14px;
     font-size: 16px;
     line-height: 20px;
   }
 
+  .main-nav::before {
+    display: none;
+  }
+
   .main-nav a {
-    padding-left: 22px;
+    padding-left: 0;
+    color: var(--muted-text);
   }
 
   .main-nav a + a {
@@ -632,15 +637,17 @@ ul {
   }
 
   .main-nav a.nav-mail {
-    margin-top: 16px;
+    flex-basis: 100%;
+    margin-top: 2px;
   }
 
   .main-nav a::before {
-    display: block;
+    display: none;
   }
 
   .main-nav a.is-active,
   .main-nav a[aria-current="true"] {
+    color: var(--text);
     text-decoration: none;
   }
 
@@ -648,7 +655,7 @@ ul {
     /* Mobile first screen mirrors desktop: header + superlead compose one viewport.
        The superlead is held near the bottom edge; “О нас” starts after the first scroll. */
     --mobile-brand-height: calc((100vw - (var(--page-padding-x) * 2)) * 0.43137255);
-    min-height: max(300px, calc(100svh - 16px - var(--mobile-brand-height) - 28px - 110px));
+    min-height: max(300px, calc(100svh - 16px - var(--mobile-brand-height) - 18px - 50px));
     display: flex;
     align-items: flex-end;
     padding: 0 0 clamp(44px, 8svh, 72px);
@@ -758,7 +765,7 @@ ul {
 @media (max-width: 420px) {
   .superlead p,
   h1 {
-    font-size: 36px;
+    font-size: 34px;
   }
 
   .superlead {
