@@ -56,7 +56,7 @@
       0 -18px 42px rgba(0, 0, 0, 0.28),
       inset 0 1px 0 rgba(255, 255, 255, 0.08);
     --mobile-pill-fallback-bg: rgba(16, 16, 16, 0.96);
-    --focus-text-muted: #646464;
+    --focus-text-muted: #787878;
     --cursor-trail-rgb: 242 242 242;
   }
 }
@@ -97,6 +97,22 @@ body {
   text-rendering: geometricPrecision;
   -webkit-font-smoothing: antialiased;
   font-feature-settings: "dlig" 1, "frac" 1;
+}
+
+.skip-link {
+  position: fixed;
+  top: 14px;
+  left: 14px;
+  z-index: 20;
+  padding: 9px 13px 10px;
+  background: var(--text);
+  color: var(--page-bg);
+  text-decoration: none;
+  transform: translateY(calc(-100% - 24px));
+}
+
+.skip-link:focus-visible {
+  transform: translateY(0);
 }
 
 img {
@@ -250,6 +266,10 @@ a:hover {
 .section {
   margin: 0;
   scroll-margin-top: 32px;
+}
+
+.section:focus {
+  outline: none;
 }
 
 .section-offset {

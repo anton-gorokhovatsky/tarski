@@ -475,6 +475,12 @@
     context?.clearRect(0, 0, window.innerWidth, window.innerHeight);
   };
 
+  const clearTrailForKeyboard = (event) => {
+    if (event.key === 'Tab') {
+      clearTrail();
+    }
+  };
+
   const enableTrail = () => {
     if (canvas || !shouldRun()) return;
 
@@ -497,6 +503,7 @@
     window.addEventListener('blur', startNewStroke);
     window.addEventListener('scroll', handleScroll, { passive: true });
     window.addEventListener('resize', resizeCanvas);
+    window.addEventListener('keydown', clearTrailForKeyboard);
     document.addEventListener('visibilitychange', clearTrail);
   };
 
@@ -508,6 +515,7 @@
     window.removeEventListener('blur', startNewStroke);
     window.removeEventListener('scroll', handleScroll);
     window.removeEventListener('resize', resizeCanvas);
+    window.removeEventListener('keydown', clearTrailForKeyboard);
     document.removeEventListener('visibilitychange', clearTrail);
 
     if (frameId !== null) {
