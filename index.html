@@ -7,6 +7,26 @@
     <meta name="description" content="Среда изучения и поддержки социально ориентированного и вовлекающего искусства." />
     <meta name="theme-color" content="#f2f2f2" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#101010" media="(prefers-color-scheme: dark)" />
+    <script>
+      (() => {
+        try {
+          const theme = window.localStorage.getItem('tarski-theme');
+          const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+          const activeTheme = theme === 'dark' || theme === 'light' ? theme : systemTheme;
+
+          if (theme === 'dark' || theme === 'light') {
+            document.documentElement.dataset.theme = theme;
+          }
+
+          document.documentElement.dataset.effectiveTheme = activeTheme;
+          document
+            .querySelectorAll('meta[name="theme-color"]')
+            .forEach((meta) => meta.setAttribute('content', activeTheme === 'dark' ? '#101010' : '#f2f2f2'));
+        } catch (error) {
+          document.documentElement.dataset.effectiveTheme = 'light';
+        }
+      })();
+    </script>
     <link rel="canonical" href="https://anton-gorokhovatsky.github.io/tarski/" />
     <meta property="og:title" content="Tarski" />
     <meta property="og:description" content="Среда изучения и поддержки социально ориентированного и вовлекающего искусства." />
@@ -34,7 +54,12 @@
           <a href="#about">О проекте</a>
           <a href="#patrons">Клуб патронов</a>
           <a href="#artists">Художники</a>
-          <a class="nav-mail" href="mailto:tarski.fund@gmail.com?subject=Tarski">Написать нам</a>
+          <div class="nav-actions">
+            <a class="nav-mail" href="mailto:tarski.fund@gmail.com?subject=Tarski">Написать нам</a>
+            <button class="theme-toggle" type="button" data-theme-toggle aria-label="Переключить тему" aria-pressed="false" title="Переключить тему">
+              <span class="theme-toggle__icon" aria-hidden="true"></span>
+            </button>
+          </div>
         </nav>
       </header>
 

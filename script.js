@@ -1,4 +1,86 @@
 (() => {
+  const storageKey = 'tarski-theme';
+  const themeToggles = Array.from(document.querySelectorAll('[data-theme-toggle]'));
+  const systemThemeQuery = window.matchMedia('(prefers-color-scheme: dark)');
+  const themeColors = {
+    light: '#f2f2f2',
+    dark: '#101010'
+  };
+
+  const getStoredTheme = () => {
+    try {
+      const theme = window.localStorage.getItem(storageKey);
+      return theme === 'dark' || theme === 'light' ? theme : null;
+    } catch (error) {
+      return null;
+    }
+  };
+
+  const setStoredTheme = (theme) => {
+    try {
+      window.localStorage.setItem(storageKey, theme);
+    } catch (error) {
+      // The toggle still works for the current page when storage is unavailable.
+    }
+  };
+
+  const getEffectiveTheme = (theme = getStoredTheme()) => {
+    if (theme === 'dark' || theme === 'light') return theme;
+    return systemThemeQuery.matches ? 'dark' : 'light';
+  };
+
+  const updateThemeColor = (theme) => {
+    document
+      .querySelectorAll('meta[name="theme-color"]')
+      .forEach((meta) => meta.setAttribute('content', themeColors[theme]));
+  };
+
+  const syncThemeControls = (theme) => {
+    const isDark = theme === 'dark';
+    const label = isDark ? 'Включить светлую тему' : 'Включить темную тему';
+
+    themeToggles.forEach((toggle) => {
+      toggle.setAttribute('aria-label', label);
+      toggle.setAttribute('aria-pressed', String(isDark));
+      toggle.setAttribute('title', label);
+    });
+  };
+
+  const applyTheme = (theme = getStoredTheme()) => {
+    const effectiveTheme = getEffectiveTheme(theme);
+
+    if (theme === 'dark' || theme === 'light') {
+      document.documentElement.dataset.theme = theme;
+    } else {
+      document.documentElement.removeAttribute('data-theme');
+    }
+
+    document.documentElement.dataset.effectiveTheme = effectiveTheme;
+    updateThemeColor(effectiveTheme);
+    syncThemeControls(effectiveTheme);
+    window.dispatchEvent(new CustomEvent('tarski:themechange', {
+      detail: { theme: effectiveTheme }
+    }));
+  };
+
+  themeToggles.forEach((toggle) => {
+    toggle.addEventListener('click', () => {
+      const nextTheme = getEffectiveTheme() === 'dark' ? 'light' : 'dark';
+      setStoredTheme(nextTheme);
+      applyTheme(nextTheme);
+    });
+  });
+
+  systemThemeQuery.addEventListener('change', () => {
+    if (!getStoredTheme()) {
+      applyTheme(null);
+    }
+  });
+
+  applyTheme();
+})();
+
+(() => {
   const navLinks = Array.from(document.querySelectorAll('.main-nav a[href^="#"], .mobile-menu-panel a[href^="#"]'));
   const primaryNavLinks = Array.from(document.querySelectorAll('.main-nav a[href^="#"]'));
   const sections = primaryNavLinks
@@ -553,6 +635,7 @@
   reducedMotionQuery.addEventListener('change', syncTrail);
   finePointerQuery.addEventListener('change', syncTrail);
   colorSchemeQuery.addEventListener('change', readTrailColor);
+  window.addEventListener('tarski:themechange', readTrailColor);
 
   syncTrail();
 })();
