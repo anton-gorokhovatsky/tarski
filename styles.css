@@ -319,9 +319,7 @@ ul {
 }
 
 .artist-card {
-  --artist-card-shift: 0px;
   --artist-focus-ease: cubic-bezier(0.22, 0.61, 0.36, 1);
-  --artist-image-x: 0px;
   --artist-image-y: 0px;
   --artist-image-scale: 1;
   position: relative;
@@ -331,8 +329,6 @@ ul {
   gap: 30px;
   align-items: start;
   padding: 0 0 44px;
-  transform: translateX(var(--artist-card-shift));
-  transition: transform 620ms var(--artist-focus-ease);
 }
 
 .artist-card + .artist-card {
@@ -346,18 +342,15 @@ ul {
 }
 
 .artist-card:nth-child(3) {
-  --artist-image-x: -8px;
   --artist-image-y: -4px;
 }
 
 .artist-card:nth-child(4) {
-  --artist-image-x: 8px;
   --artist-image-y: 12px;
   --artist-image-scale: 0.94;
 }
 
 .artist-card:nth-child(5) {
-  --artist-image-x: -5px;
   --artist-image-scale: 1.03;
 }
 
@@ -366,7 +359,6 @@ ul {
 }
 
 .artist-card:nth-child(7) {
-  --artist-image-x: 6px;
   --artist-image-scale: 0.97;
 }
 
@@ -377,9 +369,9 @@ ul {
   height: var(--artist-image-height);
   object-fit: cover;
   transform:
-    translate(var(--artist-image-x), var(--artist-image-y))
+    translateY(var(--artist-image-y))
     scale(var(--artist-active-image-scale, var(--artist-image-scale)));
-  transform-origin: center;
+  transform-origin: left center;
   transition:
     opacity 420ms ease,
     transform 680ms var(--artist-focus-ease);
@@ -469,10 +461,7 @@ ul {
 }
 
 .has-text-focus .artist-card.focus-text {
-  --artist-card-shift: 0px;
-  transition:
-    color 320ms ease,
-    transform 620ms var(--artist-focus-ease);
+  transition: color 320ms ease;
 }
 
 .has-text-focus .artist-card.focus-text .artist-card__role {
@@ -485,10 +474,6 @@ ul {
 
 .has-text-focus .artist-card.focus-text .artist-card__link {
   opacity: 0.46;
-}
-
-.has-text-focus .artist-card.focus-text.is-text-focus-active {
-  --artist-card-shift: 6px;
 }
 
 .has-text-focus .artist-card.focus-text.is-text-focus-active .artist-card__role {
@@ -709,17 +694,11 @@ ul {
   }
 
   .artist-card:nth-child(n) {
-    --artist-image-x: 0px;
     --artist-image-y: 0px;
     --artist-image-scale: 1;
   }
 
-  .artist-card:nth-child(2n) {
-    --artist-image-x: 12px;
-  }
-
   .artist-card:nth-child(3n) {
-    --artist-image-x: 24px;
     --artist-image-scale: 0.96;
   }
 
@@ -746,10 +725,6 @@ ul {
   .artist-card__links {
     gap: 6px;
     margin-top: -5px;
-  }
-
-  .has-text-focus .artist-card.focus-text.is-text-focus-active {
-    --artist-card-shift: 0px;
   }
 
   .has-text-focus .artist-card.focus-text.is-text-focus-active .artist-card__image {
