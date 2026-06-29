@@ -481,6 +481,36 @@ a:hover {
   padding-top: 80px;
 }
 
+.section-intro {
+  display: grid;
+  grid-template-columns: 132px minmax(0, 1fr);
+  column-gap: 34px;
+}
+
+.section-intro::before {
+  content: attr(data-section-label);
+  grid-column: 1;
+  align-self: start;
+  padding-top: 11px;
+  color: var(--muted-text);
+  font-size: 13px;
+  line-height: 1.15;
+  text-transform: lowercase;
+}
+
+.section-intro h1,
+.section-intro .lead {
+  grid-column: 2;
+}
+
+.section-intro h1 {
+  margin-bottom: 0;
+}
+
+.section-intro .lead {
+  margin-top: 20px;
+}
+
 h1,
 h2,
 h3,
@@ -599,6 +629,10 @@ ul {
 }
 
 .artists-section h1 {
+  margin-bottom: 56px;
+}
+
+.artists-section .section-intro {
   margin-bottom: 56px;
 }
 
@@ -872,6 +906,11 @@ ul {
     font-size: 42px;
   }
 
+  .section-intro {
+    grid-template-columns: 96px minmax(0, 1fr);
+    column-gap: 24px;
+  }
+
   .editorial-block {
     grid-template-columns: 96px minmax(0, 1fr);
     column-gap: 24px;
@@ -980,6 +1019,20 @@ ul {
     margin: 64px 0 28px;
     font-size: 32px;
     line-height: 1.12;
+  }
+
+  .section-intro {
+    display: block;
+  }
+
+  .section-intro::before {
+    display: block;
+    margin-bottom: 18px;
+    padding-top: 0;
+  }
+
+  .section-intro .lead {
+    margin-top: 20px;
   }
 
   .editorial-block {
