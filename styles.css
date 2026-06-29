@@ -338,7 +338,6 @@ ul {
 
 .artist-card:nth-child(2) {
   --artist-image-y: 10px;
-  --artist-image-scale: 0.96;
 }
 
 .artist-card:nth-child(3) {
@@ -347,19 +346,10 @@ ul {
 
 .artist-card:nth-child(4) {
   --artist-image-y: 12px;
-  --artist-image-scale: 0.94;
-}
-
-.artist-card:nth-child(5) {
-  --artist-image-scale: 1.03;
 }
 
 .artist-card:nth-child(6) {
   --artist-image-y: 8px;
-}
-
-.artist-card:nth-child(7) {
-  --artist-image-scale: 0.97;
 }
 
 .artist-card__image {
@@ -481,7 +471,7 @@ ul {
 }
 
 .has-text-focus .artist-card.focus-text.is-text-focus-active .artist-card__image {
-  --artist-active-image-scale: 1.045;
+  --artist-active-image-scale: 1.02;
   opacity: 1;
 }
 
@@ -702,11 +692,6 @@ ul {
 
   .artist-card:nth-child(n) {
     --artist-image-y: 0px;
-    --artist-image-scale: 1;
-  }
-
-  .artist-card:nth-child(3n) {
-    --artist-image-scale: 0.96;
   }
 
   .artist-card__image {
@@ -735,7 +720,7 @@ ul {
   }
 
   .has-text-focus .artist-card.focus-text.is-text-focus-active .artist-card__image {
-    --artist-active-image-scale: 1.025;
+    --artist-active-image-scale: 1.02;
   }
 
   .site-footer {

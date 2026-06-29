@@ -191,11 +191,11 @@
   const artistCards = Array.from(document.querySelectorAll('main.content .artist-card'));
   const groupedTextItems = new Set();
 
-  const makeFocusUnit = (elements) => ({
+  const makeFocusUnit = (elements, rectElements = elements) => ({
     anchor: elements[0],
     elements,
     getRect() {
-      return elements.reduce((bounds, element) => {
+      return rectElements.reduce((bounds, element) => {
         const rect = element.getBoundingClientRect();
 
         if (!bounds) {
@@ -249,7 +249,7 @@
 
   const focusUnits = [
     ...textUnits,
-    ...artistCards.map((card) => makeFocusUnit([card]))
+    ...artistCards.map((card) => makeFocusUnit([card], [card.querySelector('.artist-card__body') || card]))
   ].sort((first, second) => {
     if (first.anchor === second.anchor) return 0;
     return first.anchor.compareDocumentPosition(second.anchor) & Node.DOCUMENT_POSITION_PRECEDING ? 1 : -1;
