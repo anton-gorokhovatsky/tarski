@@ -37,6 +37,9 @@
   --mobile-pill-fallback-bg: rgba(242, 242, 242, 0.96);
   --focus-text-muted: #b8b8b8;
   --cursor-trail-rgb: 0 0 0;
+  --cursor-trail-base-width: 1.15;
+  --cursor-trail-extra-width: 0.65;
+  --cursor-trail-opacity: 0.95;
   --page-padding-x: 45px;
   --content-width: 890px;
   --menu-width: 199px;
@@ -103,6 +106,24 @@
   --mobile-pill-fallback-bg: rgba(16, 16, 16, 0.96);
   --focus-text-muted: #787878;
   --cursor-trail-rgb: 242 242 242;
+}
+
+:root[data-scene="about"] {
+  --cursor-trail-base-width: 1;
+  --cursor-trail-extra-width: 0.55;
+  --cursor-trail-opacity: 0.88;
+}
+
+:root[data-scene="patrons"] {
+  --cursor-trail-base-width: 1.2;
+  --cursor-trail-extra-width: 0.72;
+  --cursor-trail-opacity: 0.92;
+}
+
+:root[data-scene="artists"] {
+  --cursor-trail-base-width: 1.3;
+  --cursor-trail-extra-width: 0.5;
+  --cursor-trail-opacity: 0.9;
 }
 
 /*

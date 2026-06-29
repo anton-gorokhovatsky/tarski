@@ -91,9 +91,17 @@
   const mobileMenu = document.querySelector('[data-mobile-menu]');
   const mobilePanel = mobileMenu?.querySelector('.mobile-menu-panel');
   const mobileScroller = mobileMenu?.querySelector('[data-mobile-menu-scroller]') || mobilePanel;
+  const navLabel = mainNav?.querySelector('.nav-label');
   const mobileQuery = window.matchMedia('(max-width: 720px)');
+  const sceneLabels = {
+    cover: 'Меню',
+    about: 'Среда',
+    patrons: 'Участие',
+    artists: 'Сеть'
+  };
 
   let currentActiveId = null;
+  let currentScene = document.documentElement.dataset.scene || 'cover';
   let scrollTimer = null;
   const indicatorTimers = new WeakMap();
   const mobileCoverIndicatorX = 22;
@@ -106,6 +114,22 @@
     indicatorTimers.set(container, window.setTimeout(() => {
       container.classList.remove('is-indicator-moving');
     }, 280));
+  };
+
+  const setScene = (id) => {
+    const scene = id || 'cover';
+    if (currentScene === scene) return;
+
+    currentScene = scene;
+    document.documentElement.dataset.scene = scene;
+
+    if (navLabel) {
+      navLabel.textContent = sceneLabels[scene] || sceneLabels.cover;
+    }
+
+    window.dispatchEvent(new CustomEvent('tarski:scenechange', {
+      detail: { scene }
+    }));
   };
 
   const updateDesktopIndicator = (animate = false) => {
@@ -190,6 +214,7 @@
     const previousActiveId = currentActiveId;
     const hasChanged = previousActiveId !== id;
     currentActiveId = id;
+    setScene(id);
 
     navLinks.forEach((link) => {
       const isActive = link.getAttribute('href') === `#${id}`;
@@ -418,16 +443,24 @@
   let points = [];
   let deviceScale = 1;
   let trailRgb = '0, 0, 0';
+  let trailBaseWidth = 1.15;
+  let trailExtraWidth = 0.65;
+  let trailOpacity = 0.95;
   let hasPointerPosition = false;
 
   const shouldRun = () => finePointerQuery.matches && !reducedMotionQuery.matches;
 
-  const readTrailColor = () => {
-    const rawColor = getComputedStyle(document.documentElement)
-      .getPropertyValue('--cursor-trail-rgb')
-      .trim();
+  const readTrailSettings = () => {
+    const rootStyles = getComputedStyle(document.documentElement);
+    const rawColor = rootStyles.getPropertyValue('--cursor-trail-rgb').trim();
+    const baseWidth = parseFloat(rootStyles.getPropertyValue('--cursor-trail-base-width'));
+    const extraWidth = parseFloat(rootStyles.getPropertyValue('--cursor-trail-extra-width'));
+    const opacity = parseFloat(rootStyles.getPropertyValue('--cursor-trail-opacity'));
 
     trailRgb = rawColor ? rawColor.split(/\s+/).join(', ') : '0, 0, 0';
+    trailBaseWidth = Number.isFinite(baseWidth) ? baseWidth : 1.15;
+    trailExtraWidth = Number.isFinite(extraWidth) ? extraWidth : 0.65;
+    trailOpacity = Number.isFinite(opacity) ? opacity : 0.95;
   };
 
   const resizeCanvas = () => {
@@ -496,8 +529,8 @@
         endX,
         endY
       );
-      context.lineWidth = 1.15 + life * 0.65;
-      context.strokeStyle = `rgba(${trailRgb}, ${life * 0.95})`;
+      context.lineWidth = trailBaseWidth + life * trailExtraWidth;
+      context.strokeStyle = `rgba(${trailRgb}, ${life * trailOpacity})`;
       context.stroke();
     }
 
@@ -589,7 +622,7 @@
     }
 
     document.body.append(canvas);
-    readTrailColor();
+    readTrailSettings();
     resizeCanvas();
 
     window.addEventListener('pointermove', rememberPoint, { passive: true });
@@ -634,8 +667,9 @@
 
   reducedMotionQuery.addEventListener('change', syncTrail);
   finePointerQuery.addEventListener('change', syncTrail);
-  colorSchemeQuery.addEventListener('change', readTrailColor);
-  window.addEventListener('tarski:themechange', readTrailColor);
+  colorSchemeQuery.addEventListener('change', readTrailSettings);
+  window.addEventListener('tarski:themechange', readTrailSettings);
+  window.addEventListener('tarski:scenechange', readTrailSettings);
 
   syncTrail();
 })();
