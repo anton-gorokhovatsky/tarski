@@ -522,25 +522,35 @@ ul {
 .site-footer__texts {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  width: 100%;
-  align-items: stretch;
+  gap: 7px;
+  width: min(100%, 1040px);
+  margin: 10px auto 0;
+  padding-bottom: 22px;
+  align-items: center;
 }
 
 .site-footer__year,
 .site-footer__disclaimer {
   margin: 0;
-  font-size: 20px;
-  line-height: 1.25;
   text-align: center;
 }
 
 .site-footer__year {
-  padding-top: 20px;
+  color: var(--text);
+  font-size: 18px;
+  line-height: 1;
 }
 
 .site-footer__disclaimer {
-  padding-bottom: 20px;
+  max-width: 100%;
+  color: var(--muted-text);
+  font-size: 16px;
+  line-height: 1.18;
+}
+
+.site-footer__disclaimer sup {
+  font-size: 0.8em;
+  line-height: 0;
 }
 
 @media (min-width: 961px) {
@@ -752,7 +762,21 @@ ul {
 
   .site-footer__year,
   .site-footer__disclaimer {
+    font-size: 15px;
+  }
+
+  .site-footer__texts {
+    gap: 8px;
+    margin-top: 12px;
+    padding-bottom: 18px;
+  }
+
+  .site-footer__year {
     font-size: 16px;
+  }
+
+  .site-footer__disclaimer {
+    line-height: 1.18;
   }
 }
 
