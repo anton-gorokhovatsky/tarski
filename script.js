@@ -14,6 +14,8 @@
   let currentActiveId = null;
   let scrollTimer = null;
   const indicatorTimers = new WeakMap();
+  const desktopCoverIndicatorY = -8;
+  const mobileCoverIndicatorX = 22;
 
   const pulseIndicator = (container) => {
     if (!container) return;
@@ -30,7 +32,8 @@
 
     const activeLink = mainNav.querySelector('a.is-active[href^="#"]');
     if (!activeLink) {
-      mainNav.style.setProperty('--nav-indicator-opacity', '0');
+      mainNav.style.setProperty('--nav-indicator-y', `${desktopCoverIndicatorY}px`);
+      mainNav.style.setProperty('--nav-indicator-opacity', '0.58');
       return;
     }
 
@@ -51,6 +54,7 @@
 
     const activeLink = mobilePanel.querySelector('a.is-active[href^="#"]');
     if (!activeLink) {
+      mobilePanel.style.setProperty('--mobile-indicator-x', `${mobileCoverIndicatorX}px`);
       mobilePanel.style.setProperty('--mobile-indicator-opacity', '0');
       return;
     }
@@ -128,6 +132,14 @@
     if (!sections.length) return;
 
     const marker = window.scrollY + window.innerHeight * 0.38;
+    const firstSection = sections[0];
+    const coverExitOffset = firstSection.offsetTop - window.innerHeight * 0.06;
+
+    if (marker < coverExitOffset) {
+      setActive(null);
+      return;
+    }
+
     let current = sections[0];
 
     sections.forEach((section) => {

@@ -188,8 +188,8 @@ a:hover {
 }
 
 .main-nav {
-  --nav-indicator-y: 10px;
-  --nav-indicator-opacity: 1;
+  --nav-indicator-y: -8px;
+  --nav-indicator-opacity: 0.58;
   position: relative;
   width: var(--menu-width);
   font-size: 16px;
