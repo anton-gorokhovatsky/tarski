@@ -147,7 +147,7 @@ a:hover {
 
 .brand {
   display: block;
-  width: 315px;
+  width: clamp(300px, 22vw, 390px);
   max-width: 62vw;
 }
 
