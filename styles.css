@@ -36,10 +36,18 @@
   --mobile-bottom-pill-shadow: var(--shadow-mobile-bottom-pill);
   --mobile-pill-fallback-bg: rgba(242, 242, 242, 0.96);
   --focus-text-muted: #b8b8b8;
+  --focus-transition-duration: var(--duration-fast);
   --cursor-trail-rgb: 0 0 0;
   --cursor-trail-base-width: 1.15;
   --cursor-trail-extra-width: 0.65;
   --cursor-trail-opacity: 0.95;
+  --nav-indicator-rotation: -3deg;
+  --nav-indicator-scale: 1;
+  --nav-indicator-moving-rotation: 7deg;
+  --nav-indicator-moving-scale: 1.12;
+  --scene-label-opacity: 0.68;
+  --scene-label-active-opacity: 0.96;
+  --scene-label-active-shift: -4px;
   --page-padding-x: 45px;
   --content-width: 890px;
   --menu-width: 199px;
@@ -75,6 +83,7 @@
     --mobile-pill-fallback-bg: rgba(16, 16, 16, 0.96);
     --focus-text-muted: #787878;
     --cursor-trail-rgb: 242 242 242;
+    --scene-label-opacity: 0.76;
   }
 }
 
@@ -106,24 +115,48 @@
   --mobile-pill-fallback-bg: rgba(16, 16, 16, 0.96);
   --focus-text-muted: #787878;
   --cursor-trail-rgb: 242 242 242;
+  --scene-label-opacity: 0.76;
+}
+
+:root[data-scene="cover"] {
+  --cursor-trail-base-width: 1.08;
+  --cursor-trail-extra-width: 0.58;
+  --nav-indicator-rotation: -4deg;
+  --nav-indicator-moving-rotation: 6deg;
 }
 
 :root[data-scene="about"] {
   --cursor-trail-base-width: 1;
   --cursor-trail-extra-width: 0.55;
   --cursor-trail-opacity: 0.88;
+  --focus-transition-duration: 220ms;
+  --nav-indicator-rotation: -5deg;
+  --nav-indicator-moving-rotation: 5deg;
+  --scene-label-active-shift: -3px;
 }
 
 :root[data-scene="patrons"] {
   --cursor-trail-base-width: 1.2;
   --cursor-trail-extra-width: 0.72;
   --cursor-trail-opacity: 0.92;
+  --focus-transition-duration: 300ms;
+  --nav-indicator-rotation: 3deg;
+  --nav-indicator-scale: 1.04;
+  --nav-indicator-moving-rotation: -5deg;
+  --nav-indicator-moving-scale: 1.1;
+  --scene-label-active-shift: -2px;
 }
 
 :root[data-scene="artists"] {
   --cursor-trail-base-width: 1.3;
   --cursor-trail-extra-width: 0.5;
   --cursor-trail-opacity: 0.9;
+  --focus-transition-duration: 360ms;
+  --nav-indicator-rotation: -7deg;
+  --nav-indicator-scale: 1.03;
+  --nav-indicator-moving-rotation: 2deg;
+  --nav-indicator-moving-scale: 1.08;
+  --scene-label-active-shift: -5px;
 }
 
 /*
@@ -206,7 +239,7 @@ a:hover {
 
 .has-text-focus .focus-text {
   color: var(--focus-text-muted);
-  transition: color var(--duration-fast) var(--ease-smooth);
+  transition: color var(--focus-transition-duration) var(--ease-smooth);
 }
 
 .has-text-focus .focus-text.is-text-focus-active {
@@ -269,12 +302,18 @@ a:hover {
   height: 24px;
   background: url("assets/menu-shape.svg") center / contain no-repeat;
   filter: var(--indicator-filter);
-  transform: translate3d(0, -50%, 0) rotateZ(-3deg) scale(1);
+  transform:
+    translate3d(0, -50%, 0)
+    rotateZ(var(--nav-indicator-rotation))
+    scale(var(--nav-indicator-scale));
   transform-origin: 50% 64%;
 }
 
 .main-nav.is-indicator-moving::before {
-  transform: translate3d(0, -50%, 0) rotateZ(7deg) scale(1.12);
+  transform:
+    translate3d(0, -50%, 0)
+    rotateZ(var(--nav-indicator-moving-rotation))
+    scale(var(--nav-indicator-moving-scale));
 }
 
 .main-nav .nav-label {
@@ -298,8 +337,12 @@ a:hover {
   background: url("assets/menu-shape.svg") center / contain no-repeat;
   filter: var(--indicator-filter);
   opacity: 0;
-  transform: rotateZ(-3deg);
-  transition: opacity var(--duration-fast) var(--ease-smooth);
+  transform:
+    rotateZ(var(--nav-indicator-rotation))
+    scale(var(--nav-indicator-scale));
+  transition:
+    opacity var(--duration-fast) var(--ease-smooth),
+    transform var(--duration-fast) var(--ease-smooth);
 }
 
 .main-nav.is-cover-state .nav-label {
@@ -496,6 +539,20 @@ a:hover {
   font-size: 13px;
   line-height: 1.15;
   text-transform: lowercase;
+  opacity: var(--scene-label-opacity);
+  transform: translateX(0);
+  transition:
+    color var(--focus-transition-duration) var(--ease-smooth),
+    opacity var(--focus-transition-duration) var(--ease-smooth),
+    transform var(--focus-transition-duration) var(--ease-smooth);
+}
+
+:root[data-scene="about"] #about > .section-intro::before,
+:root[data-scene="patrons"] #patrons > .section-intro::before,
+:root[data-scene="artists"] #artists > .section-intro::before {
+  color: var(--text);
+  opacity: var(--scene-label-active-opacity);
+  transform: translateX(var(--scene-label-active-shift));
 }
 
 .section-intro h1,
@@ -582,6 +639,18 @@ ul {
   line-height: 1.15;
   font-weight: 400;
   text-transform: lowercase;
+  opacity: var(--scene-label-opacity);
+  transform: translateX(0);
+  transition:
+    color var(--focus-transition-duration) var(--ease-smooth),
+    opacity var(--focus-transition-duration) var(--ease-smooth),
+    transform var(--focus-transition-duration) var(--ease-smooth);
+}
+
+:root[data-scene="about"] #about .editorial-block__marker,
+:root[data-scene="patrons"] #patrons .editorial-block__marker {
+  opacity: 0.86;
+  transform: translateX(var(--scene-label-active-shift));
 }
 
 .editorial-block__content {
@@ -1271,12 +1340,18 @@ ul {
     height: 22px;
     background: url("assets/menu-shape.svg") center / contain no-repeat;
     filter: var(--indicator-filter);
-    transform: translate3d(var(--mobile-indicator-x), -50%, 0) rotateZ(-3deg) scale(1);
+    transform:
+      translate3d(var(--mobile-indicator-x), -50%, 0)
+      rotateZ(var(--nav-indicator-rotation))
+      scale(var(--nav-indicator-scale));
     transform-origin: 50% 64%;
   }
 
   .mobile-menu-panel.is-indicator-moving::before {
-    transform: translate3d(var(--mobile-indicator-x), -50%, 0) rotateZ(7deg) scale(1.12);
+    transform:
+      translate3d(var(--mobile-indicator-x), -50%, 0)
+      rotateZ(var(--nav-indicator-moving-rotation))
+      scale(var(--nav-indicator-moving-scale));
   }
 
   .mobile-mail-pill {
@@ -1423,7 +1498,9 @@ ul {
     background: url("assets/menu-shape.svg") center / contain no-repeat;
     opacity: 1;
     filter: var(--indicator-filter);
-    transform: rotateZ(-3deg);
+    transform:
+      rotateZ(var(--nav-indicator-rotation))
+      scale(var(--nav-indicator-scale));
   }
 
   @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
@@ -1490,10 +1567,16 @@ ul {
   }
 
   .main-nav.is-indicator-moving::before {
-    transform: translate3d(0, -50%, 0) rotateZ(-3deg) scale(1);
+    transform:
+      translate3d(0, -50%, 0)
+      rotateZ(var(--nav-indicator-rotation))
+      scale(var(--nav-indicator-scale));
   }
 
   .mobile-menu-panel.is-indicator-moving::before {
-    transform: translate3d(var(--mobile-indicator-x), -50%, 0) rotateZ(-3deg) scale(1);
+    transform:
+      translate3d(var(--mobile-indicator-x), -50%, 0)
+      rotateZ(var(--nav-indicator-rotation))
+      scale(var(--nav-indicator-scale));
   }
 }
