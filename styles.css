@@ -823,29 +823,29 @@ ul {
 }
 
 .site-footer__texts {
-  display: flex;
-  flex-direction: column;
-  gap: 7px;
-  width: min(100%, 1040px);
-  margin: 10px auto 0;
+  display: grid;
+  grid-template-columns: 132px minmax(0, 1fr);
+  column-gap: 34px;
+  width: min(100%, var(--content-width));
+  margin: 14px auto 0;
   padding-bottom: 22px;
-  align-items: center;
+  align-items: start;
 }
 
 .site-footer__year,
 .site-footer__disclaimer {
   margin: 0;
-  text-align: center;
+  text-align: left;
 }
 
 .site-footer__year {
-  color: var(--text);
-  font-size: 18px;
-  line-height: 1;
+  color: var(--muted-text);
+  font-size: 13px;
+  line-height: 1.15;
 }
 
 .site-footer__disclaimer {
-  max-width: 100%;
+  max-width: 52em;
   color: var(--muted-text);
   font-size: 16px;
   line-height: 1.18;
@@ -907,6 +907,11 @@ ul {
   }
 
   .section-intro {
+    grid-template-columns: 96px minmax(0, 1fr);
+    column-gap: 24px;
+  }
+
+  .site-footer__texts {
     grid-template-columns: 96px minmax(0, 1fr);
     column-gap: 24px;
   }
@@ -1143,13 +1148,14 @@ ul {
   }
 
   .site-footer__texts {
-    gap: 8px;
+    display: block;
     margin-top: 12px;
     padding-bottom: 18px;
   }
 
   .site-footer__year {
-    font-size: 16px;
+    margin-bottom: 8px;
+    font-size: 13px;
   }
 
   .site-footer__disclaimer {
