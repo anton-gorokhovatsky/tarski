@@ -633,6 +633,8 @@ ul {
 }
 
 .artists-section .section-intro {
+  grid-template-columns: var(--artist-image-width) minmax(0, 1fr);
+  column-gap: 30px;
   margin-bottom: 56px;
 }
 
@@ -914,6 +916,11 @@ ul {
   .section-intro {
     grid-template-columns: 96px minmax(0, 1fr);
     column-gap: 24px;
+  }
+
+  .artists-section .section-intro {
+    grid-template-columns: var(--artist-image-width) minmax(0, 1fr);
+    column-gap: 30px;
   }
 
   .site-footer__texts {
