@@ -818,25 +818,26 @@ li::before {
 }
 
 .artists-section .section-intro {
-  grid-template-columns: var(--artist-image-width) minmax(0, 1fr);
-  column-gap: 30px;
   margin-bottom: 56px;
 }
 
 .artist-index {
-  --artist-index-width: min(1400px, calc(100vw - (var(--page-padding-x) * 2) - var(--menu-width) - 80px));
+  --artist-index-width: min(1120px, calc(100vw - (var(--page-padding-x) * 2) - var(--menu-width) - 80px));
+  --artist-index-wash: rgba(0, 0, 0, 0);
   position: relative;
   z-index: 2;
   isolation: isolate;
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
+  flex-wrap: nowrap;
   justify-content: center;
-  gap: 0.02em 0.24em;
+  align-items: center;
+  gap: 0.04em;
   width: var(--artist-index-width);
-  margin: -10px 0 96px;
+  margin: -10px auto 96px;
   font-family: Georgia, "Times New Roman", serif;
   font-size: clamp(44px, 5.7vw, 86px);
-  line-height: 0.9;
+  line-height: 0.86;
   text-align: center;
 }
 
@@ -845,11 +846,11 @@ li::before {
   position: fixed;
   left: 50%;
   top: 55%;
-  z-index: 1;
-  width: min(30vw, 390px);
+  z-index: 2;
+  width: min(36vw, 470px);
   max-width: calc(100vw - 80px);
   aspect-ratio: 0.72;
-  background: var(--artist-index-preview) center / cover no-repeat;
+  background: var(--artist-index-preview) center / contain no-repeat;
   opacity: 0;
   transform: translate3d(-50%, -48%, 0) scale(0.96);
   transition:
@@ -859,10 +860,25 @@ li::before {
   will-change: opacity, transform;
 }
 
+.artist-index::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background: var(--artist-index-wash);
+  opacity: 0;
+  transition:
+    background-color var(--duration-normal) var(--ease-smooth),
+    opacity var(--duration-normal) var(--ease-smooth);
+  pointer-events: none;
+}
+
 .artist-index__link {
   position: relative;
-  z-index: 2;
-  display: inline-block;
+  z-index: 1;
+  display: block;
+  width: max-content;
+  max-width: 100%;
   color: var(--text);
   text-decoration: none;
   transform-origin: center baseline;
@@ -891,32 +907,44 @@ li::before {
     transform: translate3d(-50%, -48%, 0) scale(1);
   }
 
+  .artist-index:has(.artist-index__link:hover)::after,
+  .artist-index:has(.artist-index__link:focus-visible)::after {
+    opacity: 1;
+  }
+
   .artist-index:has(.artist-index__link:nth-child(1):is(:hover, :focus-visible)) {
     --artist-index-preview: url("assets/artist-cover.png");
+    --artist-index-wash: rgba(176, 170, 154, 0.42);
   }
 
   .artist-index:has(.artist-index__link:nth-child(2):is(:hover, :focus-visible)) {
     --artist-index-preview: url("assets/irhs.png");
+    --artist-index-wash: rgba(232, 232, 224, 0.44);
   }
 
   .artist-index:has(.artist-index__link:nth-child(3):is(:hover, :focus-visible)) {
     --artist-index-preview: url("assets/ish_nadya.png");
+    --artist-index-wash: rgba(206, 197, 183, 0.4);
   }
 
   .artist-index:has(.artist-index__link:nth-child(4):is(:hover, :focus-visible)) {
     --artist-index-preview: url("assets/kolesnikova.png");
+    --artist-index-wash: rgba(205, 207, 199, 0.42);
   }
 
   .artist-index:has(.artist-index__link:nth-child(5):is(:hover, :focus-visible)) {
     --artist-index-preview: url("assets/kugush.png");
+    --artist-index-wash: rgba(205, 184, 158, 0.4);
   }
 
   .artist-index:has(.artist-index__link:nth-child(6):is(:hover, :focus-visible)) {
     --artist-index-preview: url("assets/noexcusegroup.png");
+    --artist-index-wash: rgba(118, 126, 118, 0.34);
   }
 
   .artist-index:has(.artist-index__link:nth-child(7):is(:hover, :focus-visible)) {
     --artist-index-preview: url("assets/orlova.png");
+    --artist-index-wash: rgba(202, 202, 196, 0.4);
   }
 
   .artist-index:has(.artist-index__link:hover) .artist-index__link:not(:hover),
@@ -924,13 +952,43 @@ li::before {
     opacity: 0.18;
   }
 
-  .artist-index__link:hover {
+  .artist-index__link:hover,
+  .artist-index__link:focus-visible {
+    z-index: 3;
     transform: translateY(-0.04em) scale(1.025);
   }
 
   :root[data-effective-theme="dark"] .artist-index__link:hover,
   :root[data-effective-theme="dark"] .artist-index__link:focus-visible {
     mix-blend-mode: difference;
+  }
+
+  :root[data-effective-theme="dark"] .artist-index:has(.artist-index__link:nth-child(1):is(:hover, :focus-visible)) {
+    --artist-index-wash: rgba(176, 170, 154, 0.18);
+  }
+
+  :root[data-effective-theme="dark"] .artist-index:has(.artist-index__link:nth-child(2):is(:hover, :focus-visible)) {
+    --artist-index-wash: rgba(232, 232, 224, 0.16);
+  }
+
+  :root[data-effective-theme="dark"] .artist-index:has(.artist-index__link:nth-child(3):is(:hover, :focus-visible)) {
+    --artist-index-wash: rgba(206, 197, 183, 0.16);
+  }
+
+  :root[data-effective-theme="dark"] .artist-index:has(.artist-index__link:nth-child(4):is(:hover, :focus-visible)) {
+    --artist-index-wash: rgba(205, 207, 199, 0.16);
+  }
+
+  :root[data-effective-theme="dark"] .artist-index:has(.artist-index__link:nth-child(5):is(:hover, :focus-visible)) {
+    --artist-index-wash: rgba(205, 184, 158, 0.16);
+  }
+
+  :root[data-effective-theme="dark"] .artist-index:has(.artist-index__link:nth-child(6):is(:hover, :focus-visible)) {
+    --artist-index-wash: rgba(118, 126, 118, 0.16);
+  }
+
+  :root[data-effective-theme="dark"] .artist-index:has(.artist-index__link:nth-child(7):is(:hover, :focus-visible)) {
+    --artist-index-wash: rgba(202, 202, 196, 0.16);
   }
 }
 
@@ -1016,10 +1074,10 @@ li::before {
 }
 
 .artist-card__header {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 4px 10px;
-  align-items: flex-start;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  align-items: center;
   margin-bottom: 14px;
 }
 
@@ -1045,7 +1103,6 @@ li::before {
   align-items: center;
   flex: 0 0 auto;
   margin-top: -6px;
-  justify-self: end;
   line-height: 1.2;
 }
 
@@ -1240,8 +1297,7 @@ li::before {
   }
 
   .artists-section .section-intro {
-    grid-template-columns: var(--artist-image-width) minmax(0, 1fr);
-    column-gap: 30px;
+    margin-bottom: 56px;
   }
 
   .artist-index {
@@ -1432,15 +1488,22 @@ li::before {
   .artist-index {
     width: 100%;
     justify-content: flex-start;
-    gap: 0.02em 0.22em;
+    align-items: flex-start;
+    gap: 0.04em;
     margin: 0 0 48px;
     font-size: clamp(34px, 12vw, 56px);
-    line-height: 0.95;
+    line-height: 0.92;
     text-align: left;
   }
 
-  .artist-index::before {
+  .artist-index::before,
+  .artist-index::after {
     display: none;
+  }
+
+  .artist-index__link {
+    width: auto;
+    max-width: 100%;
   }
 
   .artist-index__link,
