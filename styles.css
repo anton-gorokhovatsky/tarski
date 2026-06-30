@@ -464,10 +464,15 @@ a:hover {
 .theme-toggle__icon {
   position: relative;
   display: block;
-  width: 16px;
-  height: 16px;
+  width: 17px;
+  height: 17px;
   border: 1.5px solid currentColor;
   border-radius: 999px;
+  background: transparent;
+  transition:
+    background-color var(--duration-fast) var(--ease-smooth),
+    border-color var(--duration-fast) var(--ease-smooth),
+    transform var(--duration-fast) var(--ease-smooth);
 }
 
 .theme-toggle__icon::before,
@@ -481,28 +486,30 @@ a:hover {
 }
 
 .theme-toggle__icon::before {
-  inset: 3px;
+  inset: 4px;
   background: currentColor;
-  opacity: 0.2;
+  opacity: 0;
+  transform: scale(0.68);
 }
 
 .theme-toggle__icon::after {
-  top: -2px;
-  right: -2px;
-  width: 10px;
-  height: 20px;
-  background: var(--page-bg);
-  opacity: 0;
-  transform: translateX(5px);
+  top: 2px;
+  right: 2px;
+  width: 3.5px;
+  height: 3.5px;
+  background: currentColor;
+  opacity: 0.72;
+  transform: translate3d(4px, -4px, 0);
 }
 
 :root[data-effective-theme="dark"] .theme-toggle__icon::before {
-  opacity: 1;
+  opacity: 0.9;
+  transform: scale(1);
 }
 
 :root[data-effective-theme="dark"] .theme-toggle__icon::after {
-  opacity: 1;
-  transform: translateX(0);
+  opacity: 0.38;
+  transform: translate3d(-1px, 1px, 0) scale(0.72);
 }
 
 .content {
@@ -946,7 +953,10 @@ li::before {
   }
 
   .artist-index:has(.artist-index__link:nth-child(5):is(:hover, :focus-visible)) {
-    --artist-index-preview: url("assets/kugush.png");
+    --artist-index-preview: url("assets/artist-index/izobrazhenie-dsc05043-1-1500x.jpg");
+    --artist-index-preview-fit: cover;
+    --artist-index-preview-ratio: 0.75;
+    --artist-index-preview-width: min(32vw, 460px);
     --artist-index-wash: rgba(205, 184, 158, 0.4);
   }
 
