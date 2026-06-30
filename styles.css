@@ -693,7 +693,7 @@ ul {
 }
 
 .editorial-disclosure summary::after {
-  content: "+";
+  content: "";
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -702,6 +702,9 @@ ul {
   height: 22px;
   border: 1px solid currentColor;
   border-radius: 999px;
+  background:
+    linear-gradient(currentColor, currentColor) center / 9px 1.5px no-repeat,
+    linear-gradient(currentColor, currentColor) center / 1.5px 9px no-repeat;
   font-size: 18px;
   line-height: 1;
   transform: rotateZ(0deg);
@@ -711,7 +714,8 @@ ul {
 }
 
 .editorial-disclosure[open] summary::after {
-  content: "-";
+  background:
+    linear-gradient(currentColor, currentColor) center / 9px 1.5px no-repeat;
   transform: rotateZ(180deg);
 }
 
