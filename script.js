@@ -377,9 +377,11 @@
     })
     .filter(Boolean);
 
+  const artistFocusUnits = artistCards.map((card) => makeFocusUnit([card], [card.querySelector('.artist-card__body') || card]));
+  const artistFocusUnitsById = new Map(artistFocusUnits.map((item) => [item.anchor.id, item]));
   const focusUnits = [
     ...textUnits,
-    ...artistCards.map((card) => makeFocusUnit([card], [card.querySelector('.artist-card__body') || card]))
+    ...artistFocusUnits
   ].sort((first, second) => {
     if (first.anchor === second.anchor) return 0;
     return first.anchor.compareDocumentPosition(second.anchor) & Node.DOCUMENT_POSITION_PRECEDING ? 1 : -1;
@@ -429,7 +431,37 @@
     }
   };
 
+  const scrollArtistLinkToFocus = (event) => {
+    const hash = event.currentTarget.getAttribute('href');
+    if (!hash?.startsWith('#')) return;
+
+    const card = document.querySelector(hash);
+    const focusUnit = card ? artistFocusUnitsById.get(card.id) : null;
+    if (!card || !focusUnit) return;
+
+    event.preventDefault();
+
+    const target = card.querySelector('.artist-card__body') || card;
+    const rect = target.getBoundingClientRect();
+    const focusY = window.innerHeight * (window.innerWidth <= 720 ? 0.46 : 0.52);
+    const scrollTop = window.scrollY + rect.top - Math.max(24, focusY - rect.height / 2);
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    window.history.pushState(null, '', hash);
+    setActiveText(focusUnit);
+    window.scrollTo({
+      top: Math.max(0, scrollTop),
+      behavior: reducedMotion ? 'auto' : 'smooth'
+    });
+
+    window.setTimeout(scheduleTextFocusUpdate, reducedMotion ? 0 : 420);
+    window.setTimeout(scheduleTextFocusUpdate, reducedMotion ? 0 : 760);
+  };
+
   focusUnits.forEach((item) => item.elements.forEach((element) => element.classList.add('focus-text')));
+  document.querySelectorAll('.artist-index__link[href^="#artist-"]').forEach((link) => {
+    link.addEventListener('click', scrollArtistLinkToFocus);
+  });
   document.documentElement.classList.add('has-text-focus');
   updateTextFocus();
 
