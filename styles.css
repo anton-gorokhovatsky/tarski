@@ -845,6 +845,7 @@ ul {
 }
 
 .site-footer__disclaimer {
+  position: relative;
   max-width: 52em;
   color: var(--muted-text);
   font-size: 16px;
@@ -852,8 +853,12 @@ ul {
 }
 
 .site-footer__disclaimer sup {
+  position: absolute;
+  left: 0;
+  top: 0.02em;
+  transform: translateX(calc(-100% - 0.08em));
   font-size: 0.8em;
-  line-height: 0;
+  line-height: 1;
 }
 
 @media (min-width: 961px) {
