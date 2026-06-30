@@ -238,7 +238,7 @@
   const updateActive = () => {
     if (!sections.length) return;
 
-    const marker = window.scrollY + window.innerHeight * 0.38;
+    const marker = window.scrollY + window.innerHeight * 0.52;
     const firstSection = sections[0];
     const coverExitOffset = firstSection.offsetTop - window.innerHeight * 0.06;
 
