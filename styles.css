@@ -823,6 +823,9 @@ li::before {
 
 .artist-index {
   --artist-index-width: min(1120px, calc(100vw - (var(--page-padding-x) * 2) - var(--menu-width) - 80px));
+  --artist-index-preview-fit: contain;
+  --artist-index-preview-ratio: 0.72;
+  --artist-index-preview-width: min(36vw, 470px);
   --artist-index-wash: rgba(0, 0, 0, 0);
   position: relative;
   z-index: 2;
@@ -847,10 +850,11 @@ li::before {
   left: 50%;
   top: 55%;
   z-index: 2;
-  width: min(36vw, 470px);
+  width: var(--artist-index-preview-width);
   max-width: calc(100vw - 80px);
-  aspect-ratio: 0.72;
-  background: var(--artist-index-preview) center / contain no-repeat;
+  max-height: calc(100vh - 180px);
+  aspect-ratio: var(--artist-index-preview-ratio);
+  background: var(--artist-index-preview) center / var(--artist-index-preview-fit) no-repeat;
   opacity: 0;
   transform: translate3d(-50%, -48%, 0) scale(0.96);
   transition:
@@ -913,7 +917,10 @@ li::before {
   }
 
   .artist-index:has(.artist-index__link:nth-child(1):is(:hover, :focus-visible)) {
-    --artist-index-preview: url("assets/artist-cover.png");
+    --artist-index-preview: url("assets/artist-index/330551584_215344677620530_5433914055885423503_n.jpg");
+    --artist-index-preview-fit: cover;
+    --artist-index-preview-ratio: 1;
+    --artist-index-preview-width: min(36vw, 560px);
     --artist-index-wash: rgba(176, 170, 154, 0.42);
   }
 
@@ -923,12 +930,18 @@ li::before {
   }
 
   .artist-index:has(.artist-index__link:nth-child(3):is(:hover, :focus-visible)) {
-    --artist-index-preview: url("assets/ish_nadya.png");
+    --artist-index-preview: url("assets/artist-index/Надежда Ишкиняева.png");
+    --artist-index-preview-fit: cover;
+    --artist-index-preview-ratio: 0.711;
+    --artist-index-preview-width: min(30vw, 430px);
     --artist-index-wash: rgba(206, 197, 183, 0.4);
   }
 
   .artist-index:has(.artist-index__link:nth-child(4):is(:hover, :focus-visible)) {
-    --artist-index-preview: url("assets/kolesnikova.png");
+    --artist-index-preview: url("assets/artist-index/Елена Колесникова.webp");
+    --artist-index-preview-fit: cover;
+    --artist-index-preview-ratio: 0.667;
+    --artist-index-preview-width: min(30vw, 430px);
     --artist-index-wash: rgba(205, 207, 199, 0.42);
   }
 
@@ -938,7 +951,10 @@ li::before {
   }
 
   .artist-index:has(.artist-index__link:nth-child(6):is(:hover, :focus-visible)) {
-    --artist-index-preview: url("assets/noexcusegroup.png");
+    --artist-index-preview: url("assets/artist-index/0015.jpg.webp");
+    --artist-index-preview-fit: cover;
+    --artist-index-preview-ratio: 1.5;
+    --artist-index-preview-width: min(56vw, 760px);
     --artist-index-wash: rgba(118, 126, 118, 0.34);
   }
 
