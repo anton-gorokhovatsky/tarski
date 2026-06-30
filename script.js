@@ -340,6 +340,14 @@
     .map((item) => {
       if (groupedTextItems.has(item)) return null;
 
+      if (item.matches('.section-intro h1')) {
+        const intro = item.closest('.section-intro');
+        const elements = Array.from(intro?.querySelectorAll('h1, .lead') || [item]);
+
+        elements.slice(1).forEach((element) => groupedTextItems.add(element));
+        return makeFocusUnit(elements, intro ? [intro] : elements);
+      }
+
       if (item.matches('h3')) {
         const elements = [item];
         let sibling = item.nextElementSibling;
