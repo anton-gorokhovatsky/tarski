@@ -620,6 +620,95 @@ ul {
   padding-left: 1.25em;
 }
 
+.editorial-disclosure {
+  margin-top: 28px;
+}
+
+.editorial-disclosure summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  width: max-content;
+  max-width: 100%;
+  color: var(--muted-text);
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1.12;
+  list-style: none;
+  text-decoration: none;
+  transition:
+    color var(--focus-transition-duration) var(--ease-smooth),
+    transform var(--duration-fast) var(--ease-smooth);
+}
+
+.editorial-disclosure summary::-webkit-details-marker {
+  display: none;
+}
+
+.editorial-disclosure summary::after {
+  content: "+";
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 22px;
+  height: 22px;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  font-size: 18px;
+  line-height: 1;
+  transform: rotateZ(0deg);
+  transition:
+    border-color var(--focus-transition-duration) var(--ease-smooth),
+    transform var(--duration-normal) var(--ease-smooth);
+}
+
+.editorial-disclosure[open] summary::after {
+  content: "-";
+  transform: rotateZ(180deg);
+}
+
+.editorial-disclosure summary:hover {
+  color: var(--text);
+}
+
+.editorial-disclosure[open] summary {
+  color: var(--text);
+}
+
+.editorial-disclosure summary:active {
+  transform: scale(0.98);
+}
+
+.editorial-disclosure__content {
+  max-width: 34em;
+  margin-top: 18px;
+}
+
+.editorial-disclosure__content p + p {
+  margin-top: 20px;
+}
+
+.has-text-focus .editorial-disclosure.focus-text {
+  transition: color var(--focus-transition-duration) var(--ease-smooth);
+}
+
+.has-text-focus .editorial-disclosure.focus-text summary {
+  color: inherit;
+}
+
+.has-text-focus .editorial-disclosure.focus-text.is-text-focus-active summary {
+  color: var(--text);
+}
+
+.has-text-focus .editorial-disclosure.focus-text[open] summary {
+  color: var(--text);
+}
+
+.has-text-focus .editorial-disclosure.focus-text[open] .editorial-disclosure__content {
+  color: var(--text);
+}
+
 .editorial-block {
   position: relative;
   display: grid;

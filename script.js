@@ -305,8 +305,11 @@
 })();
 
 (() => {
-  const standaloneTextItems = Array.from(document.querySelectorAll('main.content h1, main.content h2, main.content h3, main.content p, main.content ul'))
-    .filter((item) => !item.closest('.artist-card'));
+  const standaloneTextItems = Array.from(document.querySelectorAll('main.content h1, main.content h2, main.content h3, main.content p, main.content ul, main.content .editorial-disclosure'))
+    .filter((item) => (
+      !item.closest('.artist-card') &&
+      (!item.closest('.editorial-disclosure') || item.matches('.editorial-disclosure'))
+    ));
   const artistCards = Array.from(document.querySelectorAll('main.content .artist-card'));
   const groupedTextItems = new Set();
 
@@ -432,6 +435,9 @@
 
   window.addEventListener('scroll', scheduleTextFocusUpdate, { passive: true });
   window.addEventListener('resize', scheduleTextFocusUpdate);
+  document.querySelectorAll('.editorial-disclosure').forEach((disclosure) => {
+    disclosure.addEventListener('toggle', scheduleTextFocusUpdate);
+  });
 })();
 
 (() => {
