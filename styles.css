@@ -121,16 +121,12 @@
 }
 
 :root[data-scene="cover"] {
-  --cursor-trail-base-width: 1.18;
-  --cursor-trail-extra-width: 0.72;
   --nav-indicator-rotation: -4deg;
   --nav-indicator-moving-rotation: 6deg;
 }
 
 :root[data-scene="about"] {
   --focus-text-muted: #ababab;
-  --cursor-trail-base-width: 1.05;
-  --cursor-trail-extra-width: 0.52;
   --cursor-trail-opacity: 1;
   --focus-transition-duration: 220ms;
   --nav-indicator-rotation: -5deg;
@@ -140,8 +136,6 @@
 
 :root[data-scene="patrons"] {
   --focus-text-muted: #a3a3a3;
-  --cursor-trail-base-width: 1.75;
-  --cursor-trail-extra-width: 0.95;
   --cursor-trail-opacity: 1;
   --focus-transition-duration: 300ms;
   --nav-indicator-rotation: 3deg;
@@ -153,8 +147,6 @@
 
 :root[data-scene="artists"] {
   --focus-text-muted: #bfbfbf;
-  --cursor-trail-base-width: 1.35;
-  --cursor-trail-extra-width: 0.28;
   --cursor-trail-opacity: 1;
   --focus-transition-duration: 360ms;
   --nav-indicator-rotation: -7deg;
@@ -328,6 +320,7 @@ a:hover {
   align-items: center;
   gap: 10px;
   width: max-content;
+  min-height: 24px;
   padding-left: 30px;
   color: var(--text);
   font-size: 13px;
@@ -342,30 +335,32 @@ a:hover {
 
 .main-nav .nav-label::before {
   content: "";
-  display: none;
-  flex: 0 0 18px;
+  position: absolute;
+  left: 0;
+  top: 50%;
+  display: block;
   width: 18px;
   height: 24px;
   background: url("assets/menu-shape.svg") center / contain no-repeat;
   filter: var(--indicator-filter);
   opacity: 0;
   transform:
+    translateY(-50%)
     rotateZ(var(--nav-indicator-rotation))
     scale(var(--nav-indicator-scale));
+  transform-origin: 50% 64%;
   transition:
     opacity var(--duration-fast) var(--ease-smooth),
     transform var(--duration-fast) var(--ease-smooth);
 }
 
 .main-nav.is-cover-state .nav-label {
-  padding-left: 0;
   color: var(--text);
   opacity: 1;
   transform: translateX(0);
 }
 
 .main-nav.is-cover-state .nav-label::before {
-  display: block;
   opacity: 0.72;
 }
 
