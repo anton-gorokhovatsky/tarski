@@ -832,12 +832,12 @@ li::before {
   flex-wrap: nowrap;
   justify-content: center;
   align-items: center;
-  gap: 0.04em;
+  gap: 0.02em;
   width: var(--artist-index-width);
   margin: -10px auto 96px;
   font-family: Georgia, "Times New Roman", serif;
   font-size: clamp(44px, 5.7vw, 86px);
-  line-height: 0.86;
+  line-height: 0.98;
   text-align: center;
 }
 
@@ -952,8 +952,8 @@ li::before {
     opacity: 0.18;
   }
 
-  .artist-index__link:hover,
-  .artist-index__link:focus-visible {
+  .artist-index:has(.artist-index__link:hover) .artist-index__link:hover,
+  .artist-index:has(.artist-index__link:focus-visible) .artist-index__link:focus-visible {
     z-index: 3;
     color: #fff;
     mix-blend-mode: difference;
