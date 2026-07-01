@@ -1,4 +1,58 @@
 (() => {
+  const iconLink = document.querySelector('link[rel~="icon"]');
+  const reduceMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const version = '20260701-favicon-frames';
+  const frames = [
+    'assets/favicon.svg',
+    'assets/favicon-a.svg',
+    'assets/favicon-r.svg',
+    'assets/favicon-s.svg',
+    'assets/favicon-k.svg',
+    'assets/favicon-i.svg'
+  ];
+
+  if (!iconLink) return;
+
+  let frameIndex = 0;
+  let timer = null;
+
+  const frameUrl = (path) => new URL(`${path}?v=${version}`, document.baseURI).href;
+
+  const setFrame = (index) => {
+    iconLink.href = frameUrl(frames[index]);
+  };
+
+  const stop = () => {
+    if (timer) {
+      window.clearInterval(timer);
+      timer = null;
+    }
+
+    frameIndex = 0;
+    setFrame(frameIndex);
+  };
+
+  const start = () => {
+    stop();
+
+    if (reduceMotionQuery.matches) return;
+
+    timer = window.setInterval(() => {
+      frameIndex = (frameIndex + 1) % frames.length;
+      setFrame(frameIndex);
+    }, 800);
+  };
+
+  if (typeof reduceMotionQuery.addEventListener === 'function') {
+    reduceMotionQuery.addEventListener('change', start);
+  } else if (typeof reduceMotionQuery.addListener === 'function') {
+    reduceMotionQuery.addListener(start);
+  }
+
+  start();
+})();
+
+(() => {
   const storageKey = 'tarski-theme';
   const themeToggles = Array.from(document.querySelectorAll('[data-theme-toggle]'));
   const systemThemeQuery = window.matchMedia('(prefers-color-scheme: dark)');
