@@ -382,11 +382,19 @@ a:hover {
   position: relative;
   z-index: 3;
   display: flex;
-  align-items: center;
-  gap: 12px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 9px;
   width: max-content;
   margin-top: 20px;
   padding-left: 30px;
+}
+
+.nav-service-panel {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  width: max-content;
 }
 
 .main-nav a {
@@ -1661,13 +1669,17 @@ html.has-open-dossier {
   }
 
   .main-nav .nav-actions {
-    display: inline-flex;
+    display: flex;
     flex-basis: 100%;
-    align-items: center;
-    gap: 12px;
+    align-items: flex-start;
+    gap: 8px;
     width: 100%;
-    margin-top: 2px;
+    margin-top: 10px;
     padding-left: 0;
+  }
+
+  .nav-service-panel {
+    gap: 12px;
   }
 
   .language-switcher {
