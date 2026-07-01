@@ -61,6 +61,8 @@
     dark: '#101010'
   };
 
+  const getLabel = (path, fallback) => window.tarskiI18n?.t(path) || fallback;
+
   const getStoredTheme = () => {
     try {
       const theme = window.localStorage.getItem(storageKey);
@@ -91,7 +93,9 @@
 
   const syncThemeControls = (theme) => {
     const isDark = theme === 'dark';
-    const label = isDark ? 'Включить светлую тему' : 'Включить темную тему';
+    const label = isDark
+      ? getLabel('ui.themeLight', 'Включить светлую тему')
+      : getLabel('ui.themeDark', 'Включить темную тему');
 
     themeToggles.forEach((toggle) => {
       toggle.setAttribute('aria-label', label);
@@ -131,6 +135,8 @@
     }
   });
 
+  window.addEventListener('tarski:languagechange', () => syncThemeControls(getEffectiveTheme()));
+
   applyTheme();
 })();
 
@@ -147,12 +153,13 @@
   const mobileScroller = mobileMenu?.querySelector('[data-mobile-menu-scroller]') || mobilePanel;
   const navLabel = mainNav?.querySelector('.nav-label');
   const mobileQuery = window.matchMedia('(max-width: 720px)');
-  const sceneLabels = {
+  const fallbackSceneLabels = {
     cover: 'Меню',
     about: 'Среда',
     patrons: 'Участие',
     artists: 'Сеть'
   };
+  const getSceneLabels = () => window.tarskiI18n?.getSceneLabels?.() || fallbackSceneLabels;
 
   let currentActiveId = null;
   let currentScene = document.documentElement.dataset.scene || 'cover';
@@ -178,7 +185,8 @@
     document.documentElement.dataset.scene = scene;
 
     if (navLabel) {
-      navLabel.textContent = sceneLabels[scene] || sceneLabels.cover;
+      const sceneLabels = getSceneLabels();
+      navLabel.textContent = sceneLabels[scene] || sceneLabels.cover || fallbackSceneLabels.cover;
     }
 
     window.dispatchEvent(new CustomEvent('tarski:scenechange', {
@@ -356,6 +364,19 @@
     updateMobileScrollerMask();
     updateMobileMenuVisibility();
   });
+
+  window.addEventListener('tarski:languagechange', () => {
+    if (navLabel) {
+      const sceneLabels = getSceneLabels();
+      navLabel.textContent = sceneLabels[currentScene] || sceneLabels.cover || fallbackSceneLabels.cover;
+    }
+
+    updateActive();
+    updateMenuIndicators(false);
+    updateMobileScrollerMask();
+    updateMobileMenuVisibility();
+    window.setTimeout(() => scrollActiveMobileLinkIntoView('auto'), 40);
+  });
 })();
 
 (() => {
@@ -521,6 +542,10 @@
 
   window.addEventListener('scroll', scheduleTextFocusUpdate, { passive: true });
   window.addEventListener('resize', scheduleTextFocusUpdate);
+  window.addEventListener('tarski:languagechange', () => {
+    scheduleTextFocusUpdate();
+    window.setTimeout(scheduleTextFocusUpdate, 260);
+  });
   document.querySelectorAll('.editorial-disclosure').forEach((disclosure) => {
     disclosure.addEventListener('toggle', scheduleTextFocusUpdate);
   });
@@ -549,9 +574,23 @@
 
   const cardsById = new Map(cards.map((card) => [card.id, card]));
   let activeTrigger = null;
+  let activeCard = null;
   let openTimerId = null;
 
   const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const getOpenDetailsPrefix = () => window.tarskiI18n?.t('ui.openDetails') || 'Открыть подробности: ';
+  const getCardName = (card) => card.querySelector('.artist-card__name')?.textContent.trim() || 'художника';
+
+  const syncDetailTriggerLabels = () => {
+    cards.forEach((card) => {
+      const cardName = getCardName(card);
+      card
+        .querySelectorAll('.artist-card__detail-trigger')
+        .forEach((trigger) => {
+          trigger.setAttribute('aria-label', `${getOpenDetailsPrefix()}${cardName}`);
+        });
+    });
+  };
 
   const focusWithoutScroll = (element) => {
     try {
@@ -593,6 +632,7 @@
 
   const openDossier = (card, trigger = null) => {
     const data = getCardData(card);
+    activeCard = card;
     activeTrigger = trigger || document.activeElement;
 
     image.src = data.imageSrc;
@@ -623,6 +663,7 @@
     }
 
     activeTrigger = null;
+    activeCard = null;
   };
 
   const getFocusableElements = () => Array.from(panel.querySelectorAll(
@@ -630,7 +671,6 @@
   )).filter((element) => element.offsetParent !== null);
 
   cards.forEach((card) => {
-    const cardName = card.querySelector('.artist-card__name')?.textContent.trim() || 'художника';
     const detailTriggers = [
       card.querySelector('.artist-card__image'),
       card.querySelector('.artist-card__name')
@@ -640,7 +680,7 @@
       trigger.classList.add('artist-card__detail-trigger');
       trigger.setAttribute('role', 'button');
       trigger.setAttribute('tabindex', '0');
-      trigger.setAttribute('aria-label', `Открыть подробности: ${cardName}`);
+      trigger.setAttribute('aria-label', `${getOpenDetailsPrefix()}${getCardName(card)}`);
       trigger.addEventListener('click', () => openDossier(card, trigger));
       trigger.addEventListener('keydown', (event) => {
         if (event.key !== 'Enter' && event.key !== ' ') return;
@@ -701,6 +741,14 @@
     const card = cardsById.get(id);
     if (card) {
       openDossier(card);
+    }
+  });
+
+  window.addEventListener('tarski:languagechange', () => {
+    syncDetailTriggerLabels();
+
+    if (activeCard && dossier.classList.contains('is-open')) {
+      openDossier(activeCard, activeTrigger);
     }
   });
 

@@ -194,6 +194,16 @@ body {
   font-feature-settings: "dlig" 1, "frac" 1;
 }
 
+:root[data-language="ja"] body {
+  line-break: strict;
+  word-break: normal;
+}
+
+:root[data-language="ja"] .artist-index,
+:root[data-language="ja"] .artist-dossier h2 {
+  line-break: loose;
+}
+
 .skip-link {
   position: fixed;
   top: 14px;
@@ -403,6 +413,52 @@ a:hover {
 
 .main-nav a.nav-mail::before {
   display: none;
+}
+
+.language-switcher {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 7px;
+  color: var(--text);
+  font-size: 13px;
+  line-height: 1;
+}
+
+.language-switcher button {
+  -webkit-appearance: none;
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  line-height: inherit;
+  opacity: 0.46;
+  text-transform: uppercase;
+  transition:
+    opacity var(--duration-fast) var(--ease-smooth),
+    transform var(--duration-fast) var(--ease-smooth);
+}
+
+.language-switcher button:hover,
+.language-switcher button:focus-visible,
+.language-switcher button[aria-pressed="true"] {
+  opacity: 1;
+}
+
+.language-switcher button:focus-visible {
+  outline: 0;
+  text-decoration: underline;
+  text-underline-offset: 0.16em;
+}
+
+.language-switcher button:active {
+  transform: scale(0.96);
 }
 
 .main-nav a::before {
@@ -1608,10 +1664,14 @@ html.has-open-dossier {
     display: inline-flex;
     flex-basis: 100%;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
     width: 100%;
     margin-top: 2px;
     padding-left: 0;
+  }
+
+  .language-switcher {
+    font-size: 14px;
   }
 
   .main-nav a.nav-mail {
