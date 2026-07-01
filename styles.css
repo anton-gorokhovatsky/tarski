@@ -50,6 +50,9 @@
   --scene-label-active-shift: -4px;
   --scene-nav-label-opacity: 0.82;
   --scene-nav-label-shift: 0px;
+  --kinetic-x: 0;
+  --kinetic-y: 0;
+  --kinetic-scroll: 0;
   --page-padding-x: 45px;
   --content-width: 890px;
   --menu-width: 199px;
@@ -276,6 +279,18 @@ a:hover {
   width: 100%;
   height: auto;
   filter: var(--brand-filter);
+  transform:
+    translate3d(
+      calc(var(--kinetic-x) * 5px),
+      calc((var(--kinetic-y) * 2px) + (var(--kinetic-scroll) * 10px)),
+      0
+    )
+    skewX(calc(var(--kinetic-x) * -0.8deg));
+  transform-origin: 0 0;
+  transition:
+    filter var(--duration-fast) var(--ease-smooth),
+    transform 700ms var(--ease-smooth);
+  will-change: transform;
 }
 
 .main-nav {
@@ -584,6 +599,19 @@ a:hover {
   line-height: 1.16;
   font-weight: 400;
   letter-spacing: 0;
+  text-wrap: balance;
+}
+
+.superlead .kinetic-word {
+  display: inline-block;
+  transform:
+    translate3d(
+      calc(var(--kinetic-x) * var(--word-x) * 1px),
+      calc((var(--kinetic-y) * var(--word-y) * 1px) + (var(--kinetic-scroll) * var(--word-scroll) * 1px)),
+      0
+    );
+  transition: transform 680ms var(--ease-smooth);
+  will-change: transform;
 }
 
 .section {
@@ -1333,9 +1361,9 @@ li::before {
 .artist-dossier__panel {
   position: relative;
   display: grid;
-  grid-template-columns: minmax(240px, 0.72fr) minmax(0, 1fr);
-  gap: clamp(26px, 3.2vw, 46px);
-  width: min(1120px, calc(100vw - (var(--page-padding-x) * 2) - var(--menu-width) - 34px));
+  grid-template-columns: minmax(300px, 0.64fr) minmax(0, 1.08fr);
+  gap: clamp(30px, 3.4vw, 56px);
+  width: min(1320px, calc(100vw - (var(--page-padding-x) * 2) - var(--menu-width) - 8px));
   max-height: min(760px, calc(100svh - 36px));
   padding: clamp(20px, 3vw, 34px);
   overflow: auto;
@@ -1435,7 +1463,7 @@ li::before {
   width: 100%;
   height: auto;
   min-height: 0;
-  max-height: min(58svh, 540px);
+  max-height: min(60svh, 600px);
   object-fit: contain;
 }
 
@@ -1448,14 +1476,20 @@ li::before {
 .artist-dossier h2 {
   max-width: 100%;
   margin: 0 0 12px;
-  font-size: clamp(36px, 5.2vw, 72px);
+  font-size: clamp(38px, 4.9vw, 82px);
   line-height: 0.94;
   font-family: Georgia, "Times New Roman", serif;
   font-weight: 400;
   letter-spacing: 0;
+  hyphens: none;
+  overflow-wrap: normal;
+  word-break: normal;
+  text-wrap: balance;
+}
+
+.artist-dossier__panel[data-artist-id="artist-irhs"] h2 {
   hyphens: manual;
   overflow-wrap: break-word;
-  word-break: normal;
 }
 
 .artist-dossier__role {
@@ -1978,6 +2012,13 @@ html.has-open-dossier {
   }
 }
 
+@media (hover: none), (pointer: coarse) {
+  .brand img,
+  .superlead .kinetic-word {
+    transform: none;
+  }
+}
+
 /* Mobile floating menu — vertical art map + separate mail action. */
 .mobile-floating-menu {
   display: none;
@@ -2416,5 +2457,10 @@ html.has-open-dossier {
       translate3d(var(--mobile-indicator-x), -50%, 0)
       rotateZ(var(--nav-indicator-rotation))
       scale(var(--nav-indicator-scale));
+  }
+
+  .brand img,
+  .superlead .kinetic-word {
+    transform: none;
   }
 }
