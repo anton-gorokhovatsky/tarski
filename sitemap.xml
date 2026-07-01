@@ -1,7 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset
+  xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+  xmlns:xhtml="http://www.w3.org/1999/xhtml"
+>
   <url>
     <loc>https://anton-gorokhovatsky.github.io/tarski/</loc>
-    <lastmod>2026-06-27</lastmod>
+    <lastmod>2026-07-01</lastmod>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://anton-gorokhovatsky.github.io/tarski/" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://anton-gorokhovatsky.github.io/tarski/?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://anton-gorokhovatsky.github.io/tarski/?lang=ja" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://anton-gorokhovatsky.github.io/tarski/" />
+  </url>
+  <url>
+    <loc>https://anton-gorokhovatsky.github.io/tarski/?lang=en</loc>
+    <lastmod>2026-07-01</lastmod>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://anton-gorokhovatsky.github.io/tarski/" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://anton-gorokhovatsky.github.io/tarski/?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://anton-gorokhovatsky.github.io/tarski/?lang=ja" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://anton-gorokhovatsky.github.io/tarski/" />
+  </url>
+  <url>
+    <loc>https://anton-gorokhovatsky.github.io/tarski/?lang=ja</loc>
+    <lastmod>2026-07-01</lastmod>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://anton-gorokhovatsky.github.io/tarski/" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://anton-gorokhovatsky.github.io/tarski/?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://anton-gorokhovatsky.github.io/tarski/?lang=ja" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://anton-gorokhovatsky.github.io/tarski/" />
   </url>
 </urlset>

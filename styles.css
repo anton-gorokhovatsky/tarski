@@ -1989,6 +1989,9 @@ html.has-open-dossier {
   }
 
   .mobile-floating-menu {
+    --mobile-service-pad-x: 17px;
+    --mobile-service-pad-y: 11px;
+    --mobile-service-gap: 14px;
     position: fixed;
     right: max(12px, var(--page-padding-x));
     bottom: calc(14px + env(safe-area-inset-bottom));
@@ -2139,6 +2142,15 @@ html.has-open-dossier {
       width var(--duration-fast) var(--ease-smooth);
   }
 
+  .mobile-service-toggle:focus {
+    outline: 0;
+  }
+
+  .mobile-service-toggle:focus-visible {
+    outline: 1px solid currentColor;
+    outline-offset: 4px;
+  }
+
   .mobile-service-toggle::after {
     content: "";
     flex: 0 0 auto;
@@ -2172,9 +2184,9 @@ html.has-open-dossier {
     bottom: calc(100% + 8px);
     display: inline-flex;
     align-items: center;
-    gap: 12px;
+    gap: var(--mobile-service-gap);
     width: max-content;
-    padding: 10px 12px;
+    padding: var(--mobile-service-pad-y) var(--mobile-service-pad-x);
     border-radius: 999px;
     background: var(--mobile-pill-bg);
     box-shadow: var(--mobile-bottom-pill-shadow);
@@ -2188,7 +2200,12 @@ html.has-open-dossier {
   }
 
   .mobile-service-panel .language-switcher {
+    gap: 9px;
     font-size: 14px;
+  }
+
+  .mobile-service-panel .language-switcher button {
+    min-width: 18px;
   }
 
   .mobile-service-panel .theme-toggle {

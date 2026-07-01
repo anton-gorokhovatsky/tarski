@@ -175,6 +175,9 @@
   toggle.addEventListener('click', (event) => {
     event.stopPropagation();
     setOpen(toggle.getAttribute('aria-expanded') !== 'true');
+    if (event.detail > 0) {
+      toggle.blur();
+    }
   });
 
   panel.addEventListener('click', (event) => {

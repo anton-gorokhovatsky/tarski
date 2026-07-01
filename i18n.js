@@ -522,6 +522,12 @@
     document.documentElement.dataset.language = currentLanguage;
 
     document.querySelector('link[rel="canonical"]')?.setAttribute('href', pageUrl);
+    document.querySelectorAll('link[rel="alternate"][data-i18n-alternate]').forEach((link) => {
+      const language = link.dataset.i18nAlternate === 'x-default' ? 'ru' : link.dataset.i18nAlternate;
+      if (supportedLanguages.includes(language)) {
+        link.setAttribute('href', getCanonicalUrl(language));
+      }
+    });
     document.querySelector('meta[name="description"]')?.setAttribute('content', data.meta.description);
     document.querySelector('meta[property="og:title"]')?.setAttribute('content', ogTitle);
     document.querySelector('meta[property="og:description"]')?.setAttribute('content', data.meta.description);
