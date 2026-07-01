@@ -423,8 +423,6 @@ a:hover {
 }
 
 .theme-toggle {
-  --theme-phase-fill-x: -2.5px;
-  --theme-phase-ring-x: 3px;
   -webkit-appearance: none;
   appearance: none;
   position: relative;
@@ -468,7 +466,7 @@ a:hover {
   display: block;
   width: 20px;
   height: 20px;
-  border: 1.7px solid currentColor;
+  border: 1.8px solid currentColor;
   border-radius: 999px;
   background: transparent;
   overflow: visible;
@@ -488,33 +486,24 @@ a:hover {
 }
 
 .theme-toggle__icon::before {
-  width: 8px;
-  height: 8px;
-  left: 50%;
-  top: 50%;
+  width: 5px;
+  height: 5px;
+  right: 1px;
+  top: 1px;
   background: currentColor;
-  opacity: 0.78;
-  transform:
-    translate3d(calc(-50% + var(--theme-phase-fill-x)), -50%, 0)
-    scale(1);
+  opacity: 0.82;
+  transform: none;
 }
 
 .theme-toggle__icon::after {
-  width: 8px;
-  height: 8px;
-  left: 50%;
-  top: 50%;
-  border: 1.7px solid currentColor;
-  background: transparent;
-  opacity: 0.62;
-  transform:
-    translate3d(calc(-50% + var(--theme-phase-ring-x)), -50%, 0)
-    scale(1);
+  display: none;
 }
 
-:root[data-effective-theme="dark"] .theme-toggle {
-  --theme-phase-fill-x: 3px;
-  --theme-phase-ring-x: -2.5px;
+:root[data-effective-theme="dark"] .theme-toggle__icon::before {
+  right: auto;
+  left: 3px;
+  top: 50%;
+  transform: translateY(-50%);
 }
 
 .content {
@@ -1119,6 +1108,23 @@ li::before {
   overflow-wrap: break-word;
 }
 
+.artist-card__detail-trigger {
+  cursor: pointer;
+}
+
+.artist-card__detail-trigger:focus-visible {
+  outline: 0;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.1em;
+}
+
+.artist-card__image.artist-card__detail-trigger:focus-visible {
+  outline: 0;
+  text-decoration: none;
+  filter: drop-shadow(0 0 0.35rem color-mix(in srgb, currentColor 18%, transparent));
+}
+
 .artist-card__role {
   margin: 0 0 16px;
   color: var(--muted-text);
@@ -1184,44 +1190,6 @@ li::before {
   transform: translateY(0) scale(0.98);
 }
 
-.artist-card__open {
-  -webkit-appearance: none;
-  appearance: none;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 38px;
-  height: 28px;
-  margin: -3px 0 0 4px;
-  padding: 0 9px;
-  border: 1px solid currentColor;
-  border-radius: 999px;
-  background: transparent;
-  color: inherit;
-  cursor: pointer;
-  font: inherit;
-  font-size: 13px;
-  line-height: 1;
-  opacity: 0.62;
-  transition:
-    opacity var(--duration-fast) var(--ease-smooth),
-    transform var(--duration-fast) var(--ease-smooth);
-}
-
-.artist-card__open:hover,
-.artist-card__open:focus-visible {
-  opacity: 1;
-  transform: translateY(-1px);
-}
-
-.artist-card__open:focus-visible {
-  outline: 0;
-}
-
-.artist-card__open:active {
-  transform: translateY(0) scale(0.98);
-}
-
 .has-text-focus .artist-card.focus-text {
   transition: color var(--duration-normal) var(--ease-smooth);
 }
@@ -1236,10 +1204,6 @@ li::before {
 
 .has-text-focus .artist-card.focus-text .artist-card__link {
   opacity: 0.46;
-}
-
-.has-text-focus .artist-card.focus-text .artist-card__open {
-  opacity: 0.34;
 }
 
 .has-text-focus .artist-card.focus-text.is-text-focus-active .artist-card__body {
@@ -1259,16 +1223,7 @@ li::before {
   opacity: 0.95;
 }
 
-.has-text-focus .artist-card.focus-text.is-text-focus-active .artist-card__open {
-  opacity: 0.74;
-}
-
 .has-text-focus .artist-card.focus-text.is-text-focus-active .artist-card__link:hover {
-  opacity: 1;
-}
-
-.has-text-focus .artist-card.focus-text.is-text-focus-active .artist-card__open:hover,
-.has-text-focus .artist-card.focus-text.is-text-focus-active .artist-card__open:focus-visible {
   opacity: 1;
 }
 
@@ -1322,11 +1277,13 @@ li::before {
   padding: clamp(20px, 3vw, 34px);
   overflow: auto;
   overflow-x: hidden;
-  border: 1px solid var(--rule);
+  border: 0;
+  outline: 0;
   background: var(--page-bg);
   background: color-mix(in srgb, var(--page-bg) 94%, transparent);
   box-shadow:
     0 34px 86px rgba(0, 0, 0, 0.16),
+    inset 0 0 0 1px color-mix(in srgb, var(--text) 12%, transparent),
     inset 0 1px 0 rgba(255, 255, 255, 0.28);
   backdrop-filter: blur(28px) saturate(150%);
   -webkit-backdrop-filter: blur(28px) saturate(150%);
@@ -1338,9 +1295,14 @@ li::before {
     transform var(--duration-focus) var(--ease-smooth);
 }
 
+.artist-dossier__panel:focus {
+  outline: 0;
+}
+
 :root[data-effective-theme="dark"] .artist-dossier__panel {
   box-shadow:
     0 34px 96px rgba(0, 0, 0, 0.45),
+    inset 0 0 0 1px color-mix(in srgb, var(--text) 14%, transparent),
     inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
@@ -1408,21 +1370,16 @@ li::before {
 .artist-dossier__media img {
   display: block;
   width: 100%;
+  height: auto;
   min-height: 0;
   max-height: min(58svh, 540px);
-  object-fit: cover;
+  object-fit: contain;
 }
 
 .artist-dossier__content {
   min-width: 0;
+  overflow-x: hidden;
   padding-right: 28px;
-}
-
-.artist-dossier__eyebrow {
-  margin: 0 0 12px;
-  color: var(--muted-text);
-  font-size: 15px;
-  line-height: 1.1;
 }
 
 .artist-dossier h2 {
@@ -1434,7 +1391,7 @@ li::before {
   font-weight: 400;
   letter-spacing: 0;
   hyphens: auto;
-  overflow-wrap: break-word;
+  overflow-wrap: anywhere;
 }
 
 .artist-dossier__role {
@@ -1455,7 +1412,11 @@ li::before {
   display: flex;
   flex-wrap: wrap;
   gap: 4px;
-  margin-top: 28px;
+  margin: 0 0 14px;
+}
+
+.artist-dossier__links:empty {
+  display: none;
 }
 
 .artist-dossier__links .artist-card__link {
@@ -1834,12 +1795,6 @@ html.has-open-dossier {
     gap: 6px;
     margin-top: -5px;
     justify-self: auto;
-  }
-
-  .artist-card__open {
-    height: 30px;
-    margin-top: -3px;
-    font-size: 14px;
   }
 
   .has-text-focus .artist-card.focus-text.is-text-focus-active .artist-card__body {

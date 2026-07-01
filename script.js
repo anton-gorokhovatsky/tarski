@@ -630,17 +630,25 @@
   )).filter((element) => element.offsetParent !== null);
 
   cards.forEach((card) => {
-    const header = card.querySelector('.artist-card__header');
     const cardName = card.querySelector('.artist-card__name')?.textContent.trim() || 'художника';
-    if (!header || header.querySelector('.artist-card__open')) return;
+    const detailTriggers = [
+      card.querySelector('.artist-card__image'),
+      card.querySelector('.artist-card__name')
+    ].filter(Boolean);
 
-    const button = document.createElement('button');
-    button.className = 'artist-card__open';
-    button.type = 'button';
-    button.textContent = 'ещё';
-    button.setAttribute('aria-label', `Открыть подробности: ${cardName}`);
-    button.addEventListener('click', () => openDossier(card, button));
-    header.append(button);
+    detailTriggers.forEach((trigger) => {
+      trigger.classList.add('artist-card__detail-trigger');
+      trigger.setAttribute('role', 'button');
+      trigger.setAttribute('tabindex', '0');
+      trigger.setAttribute('aria-label', `Открыть подробности: ${cardName}`);
+      trigger.addEventListener('click', () => openDossier(card, trigger));
+      trigger.addEventListener('keydown', (event) => {
+        if (event.key !== 'Enter' && event.key !== ' ') return;
+
+        event.preventDefault();
+        openDossier(card, trigger);
+      });
+    });
   });
 
   indexLinks.forEach((link) => {
