@@ -637,8 +637,8 @@
     const button = document.createElement('button');
     button.className = 'artist-card__open';
     button.type = 'button';
-    button.textContent = 'досье';
-    button.setAttribute('aria-label', `Открыть досье: ${cardName}`);
+    button.textContent = 'ещё';
+    button.setAttribute('aria-label', `Открыть подробности: ${cardName}`);
     button.addEventListener('click', () => openDossier(card, button));
     header.append(button);
   });
