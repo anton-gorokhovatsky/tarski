@@ -440,7 +440,7 @@ a:hover {
   border-radius: 999px;
   background: transparent;
   box-shadow: none;
-  color: var(--muted-text);
+  color: var(--text);
   cursor: pointer;
   font: inherit;
   line-height: 1;
@@ -453,7 +453,6 @@ a:hover {
 }
 
 .theme-toggle:hover {
-  color: var(--text);
   transform: rotateZ(-8deg) scale(1.05);
 }
 
@@ -491,7 +490,7 @@ a:hover {
   right: 1px;
   top: 1px;
   background: currentColor;
-  opacity: 0.82;
+  opacity: 1;
   transform: none;
 }
 
