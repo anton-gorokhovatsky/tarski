@@ -423,6 +423,8 @@ a:hover {
 }
 
 .theme-toggle {
+  --theme-phase-fill-x: -2.5px;
+  --theme-phase-ring-x: 3px;
   -webkit-appearance: none;
   appearance: none;
   position: relative;
@@ -464,12 +466,12 @@ a:hover {
 .theme-toggle__icon {
   position: relative;
   display: block;
-  width: 19px;
-  height: 19px;
-  border: 1.5px solid currentColor;
+  width: 20px;
+  height: 20px;
+  border: 1.7px solid currentColor;
   border-radius: 999px;
   background: transparent;
-  overflow: hidden;
+  overflow: visible;
   transition:
     border-color var(--duration-fast) var(--ease-smooth),
     transform var(--duration-fast) var(--ease-smooth);
@@ -486,21 +488,33 @@ a:hover {
 }
 
 .theme-toggle__icon::before {
-  inset: 4px;
+  width: 8px;
+  height: 8px;
+  left: 50%;
+  top: 50%;
   background: currentColor;
-  opacity: 0.86;
-  transform: scale(1);
+  opacity: 0.78;
+  transform:
+    translate3d(calc(-50% + var(--theme-phase-fill-x)), -50%, 0)
+    scale(1);
 }
 
 .theme-toggle__icon::after {
-  inset: 4px;
-  background: var(--page-bg);
-  opacity: 1;
-  transform: translate3d(3px, 0, 0) scale(1.02);
+  width: 8px;
+  height: 8px;
+  left: 50%;
+  top: 50%;
+  border: 1.7px solid currentColor;
+  background: transparent;
+  opacity: 0.62;
+  transform:
+    translate3d(calc(-50% + var(--theme-phase-ring-x)), -50%, 0)
+    scale(1);
 }
 
-:root[data-effective-theme="dark"] .theme-toggle__icon::after {
-  transform: translate3d(-3px, 0, 0) scale(1.02);
+:root[data-effective-theme="dark"] .theme-toggle {
+  --theme-phase-fill-x: 3px;
+  --theme-phase-ring-x: -2.5px;
 }
 
 .content {
@@ -1101,6 +1115,8 @@ li::before {
   line-height: 1.16;
   font-weight: 400;
   letter-spacing: 0;
+  hyphens: auto;
+  overflow-wrap: break-word;
 }
 
 .artist-card__role {
@@ -1305,6 +1321,7 @@ li::before {
   max-height: min(760px, calc(100svh - 36px));
   padding: clamp(20px, 3vw, 34px);
   overflow: auto;
+  overflow-x: hidden;
   border: 1px solid var(--rule);
   background: var(--page-bg);
   background: color-mix(in srgb, var(--page-bg) 94%, transparent);
@@ -1416,6 +1433,8 @@ li::before {
   font-family: Georgia, "Times New Roman", serif;
   font-weight: 400;
   letter-spacing: 0;
+  hyphens: auto;
+  overflow-wrap: break-word;
 }
 
 .artist-dossier__role {
