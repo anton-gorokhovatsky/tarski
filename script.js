@@ -629,7 +629,7 @@
   const indexLinks = Array.from(document.querySelectorAll('.artist-index__link[href^="#artist-"]'));
   const preferredImages = {
     'artist-anastasia-dahl': 'assets/artist-index/330551584_215344677620530_5433914055885423503_n.jpg',
-    'artist-nadezhda-ishkinyaeva': 'assets/artist-index/Надежда Ишкиняева.png',
+    'artist-nadezhda-ishkinyaeva': 'assets/artist-index/nadezhda-ishkinyaeva.jpg',
     'artist-elena-kolesnikova': 'assets/artist-index/Елена Колесникова.webp',
     'artist-alina-kugush': 'assets/artist-index/izobrazhenie-dsc05043-1-1500x.jpg',
     'artist-no-excuse-group': 'assets/artist-index/0015.jpg.webp'

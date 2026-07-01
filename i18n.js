@@ -1,5 +1,6 @@
 (() => {
   const storageKey = 'tarski-language';
+  const siteBaseUrl = 'https://tarski.ru/';
   const supportedLanguages = ['ru', 'en', 'ja'];
   const artistKeys = {
     'artist-anastasia-dahl': 'anastasia',
@@ -475,7 +476,8 @@
   const getItem = (container, key) => container?.querySelector(`[data-i18n-item="${key}"]`);
 
   const getLocalizedUrl = (language) => {
-    const url = new URL(window.location.href);
+    const url = new URL(siteBaseUrl);
+    url.hash = window.location.hash;
 
     if (language === 'ru') {
       url.searchParams.delete('lang');

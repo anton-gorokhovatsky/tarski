@@ -994,7 +994,7 @@ li::before {
   }
 
   .artist-index:has(.artist-index__link:nth-child(3):is(:hover, :focus-visible)) {
-    --artist-index-preview: url("assets/artist-index/Надежда Ишкиняева.png");
+    --artist-index-preview: url("assets/artist-index/nadezhda-ishkinyaeva.jpg");
     --artist-index-preview-fit: cover;
     --artist-index-preview-ratio: 0.711;
     --artist-index-preview-width: min(30vw, 430px);
