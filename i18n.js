@@ -45,8 +45,14 @@
         },
         themeDark: 'Включить темную тему',
         themeLight: 'Включить светлую тему',
+        serviceOpen: 'Открыть настройки сайта',
+        serviceClose: 'Закрыть настройки сайта',
         openDetails: 'Открыть подробности: ',
         closeDetails: 'Закрыть подробности',
+        links: {
+          site: 'Сайт',
+          instagram: 'Инстаграм'
+        },
         footerLegal: 'Решением суда запрещена «деятельность компании Meta Platforms Inc. по реализации продуктов — социальных сетей Facebook и Instagram на территории Российской Федерации по основаниям осуществления экстремистской деятельности»'
       }
     },
@@ -83,8 +89,14 @@
         },
         themeDark: 'Switch to dark theme',
         themeLight: 'Switch to light theme',
+        serviceOpen: 'Open site settings',
+        serviceClose: 'Close site settings',
         openDetails: 'Open details: ',
         closeDetails: 'Close details',
+        links: {
+          site: 'Website',
+          instagram: 'Instagram'
+        },
         footerLegal: 'By court decision, the activities of Meta Platforms Inc. related to the Facebook and Instagram social networks are prohibited in the Russian Federation on grounds of extremist activity.'
       },
       superlead: 'Researching and Supporting Participatory and Socially Engaged Art',
@@ -244,8 +256,14 @@
         },
         themeDark: 'ダークテーマに切り替える',
         themeLight: 'ライトテーマに切り替える',
+        serviceOpen: 'サイト設定を開く',
+        serviceClose: 'サイト設定を閉じる',
         openDetails: '詳細を開く：',
         closeDetails: '詳細を閉じる',
+        links: {
+          site: 'ウェブサイト',
+          instagram: 'Instagram'
+        },
         footerLegal: '裁判所の決定により、Meta Platforms Inc.によるFacebookおよびInstagramのサービス提供に関する活動は、過激主義的活動を理由としてロシア連邦内で禁止されています。'
       },
       superlead: '参加型およびソーシャリー・エンゲイジド・アートの研究と支援',
@@ -453,24 +471,70 @@
     .from(element?.children || [])
     .filter((child) => child.matches(selector));
 
+  const getBlock = (section, key) => section?.querySelector(`[data-i18n-block="${key}"]`);
+  const getItem = (container, key) => container?.querySelector(`[data-i18n-item="${key}"]`);
+
+  const getLocalizedUrl = (language) => {
+    const url = new URL(window.location.href);
+
+    if (language === 'ru') {
+      url.searchParams.delete('lang');
+    } else {
+      url.searchParams.set('lang', language);
+    }
+
+    return url;
+  };
+
+  const getCanonicalUrl = (language) => {
+    const url = getLocalizedUrl(language);
+    url.hash = '';
+    return url.toString();
+  };
+
+  const syncUrlLanguage = (language) => {
+    try {
+      const url = getLocalizedUrl(language);
+      if (url.href !== window.location.href) {
+        window.history.replaceState(window.history.state, '', url);
+      }
+    } catch (error) {
+      // Language still changes even when History API is unavailable.
+    }
+  };
+
+  const setIndexedItems = (container, values, keys) => {
+    keys.forEach((key, index) => {
+      const item = getItem(container, key);
+      const value = Array.isArray(values) ? values[index] : values?.[key];
+
+      setText(item?.querySelector('h3'), value?.[0]);
+      setText(item?.querySelector('p'), value?.[1]);
+    });
+  };
+
   const setMeta = (data) => {
     const ogTitle = data.meta.title.split(' — ')[0];
+    const pageUrl = getCanonicalUrl(currentLanguage);
 
     document.title = data.meta.title;
     document.documentElement.lang = data.htmlLang;
     document.documentElement.dataset.language = currentLanguage;
 
+    document.querySelector('link[rel="canonical"]')?.setAttribute('href', pageUrl);
     document.querySelector('meta[name="description"]')?.setAttribute('content', data.meta.description);
     document.querySelector('meta[property="og:title"]')?.setAttribute('content', ogTitle);
     document.querySelector('meta[property="og:description"]')?.setAttribute('content', data.meta.description);
+    document.querySelector('meta[property="og:url"]')?.setAttribute('content', pageUrl);
     document.querySelector('meta[property="og:locale"]')?.setAttribute('content', data.meta.locale);
     document.querySelector('meta[name="twitter:title"]')?.setAttribute('content', 'Tarski');
     document.querySelector('meta[name="twitter:description"]')?.setAttribute('content', data.meta.description);
   };
 
   const setLanguageControls = (data) => {
-    const switcher = document.querySelector('[data-language-switcher]');
-    setAttr(switcher, 'aria-label', data.ui.language);
+    document.querySelectorAll('[data-language-switcher]').forEach((switcher) => {
+      setAttr(switcher, 'aria-label', data.ui.language);
+    });
 
     document.querySelectorAll('[data-language-option]').forEach((button) => {
       const language = button.dataset.languageOption;
@@ -487,6 +551,13 @@
     setAttr(document.querySelector('.main-nav'), 'aria-label', data.ui.mainNav);
     setAttr(document.querySelector('[data-mobile-menu]'), 'aria-label', data.ui.mobileNav);
     setAttr(document.querySelector('#mobile-menu-panel'), 'aria-label', data.ui.mobilePanel);
+    document.querySelectorAll('[data-mobile-service-toggle]').forEach((toggle) => {
+      const isOpen = toggle.getAttribute('aria-expanded') === 'true';
+      const label = isOpen ? data.ui.serviceClose : data.ui.serviceOpen;
+
+      setAttr(toggle, 'aria-label', label);
+      setAttr(toggle, 'title', label);
+    });
 
     setText(document.querySelector('.nav-label'), data.ui.scenes[document.documentElement.dataset.scene || 'cover']);
     setTexts(document.querySelectorAll('.main-nav a[href="#about"], .mobile-menu-scroller a[href="#about"]'), [data.ui.nav.about, data.ui.nav.about]);
@@ -511,8 +582,8 @@
     setText(document.querySelector('#about .section-intro h1'), about.title);
     setText(document.querySelector('#about .section-intro .lead'), about.lead);
 
-    const blocks = document.querySelectorAll('#about .editorial-block');
-    const practice = blocks[0];
+    const aboutSection = document.querySelector('#about');
+    const practice = getBlock(aboutSection, 'practice');
     const practiceContent = practice?.querySelector('.editorial-block__content');
     setText(practice?.querySelector('.editorial-block__marker'), practiceData.marker);
     setText(practiceContent?.querySelector('h2'), practiceData.title);
@@ -521,36 +592,42 @@
     setText(practiceContent?.querySelector('summary'), practiceData.summary);
     setTexts(practiceContent?.querySelectorAll('.editorial-disclosure__content p'), practiceData.context);
 
-    const focus = blocks[1];
+    const focus = getBlock(aboutSection, 'focus');
     const focusContent = focus?.querySelector('.editorial-block__content');
     setText(focus?.querySelector('.editorial-block__marker'), focusData.marker);
     setText(focusContent?.querySelector('h2'), focusData.title);
     setTexts(directChildren(focusContent, 'p'), focusData.paragraphs);
 
-    const mediator = blocks[2];
+    const mediator = getBlock(aboutSection, 'mediator');
     const mediatorContent = mediator?.querySelector('.editorial-block__content');
     setText(mediator?.querySelector('.editorial-block__marker'), mediatorData.marker);
     setText(mediatorContent?.querySelector('h2'), mediatorData.title);
     setTexts(directChildren(mediatorContent, 'p:not(.lead-spaced)').slice(0, 2), mediatorData.intro);
-    setTexts(mediatorContent?.querySelectorAll('h3'), mediatorData.headings);
-    setTexts(Array.from(mediatorContent?.querySelectorAll('h3') || []).map((heading) => heading.nextElementSibling), mediatorData.paragraphs);
+    ['research', 'collectibleForms', 'visibility'].forEach((key, index) => {
+      const heading = getItem(mediatorContent, key);
+
+      setText(heading, mediatorData.headings?.[index]);
+      setText(heading?.nextElementSibling, mediatorData.paragraphs?.[index]);
+    });
     setText(mediatorContent?.querySelector('.lead-spaced'), mediatorData.conclusion);
 
-    const structure = blocks[3];
+    const structure = getBlock(aboutSection, 'structure');
     const structureContent = structure?.querySelector('.editorial-block__content');
     setText(structure?.querySelector('.editorial-block__marker'), structureData.marker);
     setText(structureContent?.querySelector('h2'), structureData.title);
-    Array.from(structureContent?.querySelectorAll('.editorial-index__item') || []).forEach((item, index) => {
-      const value = structureData.items?.[index];
-      setText(item.querySelector('h3'), value?.[0]);
-      setText(item.querySelector('p'), value?.[1]);
-    });
+    setIndexedItems(structureContent, structureData.items, [
+      'advisoryBoard',
+      'artists',
+      'patrons',
+      'publicProgrammes',
+      'partnerships'
+    ]);
   };
 
   const setPatrons = (data) => {
     const patrons = data.patrons || {};
     const section = document.querySelector('#patrons');
-    const block = section?.querySelector('.editorial-block');
+    const block = getBlock(section, 'patrons-programme');
     const content = block?.querySelector('.editorial-block__content');
 
     setText(section?.querySelector('.section-intro h1'), patrons.title);
@@ -558,11 +635,12 @@
     setText(block?.querySelector('.editorial-block__marker'), patrons.marker);
     setText(content?.querySelector('h2'), patrons.programmeTitle);
 
-    Array.from(content?.querySelectorAll('.editorial-index__item') || []).forEach((item, index) => {
-      const value = patrons.items?.[index];
-      setText(item.querySelector('h3'), value?.[0]);
-      setText(item.querySelector('p'), value?.[1]);
-    });
+    setIndexedItems(content, patrons.items, [
+      'studioVisits',
+      'closedEvents',
+      'education',
+      'specialProjects'
+    ]);
 
     setText(content?.querySelector('.lead-spaced'), patrons.final);
   };
@@ -587,19 +665,24 @@
       setText(card.querySelector('.artist-card__body > p:not(.artist-card__role)'), artist?.text);
       setAttr(card.querySelector('.artist-card__image'), 'alt', displayName);
       setAttr(card.querySelector('.artist-card__links'), 'aria-label', displayName ? `${data.ui.nav.artists}: ${displayName}` : undefined);
-      setAttr(card.querySelector('.artist-card__link--site'), 'aria-label', displayName ? `Website: ${displayName}` : undefined);
-      setAttr(card.querySelector('.artist-card__link--instagram'), 'aria-label', displayName ? `Instagram: ${displayName}` : undefined);
+      setAttr(card.querySelector('.artist-card__link--site'), 'aria-label', displayName ? `${data.ui.links.site}: ${displayName}` : undefined);
+      setAttr(card.querySelector('.artist-card__link--instagram'), 'aria-label', displayName ? `${data.ui.links.instagram}: ${displayName}` : undefined);
     });
   };
 
   const setSectionLabels = (data) => {
-    const labels = [data.about?.label, data.patrons?.label, data.artists?.label];
-    document.querySelectorAll('.section-intro').forEach((intro, index) => {
+    const labels = {
+      about: data.about?.label,
+      patrons: data.patrons?.label,
+      artists: data.artists?.label
+    };
+
+    document.querySelectorAll('[data-i18n-section]').forEach((intro) => {
       if (!originalSectionLabels.has(intro)) {
         originalSectionLabels.set(intro, intro.dataset.sectionLabel || '');
       }
 
-      const label = labels[index] ?? originalSectionLabels.get(intro);
+      const label = labels[intro.dataset.i18nSection] ?? originalSectionLabels.get(intro);
       if (label) {
         intro.dataset.sectionLabel = label;
       } else {
@@ -613,6 +696,10 @@
 
     currentLanguage = language;
     const data = getCurrentData();
+
+    if (options.syncUrl) {
+      syncUrlLanguage(language);
+    }
 
     setMeta(data);
     setLanguageControls(data);
@@ -651,7 +738,7 @@
 
   document.querySelectorAll('[data-language-option]').forEach((button) => {
     button.addEventListener('click', () => {
-      applyLanguage(button.dataset.languageOption, { persist: true });
+      applyLanguage(button.dataset.languageOption, { persist: true, syncUrl: true });
     });
   });
 
@@ -662,5 +749,5 @@
     t: (path) => getPath(getCurrentData(), path) ?? getPath(translations.ru, path)
   };
 
-  applyLanguage(getInitialLanguage());
+  applyLanguage(getInitialLanguage(), { syncUrl: true });
 })();

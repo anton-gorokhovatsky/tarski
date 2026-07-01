@@ -141,6 +141,68 @@
 })();
 
 (() => {
+  const service = document.querySelector('[data-mobile-service]');
+  const toggle = service?.querySelector('[data-mobile-service-toggle]');
+  const panel = service?.querySelector('[data-mobile-service-panel]');
+  const code = service?.querySelector('[data-mobile-service-code]');
+  const languageCodes = {
+    ru: 'RU',
+    en: 'EN',
+    ja: 'JP'
+  };
+
+  if (!service || !toggle || !panel || !code) return;
+
+  const getLabel = (isOpen) => {
+    const path = isOpen ? 'ui.serviceClose' : 'ui.serviceOpen';
+    const fallback = isOpen ? 'Закрыть настройки сайта' : 'Открыть настройки сайта';
+    return window.tarskiI18n?.t(path) || fallback;
+  };
+
+  const syncLanguageCode = () => {
+    const language = window.tarskiI18n?.getLanguage?.() || 'ru';
+    code.textContent = languageCodes[language] || language.toUpperCase();
+  };
+
+  const setOpen = (isOpen) => {
+    service.classList.toggle('is-open', isOpen);
+    toggle.setAttribute('aria-expanded', String(isOpen));
+    toggle.setAttribute('aria-label', getLabel(isOpen));
+    toggle.setAttribute('title', getLabel(isOpen));
+    panel.hidden = !isOpen;
+  };
+
+  toggle.addEventListener('click', (event) => {
+    event.stopPropagation();
+    setOpen(toggle.getAttribute('aria-expanded') !== 'true');
+  });
+
+  panel.addEventListener('click', (event) => {
+    event.stopPropagation();
+  });
+
+  document.addEventListener('click', (event) => {
+    if (!service.contains(event.target)) {
+      setOpen(false);
+    }
+  });
+
+  window.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+      setOpen(false);
+    }
+  });
+
+  window.addEventListener('tarski:languagechange', () => {
+    syncLanguageCode();
+    setOpen(toggle.getAttribute('aria-expanded') === 'true');
+  });
+
+  syncLanguageCode();
+  setOpen(false);
+})();
+
+(() => {
   const navLinks = Array.from(document.querySelectorAll('.main-nav a[href^="#"], .mobile-menu-panel a[href^="#"]'));
   const primaryNavLinks = Array.from(document.querySelectorAll('.main-nav a[href^="#"]'));
   const sections = primaryNavLinks

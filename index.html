@@ -38,7 +38,7 @@
     <meta name="twitter:title" content="Tarski" />
     <meta name="twitter:description" content="Среда изучения и поддержки социально ориентированного и вовлекающего искусства." />
     <link rel="icon" href="assets/favicon.svg?v=20260701-caps-favicon" type="image/svg+xml" sizes="any" />
-    <link rel="stylesheet" href="styles.css?v=20260701-service-panel" />
+    <link rel="stylesheet" href="styles.css?v=20260701-mobile-service" />
   </head>
   <body>
     <a class="skip-link" href="#about">Перейти к содержанию</a>
@@ -82,6 +82,22 @@
         <a class="mobile-mail-pill" href="mailto:tarski.fund@gmail.com?subject=Tarski" aria-label="Написать нам" title="Написать нам">
           <img class="mobile-mail-pill__icon" src="assets/contact-icon.svg" alt="" aria-hidden="true" />
         </a>
+
+        <div class="mobile-service" data-mobile-service>
+          <button class="mobile-service-toggle" type="button" data-mobile-service-toggle aria-expanded="false" aria-controls="mobile-service-panel" aria-label="Открыть настройки сайта" title="Открыть настройки сайта">
+            <span data-mobile-service-code>RU</span>
+          </button>
+          <div id="mobile-service-panel" class="mobile-service-panel" data-mobile-service-panel hidden>
+            <div class="language-switcher" role="group" aria-label="Выбор языка" data-language-switcher>
+              <button type="button" data-language-option="ru" lang="ru" aria-pressed="true">RU</button>
+              <button type="button" data-language-option="en" lang="en" aria-pressed="false">EN</button>
+              <button type="button" data-language-option="ja" lang="ja" aria-pressed="false">JP</button>
+            </div>
+            <button class="theme-toggle" type="button" data-theme-toggle aria-label="Переключить тему" aria-pressed="false" title="Переключить тему">
+              <span class="theme-toggle__icon" aria-hidden="true"></span>
+            </button>
+          </div>
+        </div>
       </nav>
 
       <main id="top" class="content">
@@ -90,12 +106,12 @@
         </section>
 
         <section id="about" class="section" tabindex="-1">
-          <div class="section-intro" data-section-label="среда">
+          <div class="section-intro" data-section-label="среда" data-i18n-section="about">
             <h1>О нас</h1>
             <p class="lead">Мы создаем среду для развития социально ориентированного и&nbsp;вовлекающего искусства&nbsp;— через работу с&nbsp;художниками, образовательные форматы и&nbsp;культурные инициативы.</p>
           </div>
 
-          <div class="editorial-block">
+          <div class="editorial-block" data-i18n-block="practice">
             <span class="editorial-block__marker" aria-hidden="true">поле практик</span>
             <div class="editorial-block__content">
               <h2>С каким искусством мы работаем</h2>
@@ -120,7 +136,7 @@
             </div>
           </div>
 
-          <div class="editorial-block">
+          <div class="editorial-block" data-i18n-block="focus">
             <span class="editorial-block__marker" aria-hidden="true">фокус</span>
             <div class="editorial-block__content">
               <h2>Подход и&nbsp;темы</h2>
@@ -131,51 +147,51 @@
             </div>
           </div>
 
-          <div class="editorial-block">
+          <div class="editorial-block" data-i18n-block="mediator">
             <span class="editorial-block__marker" aria-hidden="true">медиация</span>
             <div class="editorial-block__content">
               <h2>Tarski&nbsp;— проект-медиатор</h2>
               <p class="lead">Как эксперты в&nbsp;современном искусстве, арт-рынке и&nbsp;филантропии, мы&nbsp;умеем раскрывать ценность сложных и&nbsp;процессуальных практик.</p>
               <p>Наша задача&nbsp;— создать среду, в&nbsp;которой такое искусство может существовать в&nbsp;разных формах, от&nbsp;объекта до&nbsp;события, и&nbsp;находить своего зрителя и&nbsp;коллекционера.</p>
 
-              <h3>Изучение и&nbsp;архивация</h3>
+              <h3 data-i18n-item="research">Изучение и&nbsp;архивация</h3>
               <p>Мы фиксируем и&nbsp;описываем практики через тексты и&nbsp;ридеры, формируя язык, который позволяет о&nbsp;них говорить. Параллельно развиваем медийное присутствие через интервью с&nbsp;художниками, кураторами и&nbsp;участниками, а&nbsp;также публикации, раскрывающие контекст их&nbsp;работы.</p>
 
-              <h3>Разработка коллекционируемых форм</h3>
+              <h3 data-i18n-item="collectibleForms">Разработка коллекционируемых форм</h3>
               <p>Мы&nbsp;работаем с&nbsp;художественными практиками, которым сложнее существовать в&nbsp;рыночной логике, и&nbsp;создаем для них условия коллекционирования: объекты, документация, формы участия, специальные издания и&nbsp;другие.</p>
 
-              <h3>Видимость</h3>
+              <h3 data-i18n-item="visibility">Видимость</h3>
               <p>Мы выстраиваем публичное поле вокруг социально ориентированного искусства, делая его понятным и&nbsp;видимым за&nbsp;пределами профессионального круга. Мы&nbsp;знакомим аудиторию с&nbsp;такими практиками через публичную программу фонда, постепенно формируя вокруг них устойчивое сообщество.</p>
               <p class="lead lead-spaced">Таким образом, Tarski выступает проводником этого искусства&nbsp;— соединяя художественные практики, профессиональную среду и&nbsp;более широкий культурный контекст.</p>
             </div>
           </div>
 
-          <div class="editorial-block">
+          <div class="editorial-block" data-i18n-block="structure">
             <span class="editorial-block__marker" aria-hidden="true">сборка среды</span>
             <div class="editorial-block__content">
               <h2>Как мы строим Tarski</h2>
               <div class="editorial-index">
-                <div class="editorial-index__item">
+                <div class="editorial-index__item" data-i18n-item="advisoryBoard">
                   <h3>Экспертный совет</h3>
                   <p>Профессионалы из&nbsp;сфер культуры, образования, бизнеса и&nbsp;медиа, которые помогают развитию Tarski своей экспертизой, связями и&nbsp;репутацией.</p>
                 </div>
 
-                <div class="editorial-index__item">
+                <div class="editorial-index__item" data-i18n-item="artists">
                   <h3>Работа с&nbsp;художниками</h3>
                   <p>Поддержка художественных проектов, исследований, резиденций и&nbsp;новых форм вовлекающего искусства.</p>
                 </div>
 
-                <div class="editorial-index__item">
+                <div class="editorial-index__item" data-i18n-item="patrons">
                   <h3>Клуб патронов</h3>
                   <p>Сообщество, которое поддерживает Tarski финансово и&nbsp;участвует в&nbsp;развитии фонда.</p>
                 </div>
 
-                <div class="editorial-index__item">
+                <div class="editorial-index__item" data-i18n-item="publicProgrammes">
                   <h3>Публичные программы</h3>
                   <p>Участие в&nbsp;конференциях, фестивалях, дискуссиях, образовательных и&nbsp;культурных проектах партнерских культурных организаций.</p>
                 </div>
 
-                <div class="editorial-index__item">
+                <div class="editorial-index__item" data-i18n-item="partnerships">
                   <h3>Партнерства</h3>
                   <p>Сотрудничество с&nbsp;культурными институциями, университетами, фондами, бизнесом, медиа и&nbsp;частными инициативами.</p>
                 </div>
@@ -185,32 +201,32 @@
         </section>
 
         <section id="patrons" class="section section-offset">
-          <div class="section-intro" data-section-label="участие">
+          <div class="section-intro" data-section-label="участие" data-i18n-section="patrons">
             <h1>Клуб патронов фонда Tarski</h1>
             <p class="lead">Программа участия в&nbsp;современном искусстве через опыт, взаимодействие и&nbsp;прямой контакт с&nbsp;художниками и&nbsp;профессиональным сообществом</p>
           </div>
 
-          <div class="editorial-block">
+          <div class="editorial-block" data-i18n-block="patrons-programme">
             <span class="editorial-block__marker" aria-hidden="true">клуб</span>
             <div class="editorial-block__content">
               <h2>Регулярная программа</h2>
               <div class="editorial-index editorial-index--program">
-                <div class="editorial-index__item">
+                <div class="editorial-index__item" data-i18n-item="studioVisits">
                   <h3>Визиты в&nbsp;мастерские художников</h3>
                   <p>Вы&nbsp;знакомитесь с&nbsp;художниками и&nbsp;поддерживаете их&nbsp;проекты, давая возможность работать с&nbsp;новыми идеями и&nbsp;форматами.</p>
                 </div>
 
-                <div class="editorial-index__item">
+                <div class="editorial-index__item" data-i18n-item="closedEvents">
                   <h3>Встречи и&nbsp;закрытые события с&nbsp;авторами</h3>
                   <p>Вы знакомитесь с&nbsp;художниками и&nbsp;поддерживаете их&nbsp;проекты, давая возможность работать с&nbsp;новыми идеями и&nbsp;форматами.</p>
                 </div>
 
-                <div class="editorial-index__item">
+                <div class="editorial-index__item" data-i18n-item="education">
                   <h3>Лекции, медиации и&nbsp;образовательные форматы</h3>
                   <p>Вы знакомитесь с&nbsp;художниками и&nbsp;поддерживаете их&nbsp;проекты, давая возможность работать с&nbsp;новыми идеями и&nbsp;форматами.</p>
                 </div>
 
-                <div class="editorial-index__item">
+                <div class="editorial-index__item" data-i18n-item="specialProjects">
                   <h3>Специальные проекты и&nbsp;коллаборации с&nbsp;культурными институциями</h3>
                   <p>Вы знакомитесь с&nbsp;художниками и&nbsp;поддерживаете их&nbsp;проекты, давая возможность работать с&nbsp;новыми идеями и&nbsp;форматами.</p>
                 </div>
@@ -222,7 +238,7 @@
         </section>
 
         <section id="artists" class="artists-section section-offset" aria-labelledby="artists-title">
-          <div class="section-intro" data-section-label="сеть">
+          <div class="section-intro" data-section-label="сеть" data-i18n-section="artists">
             <h1 id="artists-title">Сеть художников-единомышленников</h1>
           </div>
 
@@ -378,7 +394,7 @@
       </section>
     </aside>
 
-    <script src="i18n.js?v=20260701-languages"></script>
-    <script src="script.js?v=20260701-languages"></script>
+    <script src="i18n.js?v=20260701-language-url"></script>
+    <script src="script.js?v=20260701-mobile-service"></script>
   </body>
 </html>
