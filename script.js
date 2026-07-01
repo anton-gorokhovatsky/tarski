@@ -527,6 +527,182 @@
 })();
 
 (() => {
+  const dossier = document.querySelector('[data-artist-dossier]');
+  const panel = dossier?.querySelector('.artist-dossier__panel');
+  const image = dossier?.querySelector('[data-artist-dossier-image]');
+  const name = dossier?.querySelector('[data-artist-dossier-name]');
+  const role = dossier?.querySelector('[data-artist-dossier-role]');
+  const text = dossier?.querySelector('[data-artist-dossier-text]');
+  const links = dossier?.querySelector('[data-artist-dossier-links]');
+  const closeControls = Array.from(dossier?.querySelectorAll('[data-artist-dossier-close]') || []);
+  const cards = Array.from(document.querySelectorAll('.artist-card'));
+  const indexLinks = Array.from(document.querySelectorAll('.artist-index__link[href^="#artist-"]'));
+  const preferredImages = {
+    'artist-anastasia-dahl': 'assets/artist-index/330551584_215344677620530_5433914055885423503_n.jpg',
+    'artist-nadezhda-ishkinyaeva': 'assets/artist-index/Надежда Ишкиняева.png',
+    'artist-elena-kolesnikova': 'assets/artist-index/Елена Колесникова.webp',
+    'artist-alina-kugush': 'assets/artist-index/izobrazhenie-dsc05043-1-1500x.jpg',
+    'artist-no-excuse-group': 'assets/artist-index/0015.jpg.webp'
+  };
+
+  if (!dossier || !panel || !image || !name || !role || !text || !links || !cards.length) return;
+
+  const cardsById = new Map(cards.map((card) => [card.id, card]));
+  let activeTrigger = null;
+  let openTimerId = null;
+
+  const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const focusWithoutScroll = (element) => {
+    try {
+      element.focus({ preventScroll: true });
+    } catch (error) {
+      element.focus();
+    }
+  };
+
+  const getCardData = (card) => {
+    const cardImage = card.querySelector('.artist-card__image');
+    const cardName = card.querySelector('.artist-card__name');
+    const cardRole = card.querySelector('.artist-card__role');
+    const cardLinks = Array.from(card.querySelectorAll('.artist-card__link'));
+    const copy = Array.from(card.querySelectorAll('.artist-card__body > p:not(.artist-card__role)'));
+
+    return {
+      id: card.id,
+      imageSrc: preferredImages[card.id] || cardImage?.getAttribute('src') || '',
+      imageAlt: cardImage?.getAttribute('alt') || cardName?.textContent.trim() || '',
+      name: cardName?.textContent.trim() || '',
+      role: cardRole?.textContent.trim() || '',
+      copy,
+      links: cardLinks
+    };
+  };
+
+  const setCurrentIndexLink = (id) => {
+    indexLinks.forEach((link) => {
+      const isCurrent = link.getAttribute('href') === `#${id}`;
+
+      if (isCurrent) {
+        link.setAttribute('aria-current', 'true');
+      } else {
+        link.removeAttribute('aria-current');
+      }
+    });
+  };
+
+  const openDossier = (card, trigger = null) => {
+    const data = getCardData(card);
+    activeTrigger = trigger || document.activeElement;
+
+    image.src = data.imageSrc;
+    image.alt = data.imageAlt;
+    name.textContent = data.name;
+    role.textContent = data.role;
+    text.replaceChildren(...data.copy.map((item) => item.cloneNode(true)));
+    links.replaceChildren(...data.links.map((item) => item.cloneNode(true)));
+
+    dossier.classList.add('is-open');
+    dossier.setAttribute('aria-hidden', 'false');
+    document.documentElement.classList.add('has-open-dossier');
+    setCurrentIndexLink(card.id);
+
+    window.setTimeout(() => focusWithoutScroll(panel), 0);
+  };
+
+  const closeDossier = () => {
+    if (!dossier.classList.contains('is-open')) return;
+
+    dossier.classList.remove('is-open');
+    dossier.setAttribute('aria-hidden', 'true');
+    document.documentElement.classList.remove('has-open-dossier');
+    indexLinks.forEach((link) => link.removeAttribute('aria-current'));
+
+    if (activeTrigger instanceof HTMLElement) {
+      focusWithoutScroll(activeTrigger);
+    }
+
+    activeTrigger = null;
+  };
+
+  const getFocusableElements = () => Array.from(panel.querySelectorAll(
+    'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'
+  )).filter((element) => element.offsetParent !== null);
+
+  cards.forEach((card) => {
+    const header = card.querySelector('.artist-card__header');
+    const cardName = card.querySelector('.artist-card__name')?.textContent.trim() || 'художника';
+    if (!header || header.querySelector('.artist-card__open')) return;
+
+    const button = document.createElement('button');
+    button.className = 'artist-card__open';
+    button.type = 'button';
+    button.textContent = 'досье';
+    button.setAttribute('aria-label', `Открыть досье: ${cardName}`);
+    button.addEventListener('click', () => openDossier(card, button));
+    header.append(button);
+  });
+
+  indexLinks.forEach((link) => {
+    link.setAttribute('aria-haspopup', 'dialog');
+    link.addEventListener('click', () => {
+      const id = link.hash.slice(1);
+      const card = cardsById.get(id);
+      if (!card) return;
+
+      window.clearTimeout(openTimerId);
+      openTimerId = window.setTimeout(() => openDossier(card, link), reducedMotion() ? 0 : 560);
+    });
+  });
+
+  closeControls.forEach((control) => {
+    control.addEventListener('click', closeDossier);
+  });
+
+  window.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+      closeDossier();
+      return;
+    }
+
+    if (event.key !== 'Tab' || !dossier.classList.contains('is-open')) {
+      return;
+    }
+
+    const focusableElements = getFocusableElements();
+    if (!focusableElements.length) {
+      event.preventDefault();
+      focusWithoutScroll(panel);
+      return;
+    }
+
+    const firstElement = focusableElements[0];
+    const lastElement = focusableElements[focusableElements.length - 1];
+
+    if (event.shiftKey && document.activeElement === firstElement) {
+      event.preventDefault();
+      focusWithoutScroll(lastElement);
+    } else if (!event.shiftKey && document.activeElement === lastElement) {
+      event.preventDefault();
+      focusWithoutScroll(firstElement);
+    }
+  });
+
+  window.addEventListener('hashchange', () => {
+    const id = window.location.hash.slice(1);
+    const card = cardsById.get(id);
+    if (card) {
+      openDossier(card);
+    }
+  });
+
+  const initialCard = cardsById.get(window.location.hash.slice(1));
+  if (initialCard) {
+    window.setTimeout(() => openDossier(initialCard), 360);
+  }
+})();
+
+(() => {
   const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
   const finePointerQuery = window.matchMedia('(hover: hover) and (pointer: fine)');
   const colorSchemeQuery = window.matchMedia('(prefers-color-scheme: dark)');
