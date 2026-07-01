@@ -50,9 +50,6 @@
   --scene-label-active-shift: -4px;
   --scene-nav-label-opacity: 0.82;
   --scene-nav-label-shift: 0px;
-  --kinetic-x: 0;
-  --kinetic-y: 0;
-  --kinetic-scroll: 0;
   --page-padding-x: 45px;
   --content-width: 890px;
   --menu-width: 199px;
@@ -279,18 +276,6 @@ a:hover {
   width: 100%;
   height: auto;
   filter: var(--brand-filter);
-  transform:
-    translate3d(
-      calc(var(--kinetic-x) * 5px),
-      calc((var(--kinetic-y) * 2px) + (var(--kinetic-scroll) * 10px)),
-      0
-    )
-    skewX(calc(var(--kinetic-x) * -0.8deg));
-  transform-origin: 0 0;
-  transition:
-    filter var(--duration-fast) var(--ease-smooth),
-    transform 700ms var(--ease-smooth);
-  will-change: transform;
 }
 
 .main-nav {
@@ -599,19 +584,6 @@ a:hover {
   line-height: 1.16;
   font-weight: 400;
   letter-spacing: 0;
-  text-wrap: balance;
-}
-
-.superlead .kinetic-word {
-  display: inline-block;
-  transform:
-    translate3d(
-      calc(var(--kinetic-x) * var(--word-x) * 1px),
-      calc((var(--kinetic-y) * var(--word-y) * 1px) + (var(--kinetic-scroll) * var(--word-scroll) * 1px)),
-      0
-    );
-  transition: transform 680ms var(--ease-smooth);
-  will-change: transform;
 }
 
 .section {
@@ -2012,13 +1984,6 @@ html.has-open-dossier {
   }
 }
 
-@media (hover: none), (pointer: coarse) {
-  .brand img,
-  .superlead .kinetic-word {
-    transform: none;
-  }
-}
-
 /* Mobile floating menu — vertical art map + separate mail action. */
 .mobile-floating-menu {
   display: none;
@@ -2457,10 +2422,5 @@ html.has-open-dossier {
       translate3d(var(--mobile-indicator-x), -50%, 0)
       rotateZ(var(--nav-indicator-rotation))
       scale(var(--nav-indicator-scale));
-  }
-
-  .brand img,
-  .superlead .kinetic-word {
-    transform: none;
   }
 }
