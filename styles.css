@@ -1270,9 +1270,9 @@ li::before {
 .artist-dossier__panel {
   position: relative;
   display: grid;
-  grid-template-columns: minmax(180px, 0.58fr) minmax(0, 1fr);
-  gap: clamp(22px, 3vw, 38px);
-  width: min(780px, calc(100vw - (var(--page-padding-x) * 2) - var(--menu-width) - 34px));
+  grid-template-columns: minmax(240px, 0.72fr) minmax(0, 1fr);
+  gap: clamp(26px, 3.2vw, 46px);
+  width: min(1120px, calc(100vw - (var(--page-padding-x) * 2) - var(--menu-width) - 34px));
   max-height: min(760px, calc(100svh - 36px));
   padding: clamp(20px, 3vw, 34px);
   overflow: auto;
@@ -1383,15 +1383,16 @@ li::before {
 }
 
 .artist-dossier h2 {
-  max-width: 9.8em;
+  max-width: 100%;
   margin: 0 0 12px;
   font-size: clamp(36px, 5.2vw, 72px);
   line-height: 0.94;
   font-family: Georgia, "Times New Roman", serif;
   font-weight: 400;
   letter-spacing: 0;
-  hyphens: auto;
-  overflow-wrap: anywhere;
+  hyphens: manual;
+  overflow-wrap: break-word;
+  word-break: normal;
 }
 
 .artist-dossier__role {
