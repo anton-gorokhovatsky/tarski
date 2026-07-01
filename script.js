@@ -1,7 +1,7 @@
 (() => {
   const iconLink = document.querySelector('link[rel~="icon"]');
   const reduceMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-  const version = '20260701-favicon-frames';
+  const version = '20260701-caps-favicon';
   const frames = [
     'assets/favicon.svg',
     'assets/favicon-a.svg',
