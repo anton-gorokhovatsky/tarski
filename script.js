@@ -224,6 +224,44 @@
     artists: 'Сеть'
   };
   const getSceneLabels = () => window.tarskiI18n?.getSceneLabels?.() || fallbackSceneLabels;
+  const getLabelSources = () => Array.from(document.querySelectorAll(
+    '.section-intro[data-section-label], .editorial-block'
+  ));
+
+  const getSourceLabel = (source) => {
+    if (source.matches('.section-intro[data-section-label]')) {
+      return source.dataset.sectionLabel;
+    }
+
+    return source.querySelector('.editorial-block__marker')?.textContent.trim();
+  };
+
+  const getCurrentContextLabel = () => {
+    if (currentScene === 'cover') {
+      const sceneLabels = getSceneLabels();
+      return sceneLabels.cover || fallbackSceneLabels.cover;
+    }
+
+    const anchor = window.scrollY + window.innerHeight * 0.22;
+    let currentSource = null;
+
+    getLabelSources().forEach((source) => {
+      if (source.offsetTop <= anchor) {
+        currentSource = source;
+      }
+    });
+
+    const sourceLabel = currentSource ? getSourceLabel(currentSource) : null;
+    if (sourceLabel) return sourceLabel;
+
+    const sceneLabels = getSceneLabels();
+    return sceneLabels[currentScene] || sceneLabels.cover || fallbackSceneLabels.cover;
+  };
+
+  const updateNavLabel = () => {
+    if (!navLabel) return;
+    navLabel.textContent = getCurrentContextLabel();
+  };
 
   let currentActiveId = null;
   let currentScene = document.documentElement.dataset.scene || 'cover';
@@ -248,10 +286,7 @@
     currentScene = scene;
     document.documentElement.dataset.scene = scene;
 
-    if (navLabel) {
-      const sceneLabels = getSceneLabels();
-      navLabel.textContent = sceneLabels[scene] || sceneLabels.cover || fallbackSceneLabels.cover;
-    }
+    updateNavLabel();
 
     window.dispatchEvent(new CustomEvent('tarski:scenechange', {
       detail: { scene }
@@ -382,6 +417,7 @@
     });
 
     setActive(current.id);
+    updateNavLabel();
   };
 
   const updateMobileMenuVisibility = () => {
@@ -414,6 +450,7 @@
 
   window.addEventListener('scroll', () => {
     updateActive();
+    updateNavLabel();
     updateMobileMenuVisibility();
   }, { passive: true });
 
@@ -424,18 +461,15 @@
 
   window.addEventListener('resize', () => {
     updateActive();
+    updateNavLabel();
     updateMenuIndicators(false);
     updateMobileScrollerMask();
     updateMobileMenuVisibility();
   });
 
   window.addEventListener('tarski:languagechange', () => {
-    if (navLabel) {
-      const sceneLabels = getSceneLabels();
-      navLabel.textContent = sceneLabels[currentScene] || sceneLabels.cover || fallbackSceneLabels.cover;
-    }
-
     updateActive();
+    updateNavLabel();
     updateMenuIndicators(false);
     updateMobileScrollerMask();
     updateMobileMenuVisibility();
