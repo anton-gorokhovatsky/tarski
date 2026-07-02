@@ -1532,16 +1532,29 @@ html.has-open-dossier {
   align-items: start;
 }
 
+.site-footer__meta,
 .site-footer__year,
 .site-footer__disclaimer {
   margin: 0;
   text-align: left;
 }
 
-.site-footer__year {
+.site-footer__meta {
+  display: grid;
+  gap: 8px;
   color: var(--muted-text);
   font-size: 13px;
   line-height: 1.15;
+}
+
+.site-footer__year {
+  margin: 0;
+}
+
+.site-footer__privacy {
+  color: var(--muted-text);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.16em;
 }
 
 .site-footer__disclaimer {
@@ -1559,6 +1572,53 @@ html.has-open-dossier {
   transform: translateX(calc(-100% - 0.08em));
   font-size: 0.8em;
   line-height: 1;
+}
+
+.privacy-page {
+  min-height: 100vh;
+  padding: 28px var(--page-padding-x) 80px;
+  background: var(--page-bg);
+  color: var(--text);
+}
+
+.privacy-page__back {
+  display: inline-block;
+  color: var(--text);
+  font-size: 20px;
+  line-height: 1.2;
+  text-decoration: none;
+}
+
+.privacy-page__content {
+  width: min(100%, 760px);
+  margin: 18vh auto 0;
+}
+
+.privacy-page__eyebrow {
+  margin: 0 0 20px;
+  color: var(--muted-text);
+  font-size: 16px;
+  line-height: 1.2;
+}
+
+.privacy-page h1 {
+  margin: 0 0 44px;
+  font-size: clamp(42px, 8vw, 106px);
+  line-height: 0.95;
+  font-weight: 400;
+  letter-spacing: 0;
+  overflow-wrap: anywhere;
+}
+
+.privacy-page p {
+  margin: 0 0 22px;
+  color: var(--text);
+  font-size: clamp(22px, 2.5vw, 34px);
+  line-height: 1.18;
+}
+
+.privacy-page p:last-child {
+  margin-bottom: 0;
 }
 
 @media (min-width: 961px) {
@@ -1901,7 +1961,7 @@ html.has-open-dossier {
     padding-top: 120px;
   }
 
-  .site-footer__year,
+  .site-footer__meta,
   .site-footer__disclaimer {
     font-size: 15px;
   }
@@ -1912,7 +1972,8 @@ html.has-open-dossier {
     padding-bottom: 18px;
   }
 
-  .site-footer__year {
+  .site-footer__meta {
+    gap: 6px;
     margin-bottom: 8px;
     font-size: 13px;
   }

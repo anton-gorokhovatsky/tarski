@@ -54,6 +54,7 @@
           site: 'Сайт',
           instagram: 'Инстаграм'
         },
+        privacy: 'Аналитика',
         footerLegal: 'Решением суда запрещена «деятельность компании Meta Platforms Inc. по реализации продуктов — социальных сетей Facebook и Instagram на территории Российской Федерации по основаниям осуществления экстремистской деятельности»'
       }
     },
@@ -98,6 +99,7 @@
           site: 'Website',
           instagram: 'Instagram'
         },
+        privacy: 'Analytics',
         footerLegal: 'By court decision, the activities of Meta Platforms Inc. related to the Facebook and Instagram social networks are prohibited in the Russian Federation on grounds of extremist activity.'
       },
       superlead: 'Researching and Supporting Participatory and Socially Engaged Art',
@@ -265,6 +267,7 @@
           site: 'ウェブサイト',
           instagram: 'Instagram'
         },
+        privacy: '分析',
         footerLegal: '裁判所の決定により、Meta Platforms Inc.によるFacebookおよびInstagramのサービス提供に関する活動は、過激主義的活動を理由としてロシア連邦内で禁止されています。'
       },
       superlead: '参加型およびソーシャリー・エンゲイジド・アートの研究と支援',
@@ -576,6 +579,7 @@
     setAttr(document.querySelector('.mobile-mail-pill'), 'title', data.ui.nav.mail);
     setAttr(document.querySelector('.artist-dossier__scrim'), 'aria-label', data.ui.closeDetails);
     setAttr(document.querySelector('.artist-dossier__close'), 'aria-label', data.ui.closeDetails);
+    setText(document.querySelector('.site-footer__privacy'), data.ui.privacy);
     setFooterLegal(currentLanguage === 'ru' ? undefined : data.ui.footerLegal);
   };
 

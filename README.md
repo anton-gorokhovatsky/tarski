@@ -65,6 +65,12 @@ anton-gorokhovatsky.github.io
 
 Yandex Metrika is installed in `index.html`.
 
+Analytics and privacy note is available at:
+
+```text
+https://tarski.ru/privacy.html
+```
+
 Yandex Webmaster verification is available at:
 
 ```text
