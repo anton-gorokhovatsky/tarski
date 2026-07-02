@@ -127,10 +127,7 @@
           marker: 'focus',
           title: 'Approach and Themes',
           paragraphs: [
-            'We work with artistic practices at the intersection of contemporary art, participation, and philanthropy.',
-            'We address themes that influence the quality of life of individuals in society: social connectedness, access and inclusion, education and knowledge exchange, ecological and cultural sustainability.',
-            'We are interested in forms of interaction based on respect, care, and responsibility.',
-            'We see art as a space of participation, dialogue, and shared experience, where people can be not only viewers, but also co-participants in what is taking place.'
+            'We work with artistic practices at the intersection of contemporary art, participation, and philanthropy, addressing themes that influence the quality of life of individuals in society: social connectedness, access and inclusion, education and knowledge exchange, ecological and cultural sustainability. We are interested in forms of interaction based on respect, care, and responsibility, as well as in art as a space of participation, dialogue, and shared experience, where people can be not only viewers, but also co-participants in what is taking place.'
           ]
         },
         mediator: {
@@ -278,10 +275,7 @@
           marker: 'フォーカス',
           title: 'アプローチとテーマ',
           paragraphs: [
-            '私たちは、現代アート、参加、フィランソロピーが交差する地点にある芸術実践に取り組んでいます。そこで扱うのは、社会における人々の生活の質に関わるテーマです。',
-            '社会的なつながり、アクセスとインクルージョン、教育と知識の共有、そして生態的・文化的な持続可能性がその中心にあります。',
-            '私たちが重視するのは、尊重、ケア、責任に基づく関係のあり方です。',
-            'また、アートを参加、対話、共有された経験の空間として捉えています。そこでは、人々は単なる鑑賞者ではなく、起きていることに関わる共参加者となることができます。'
+            '私たちは、現代アート、参加、フィランソロピーが交差する地点にある芸術実践に取り組んでいます。そこで扱うのは、社会における人々の生活の質に関わるテーマです。社会的なつながり、アクセスとインクルージョン、教育と知識の共有、そして生態的・文化的な持続可能性がその中心にあります。私たちが重視するのは、尊重、ケア、責任に基づく関係のあり方です。また、アートを参加、対話、共有された経験の空間として捉えています。そこでは、人々は単なる鑑賞者ではなく、起きていることに関わる共参加者となることができます。'
           ]
         },
         mediator: {
