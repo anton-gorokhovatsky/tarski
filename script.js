@@ -221,7 +221,6 @@
   const fallbackSceneLabels = {
     cover: 'Меню',
     about: 'Среда',
-    patrons: 'Участие',
     artists: 'Сеть'
   };
   const getSceneLabels = () => window.tarskiI18n?.getSceneLabels?.() || fallbackSceneLabels;

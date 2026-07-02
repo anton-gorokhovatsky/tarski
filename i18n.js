@@ -34,14 +34,12 @@
         },
         nav: {
           about: 'О проекте',
-          patrons: 'Клуб патронов',
           artists: 'Художники',
           mail: 'Написать нам'
         },
         scenes: {
           cover: 'Меню',
           about: 'Среда',
-          patrons: 'Участие',
           artists: 'Сеть'
         },
         themeDark: 'Включить темную тему',
@@ -79,14 +77,12 @@
         },
         nav: {
           about: 'About',
-          patrons: 'Patrons’ Club',
           artists: 'Artists',
           mail: 'Contact us'
         },
         scenes: {
           cover: 'Menu',
           about: 'Environment',
-          patrons: 'Participation',
           artists: 'Network'
         },
         themeDark: 'Switch to dark theme',
@@ -138,7 +134,7 @@
           ]
         },
         mediator: {
-          marker: 'mediation',
+          marker: 'directions',
           title: 'Tarski as a Mediating Project',
           intro: [
             'As experts in contemporary art, the art market, and philanthropy, we know how to reveal the value of complex and process-based practices.',
@@ -154,7 +150,7 @@
             'We work with artistic practices that are more difficult to sustain within market logic and create conditions for their collectability: objects, documentation, forms of participation, special editions, and other formats.',
             'We build a public field around socially oriented art, making it understandable and visible beyond the professional circle. We introduce audiences to these practices through the foundation’s public programme, gradually forming a sustainable community of solidarity around them.'
           ],
-          conclusion: 'In this way, Tarski acts as a guide for this art — connecting artistic practices, the professional field, and a broader cultural context.'
+          conclusion: 'Tarski acts as a guide for this art — connecting artistic practices, the professional field, and a broader cultural context.'
         },
         structure: {
           marker: 'structure',
@@ -162,25 +158,10 @@
           items: [
             ['Advisory Board', 'Professionals from the fields of culture, education, business, and media who support the development of Tarski through their expertise, networks, and reputation.'],
             ['Work With Artists', 'Support for artistic projects, research, residencies, and new forms of participatory art.'],
-            ['Patrons’ Club', 'A community that supports Tarski financially and participates in the development of the foundation.'],
             ['Public Programmes', 'Participation in conferences, festivals, discussions, educational and cultural projects organised by partner cultural institutions.'],
             ['Partnerships', 'Collaboration with cultural institutions, universities, foundations, businesses, media, and private initiatives.']
           ]
         }
-      },
-      patrons: {
-        label: 'participation',
-        title: 'Tarski Foundation Patrons’ Club',
-        lead: 'A programme for participating in contemporary art through experience, interaction, and direct contact with artists and the professional community.',
-        marker: 'club',
-        programmeTitle: 'Regular Programme',
-        items: [
-          ['Visits to Artists’ Studios', 'You meet artists and support their projects, giving them the opportunity to work with new ideas and formats.'],
-          ['Meetings and Closed Events With Authors', 'You meet artists and support their projects, giving them the opportunity to work with new ideas and formats.'],
-          ['Lectures, Mediations, and Educational Formats', 'You meet artists and support their projects, giving them the opportunity to work with new ideas and formats.'],
-          ['Special Projects and Collaborations With Cultural Institutions', 'You meet artists and support their projects, giving them the opportunity to work with new ideas and formats.']
-        ],
-        final: 'The formats are designed so that participants can not only observe, but also understand artistic practices and the process of creating works of art more deeply.'
       },
       artists: {
         label: 'network',
@@ -247,14 +228,12 @@
         },
         nav: {
           about: 'プロジェクト',
-          patrons: 'パトロン・クラブ',
           artists: 'アーティスト',
           mail: 'お問い合わせ'
         },
         scenes: {
           cover: 'メニュー',
           about: '環境',
-          patrons: '参加',
           artists: 'ネットワーク'
         },
         themeDark: 'ダークテーマに切り替える',
@@ -306,7 +285,7 @@
           ]
         },
         mediator: {
-          marker: '媒介',
+          marker: '方向性',
           title: '媒介者としてのTarski',
           intro: [
             '現代アート、アートマーケット、フィランソロピーに関する専門性をもつ私たちは、複雑でプロセスを重視する実践の価値を可視化する方法を知っています。',
@@ -322,7 +301,7 @@
             '私たちは、市場の論理の中では存在し続けることが難しい芸術実践に取り組み、それらがコレクション可能になるための条件をつくります。たとえば、オブジェクト、ドキュメンテーション、参加の形式、特別版の出版物、その他のフォーマットです。',
             '私たちは、社会志向のアートをめぐる公共的な場を形成し、それを専門家の輪の外にも理解され、見えるものにしていきます。財団の公開プログラムを通じて、こうした実践を観客に紹介し、その周囲に持続的で連帯的なコミュニティを少しずつ育てていきます。'
           ],
-          conclusion: 'このように、Tarskiはこのアートの案内役として機能します。芸術実践、専門的な環境、そしてより広い文化的文脈を結びつける存在です。'
+          conclusion: 'Tarskiはこのアートの案内役として機能します。芸術実践、専門的な環境、そしてより広い文化的文脈を結びつける存在です。'
         },
         structure: {
           marker: '構成',
@@ -330,25 +309,10 @@
           items: [
             ['アドバイザリー・ボード', '文化、教育、ビジネス、メディアの分野で活動する専門家たちが、それぞれの知見、人脈、信頼性を通じてTarskiの発展を支えます。'],
             ['アーティストとの協働', '芸術プロジェクト、リサーチ、レジデンス、そして新しい参加型アートの形式を支援します。'],
-            ['パトロン・クラブ', 'Tarskiを財政的に支え、財団の発展に参加するコミュニティです。'],
             ['パブリック・プログラム', 'パートナーとなる文化機関が主催するカンファレンス、フェスティバル、ディスカッション、教育・文化プロジェクトに参加します。'],
             ['パートナーシップ', '文化機関、大学、財団、企業、メディア、そして民間のイニシアチブと協働します。']
           ]
         }
-      },
-      patrons: {
-        label: '参加',
-        title: 'Tarski財団 パトロン・クラブ',
-        lead: '現代アートに、経験、相互作用、そしてアーティストや専門的なコミュニティとの直接的な接点を通じて参加するためのプログラムです。',
-        marker: 'クラブ',
-        programmeTitle: '定期プログラム',
-        items: [
-          ['アーティストのスタジオ訪問', 'アーティストと出会い、彼らのプロジェクトを支援することで、新しいアイデアや形式に取り組む機会を生み出します。'],
-          ['作者とのミーティングとクローズドイベント', 'アーティストと出会い、彼らのプロジェクトを支援することで、新しいアイデアや形式に取り組む機会を生み出します。'],
-          ['レクチャー、メディエーション、教育的な形式', 'アーティストと出会い、彼らのプロジェクトを支援することで、新しいアイデアや形式に取り組む機会を生み出します。'],
-          ['文化機関との特別プロジェクトと協働', 'アーティストと出会い、彼らのプロジェクトを支援することで、新しいアイデアや形式に取り組む機会を生み出します。']
-        ],
-        final: 'これらの形式は、参加者がただ観察するだけでなく、芸術実践と作品制作のプロセスをより深く理解できるよう設計されています。'
       },
       artists: {
         label: 'ネットワーク',
@@ -572,7 +536,6 @@
 
     setText(document.querySelector('.nav-label'), data.ui.scenes[document.documentElement.dataset.scene || 'cover']);
     setTexts(document.querySelectorAll('.main-nav a[href="#about"], .mobile-menu-scroller a[href="#about"]'), [data.ui.nav.about, data.ui.nav.about]);
-    setTexts(document.querySelectorAll('.main-nav a[href="#patrons"], .mobile-menu-scroller a[href="#patrons"]'), [data.ui.nav.patrons, data.ui.nav.patrons]);
     setTexts(document.querySelectorAll('.main-nav a[href="#artists"], .mobile-menu-scroller a[href="#artists"]'), [data.ui.nav.artists, data.ui.nav.artists]);
     setText(document.querySelector('.nav-mail'), data.ui.nav.mail);
     setAttr(document.querySelector('.mobile-mail-pill'), 'aria-label', data.ui.nav.mail);
@@ -630,31 +593,9 @@
     setIndexedItems(structureContent, structureData.items, [
       'advisoryBoard',
       'artists',
-      'patrons',
       'publicProgrammes',
       'partnerships'
     ]);
-  };
-
-  const setPatrons = (data) => {
-    const patrons = data.patrons || {};
-    const section = document.querySelector('#patrons');
-    const block = getBlock(section, 'patrons-programme');
-    const content = block?.querySelector('.editorial-block__content');
-
-    setText(section?.querySelector('.section-intro h1'), patrons.title);
-    setText(section?.querySelector('.section-intro .lead'), patrons.lead);
-    setText(block?.querySelector('.editorial-block__marker'), patrons.marker);
-    setText(content?.querySelector('h2'), patrons.programmeTitle);
-
-    setIndexedItems(content, patrons.items, [
-      'studioVisits',
-      'closedEvents',
-      'education',
-      'specialProjects'
-    ]);
-
-    setText(content?.querySelector('.lead-spaced'), patrons.final);
   };
 
   const setArtists = (data) => {
@@ -685,7 +626,6 @@
   const setSectionLabels = (data) => {
     const labels = {
       about: data.about?.label,
-      patrons: data.patrons?.label,
       artists: data.artists?.label
     };
 
@@ -717,7 +657,6 @@
     setLanguageControls(data);
     setInterface(data);
     setAbout(language === 'ru' ? {} : data);
-    setPatrons(language === 'ru' ? {} : data);
     setArtists(language === 'ru' ? { ui: data.ui } : data);
     setSectionLabels(language === 'ru' ? {} : data);
 

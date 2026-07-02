@@ -134,17 +134,6 @@
   --scene-label-active-shift: -3px;
 }
 
-:root[data-scene="patrons"] {
-  --focus-text-muted: #a3a3a3;
-  --cursor-trail-opacity: 1;
-  --focus-transition-duration: 300ms;
-  --nav-indicator-rotation: 3deg;
-  --nav-indicator-scale: 1.08;
-  --nav-indicator-moving-rotation: -5deg;
-  --nav-indicator-moving-scale: 1.16;
-  --scene-label-active-shift: -2px;
-}
-
 :root[data-scene="artists"] {
   --focus-text-muted: #bfbfbf;
   --cursor-trail-opacity: 1;
@@ -637,7 +626,6 @@ a:hover {
 }
 
 :root[data-scene="about"] #about > .section-intro::before,
-:root[data-scene="patrons"] #patrons > .section-intro::before,
 :root[data-scene="artists"] #artists > .section-intro::before {
   color: var(--text);
   opacity: var(--scene-label-active-opacity);
@@ -841,8 +829,7 @@ li::before {
     transform var(--focus-transition-duration) var(--ease-smooth);
 }
 
-:root[data-scene="about"] #about .editorial-block__marker,
-:root[data-scene="patrons"] #patrons .editorial-block__marker {
+:root[data-scene="about"] #about .editorial-block__marker {
   opacity: 0.86;
   transform: translateX(var(--scene-label-active-shift));
 }
@@ -1583,12 +1570,14 @@ html.has-open-dossier {
 
 .privacy-page__header {
   width: 100%;
+  line-height: 0;
 }
 
 .privacy-page__brand {
-  display: inline-block;
+  display: block;
   width: clamp(300px, 22vw, 390px);
   max-width: 62vw;
+  line-height: 0;
 }
 
 .privacy-page__brand img {
@@ -1611,7 +1600,7 @@ html.has-open-dossier {
   letter-spacing: 0;
   word-break: normal;
   overflow-wrap: normal;
-  hyphens: none;
+  hyphens: manual;
   text-wrap: balance;
 }
 
