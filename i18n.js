@@ -398,6 +398,12 @@
 
   const setTexts = (elements, values) => {
     Array.from(elements || []).forEach((element, index) => {
+      if (Array.isArray(values) && index >= values.length) {
+        rememberText(element);
+        element.textContent = '';
+        return;
+      }
+
       setText(element, Array.isArray(values) ? values[index] : undefined);
     });
   };
