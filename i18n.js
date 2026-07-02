@@ -155,8 +155,10 @@
           items: [
             ['Advisory Board', 'Professionals from the fields of culture, education, business, and media who support the development of Tarski through their expertise, networks, and reputation.'],
             ['Work With Artists', 'Support for artistic projects, research, residencies, and new forms of participatory art.'],
+            ['Patrons’ Club', 'A community that supports Tarski financially and participates in the foundation’s development.'],
             ['Public Programmes', 'Participation in conferences, festivals, discussions, educational and cultural projects organised by partner cultural institutions.'],
-            ['Partnerships', 'Collaboration with cultural institutions, universities, foundations, businesses, media, and private initiatives.']
+            ['Partnerships', 'Collaboration with cultural institutions, universities, foundations, businesses, media, and private initiatives.'],
+            ['Tarski Foundation Club', 'A programme for participation in contemporary art through experience, interaction, and direct contact with artists and the professional community.']
           ]
         }
       },
@@ -303,8 +305,10 @@
           items: [
             ['アドバイザリー・ボード', '文化、教育、ビジネス、メディアの分野で活動する専門家たちが、それぞれの知見、人脈、信頼性を通じてTarskiの発展を支えます。'],
             ['アーティストとの協働', '芸術プロジェクト、リサーチ、レジデンス、そして新しい参加型アートの形式を支援します。'],
+            ['パトロン・クラブ', 'Tarskiを財政的に支え、財団の発展に参加するコミュニティです。'],
             ['パブリック・プログラム', 'パートナーとなる文化機関が主催するカンファレンス、フェスティバル、ディスカッション、教育・文化プロジェクトに参加します。'],
-            ['パートナーシップ', '文化機関、大学、財団、企業、メディア、そして民間のイニシアチブと協働します。']
+            ['パートナーシップ', '文化機関、大学、財団、企業、メディア、そして民間のイニシアチブと協働します。'],
+            ['Tarski財団クラブ', '経験、交流、アーティストや専門コミュニティとの直接的な接点を通じて現代アートに参加するためのプログラムです。']
           ]
         }
       },
@@ -587,8 +591,10 @@
     setIndexedItems(structureContent, structureData.items, [
       'advisoryBoard',
       'artists',
+      'patrons',
       'publicProgrammes',
-      'partnerships'
+      'partnerships',
+      'foundationClub'
     ]);
   };
 
