@@ -242,11 +242,11 @@
       return sceneLabels.cover || fallbackSceneLabels.cover;
     }
 
-    const anchor = window.scrollY + window.innerHeight * 0.22;
+    const anchor = window.innerHeight * 0.22;
     let currentSource = null;
 
     getLabelSources().forEach((source) => {
-      if (source.offsetTop <= anchor) {
+      if (source.getBoundingClientRect().top <= anchor) {
         currentSource = source;
       }
     });
