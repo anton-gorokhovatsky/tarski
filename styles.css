@@ -156,6 +156,19 @@
   --scene-label-active-shift: -5px;
 }
 
+:root[data-language="ja"] {
+  --font-sans:
+    -apple-system,
+    BlinkMacSystemFont,
+    "Hiragino Sans",
+    "Hiragino Kaku Gothic ProN",
+    "Yu Gothic",
+    YuGothic,
+    "Noto Sans JP",
+    "Noto Sans CJK JP",
+    sans-serif;
+}
+
 /*
   Если будут финальные web-font файлы, положи их в assets/fonts/
   и раскомментируй пример ниже. Trial-файлы лучше не публиковать.
@@ -195,6 +208,7 @@ body {
 }
 
 :root[data-language="ja"] body {
+  font-feature-settings: normal;
   line-break: strict;
   word-break: normal;
 }
