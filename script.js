@@ -224,15 +224,9 @@
     artists: 'Сеть'
   };
   const getSceneLabels = () => window.tarskiI18n?.getSceneLabels?.() || fallbackSceneLabels;
-  const getLabelSources = () => Array.from(document.querySelectorAll(
-    '.section-intro[data-section-label], .editorial-block'
-  ));
+  const getLabelSources = () => Array.from(document.querySelectorAll('.editorial-block'));
 
   const getSourceLabel = (source) => {
-    if (source.matches('.section-intro[data-section-label]')) {
-      return source.dataset.sectionLabel;
-    }
-
     return source.querySelector('.editorial-block__marker')?.textContent.trim();
   };
 
@@ -242,11 +236,17 @@
       return sceneLabels.cover || fallbackSceneLabels.cover;
     }
 
-    const anchor = window.innerHeight * 0.22;
+    const anchor = window.innerHeight * 0.42;
     let currentSource = null;
+    let closestDistance = Infinity;
 
     getLabelSources().forEach((source) => {
-      if (source.getBoundingClientRect().top <= anchor) {
+      const rect = source.getBoundingClientRect();
+      if (rect.bottom < 0 || rect.top > window.innerHeight) return;
+
+      const distance = Math.abs(rect.top - anchor);
+      if (distance < closestDistance) {
+        closestDistance = distance;
         currentSource = source;
       }
     });

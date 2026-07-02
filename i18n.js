@@ -420,6 +420,27 @@
     });
   };
 
+  const setParagraphs = (container, values, leadIndex = 0) => {
+    if (!container || !Array.isArray(values)) return;
+
+    const paragraphs = directChildren(container, 'p');
+
+    values.forEach((value, index) => {
+      let paragraph = paragraphs[index];
+
+      if (!paragraph) {
+        paragraph = document.createElement('p');
+        container.append(paragraph);
+      }
+
+      paragraph.classList.toggle('lead', index === leadIndex);
+      paragraph.classList.remove('is-i18n-empty');
+      setText(paragraph, value);
+    });
+
+    paragraphs.slice(values.length).forEach((paragraph) => paragraph.remove());
+  };
+
   const setAttr = (element, attr, value) => {
     if (!element) return;
     rememberAttr(element, attr);
@@ -589,7 +610,7 @@
     const focusContent = focus?.querySelector('.editorial-block__content');
     setText(focus?.querySelector('.editorial-block__marker'), focusData.marker);
     setText(focusContent?.querySelector('h2'), focusData.title);
-    setTexts(directChildren(focusContent, 'p'), focusData.paragraphs);
+    setParagraphs(focusContent, focusData.paragraphs, -1);
 
     const mediator = getBlock(aboutSection, 'mediator');
     const mediatorContent = mediator?.querySelector('.editorial-block__content');
