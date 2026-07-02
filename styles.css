@@ -1635,7 +1635,8 @@ html.has-open-dossier {
 }
 
 @media (min-width: 961px) {
-  .brand {
+  .brand,
+  .privacy-page__brand {
     transform: translateY(7px);
   }
 
