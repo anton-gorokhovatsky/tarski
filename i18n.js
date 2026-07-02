@@ -38,9 +38,9 @@
           mail: 'Написать нам'
         },
         scenes: {
-          cover: 'Меню',
-          about: 'Среда',
-          artists: 'Сеть'
+          cover: 'меню',
+          about: 'среда',
+          artists: 'сеть'
         },
         themeDark: 'Включить темную тему',
         themeLight: 'Включить светлую тему',
@@ -60,8 +60,8 @@
           marker: 'фокус',
           title: 'Подход и темы',
           paragraphs: [
-            'Мы работаем с художественными практиками на пересечении современного искусства, соучастия и благотворительности, обращаясь к темам, которые влияют на качество жизни человека в обществе: социальной связанности, доступу и инклюзии, образованию и обмену знаниями, экологической и культурной устойчивости.',
-            'Нам важны формы взаимодействия, основанные на уважении, заботе и ответственности, а также искусство как пространство участия, диалога и совместного опыта, где люди могут быть не только зрителями, но и соучастниками происходящего.'
+            'Мы\u00a0работаем с\u00a0художественными практиками на\u00a0пересечении современного искусства, соучастия и\u00a0благотворительности, обращаясь к\u00a0темам, которые влияют на\u00a0качество жизни человека в\u00a0обществе: социальной связанности, доступу и\u00a0инклюзии, образованию и\u00a0обмену знаниями, экологической и\u00a0культурной устойчивости.',
+            'Нам важны формы взаимодействия, основанные на\u00a0уважении, заботе и\u00a0ответственности, а\u00a0также искусство как пространство участия, диалога и\u00a0совместного опыта, где люди могут быть не\u00a0только зрителями, но\u00a0и\u00a0соучастниками происходящего.'
           ]
         }
       }
@@ -91,9 +91,9 @@
           mail: 'Contact us'
         },
         scenes: {
-          cover: 'Menu',
-          about: 'Environment',
-          artists: 'Network'
+          cover: 'menu',
+          about: 'environment',
+          artists: 'network'
         },
         themeDark: 'Switch to dark theme',
         themeLight: 'Switch to light theme',
@@ -137,8 +137,8 @@
           marker: 'focus',
           title: 'Approach and Themes',
           paragraphs: [
-            'We work with artistic practices at the intersection of contemporary art, participation, and philanthropy, addressing themes that influence the quality of life of individuals in society: social connectedness, access and inclusion, education and knowledge exchange, ecological and cultural sustainability.',
-            'We are interested in forms of interaction based on respect, care, and responsibility, as well as in art as a space of participation, dialogue, and shared experience, where people can be not only viewers, but also co-participants in what is taking place.'
+            'We\u00a0work with artistic practices at\u00a0the intersection of\u00a0contemporary art, participation, and philanthropy, addressing themes that influence the quality of\u00a0life of\u00a0individuals in\u00a0society: social connectedness, access and inclusion, education and knowledge exchange, ecological and cultural sustainability.',
+            'We\u00a0are interested in\u00a0forms of\u00a0interaction based on\u00a0respect, care, and responsibility, as\u00a0well as\u00a0in\u00a0art as\u00a0a\u00a0space of\u00a0participation, dialogue, and shared experience, where people can be\u00a0not only viewers, but also co-participants in\u00a0what is\u00a0taking place.'
           ]
         },
         mediator: {
@@ -610,7 +610,7 @@
     const focusContent = focus?.querySelector('.editorial-block__content');
     setText(focus?.querySelector('.editorial-block__marker'), focusData.marker);
     setText(focusContent?.querySelector('h2'), focusData.title);
-    setParagraphs(focusContent, focusData.paragraphs, -1);
+    setParagraphs(focusContent, focusData.paragraphs, 0);
 
     const mediator = getBlock(aboutSection, 'mediator');
     const mediatorContent = mediator?.querySelector('.editorial-block__content');
