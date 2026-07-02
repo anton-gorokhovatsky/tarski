@@ -54,6 +54,16 @@
         },
         privacy: 'Аналитика',
         footerLegal: 'Решением суда запрещена «деятельность компании Meta Platforms Inc. по реализации продуктов — социальных сетей Facebook и Instagram на территории Российской Федерации по основаниям осуществления экстремистской деятельности»'
+      },
+      about: {
+        focus: {
+          marker: 'фокус',
+          title: 'Подход и темы',
+          paragraphs: [
+            'Мы работаем с художественными практиками на пересечении современного искусства, соучастия и благотворительности, обращаясь к темам, которые влияют на качество жизни человека в обществе: социальной связанности, доступу и инклюзии, образованию и обмену знаниями, экологической и культурной устойчивости.',
+            'Нам важны формы взаимодействия, основанные на уважении, заботе и ответственности, а также искусство как пространство участия, диалога и совместного опыта, где люди могут быть не только зрителями, но и соучастниками происходящего.'
+          ]
+        }
       }
     },
     en: {
@@ -387,6 +397,7 @@
   const setText = (element, value) => {
     if (!element) return;
     rememberText(element);
+    element.classList.remove('is-i18n-empty');
 
     if (value === undefined || value === null) {
       element.innerHTML = originalMarkup.get(element);
@@ -401,6 +412,7 @@
       if (Array.isArray(values) && index >= values.length) {
         rememberText(element);
         element.textContent = '';
+        element.classList.add('is-i18n-empty');
         return;
       }
 
@@ -664,9 +676,9 @@
     setMeta(data);
     setLanguageControls(data);
     setInterface(data);
-    setAbout(language === 'ru' ? {} : data);
-    setArtists(language === 'ru' ? { ui: data.ui } : data);
-    setSectionLabels(language === 'ru' ? {} : data);
+    setAbout(data);
+    setArtists(data);
+    setSectionLabels(data);
 
     if (options.persist) {
       try {

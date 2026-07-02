@@ -207,6 +207,10 @@ body {
   line-break: loose;
 }
 
+.is-i18n-empty {
+  display: none !important;
+}
+
 .skip-link {
   position: fixed;
   top: 14px;
