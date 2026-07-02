@@ -38,9 +38,9 @@
           mail: 'Написать нам'
         },
         scenes: {
-          cover: 'меню',
-          about: 'среда',
-          artists: 'сеть'
+          cover: 'Меню',
+          about: 'Среда',
+          artists: 'Сеть'
         },
         themeDark: 'Включить темную тему',
         themeLight: 'Включить светлую тему',
@@ -57,7 +57,7 @@
       },
       about: {
         focus: {
-          marker: 'фокус',
+          marker: 'Фокус',
           title: 'Подход и темы',
           paragraphs: [
             'Мы\u00a0работаем с\u00a0художественными практиками на\u00a0пересечении современного искусства, соучастия и\u00a0благотворительности, обращаясь к\u00a0темам, которые влияют на\u00a0качество жизни человека в\u00a0обществе: социальной связанности, доступу и\u00a0инклюзии, образованию и\u00a0обмену знаниями, экологической и\u00a0культурной устойчивости.',
@@ -91,9 +91,9 @@
           mail: 'Contact us'
         },
         scenes: {
-          cover: 'menu',
-          about: 'environment',
-          artists: 'network'
+          cover: 'Menu',
+          about: 'Environment',
+          artists: 'Network'
         },
         themeDark: 'Switch to dark theme',
         themeLight: 'Switch to light theme',
@@ -110,11 +110,11 @@
       },
       superlead: 'Researching and Supporting Participatory and Socially Engaged Art',
       about: {
-        label: 'environment',
+        label: 'Environment',
         title: 'About',
         lead: 'We create an environment for the development of participatory and socially engaged art through working with artists, educational formats, and cultural initiatives.',
         practice: {
-          marker: 'field of practices',
+          marker: 'Field of practices',
           title: 'What Kind of Art We Work With',
           intro: 'The project focuses on artistic practices that artists themselves may define in different ways, but which relate to a shared field of terms:',
           terms: [
@@ -134,7 +134,7 @@
           ]
         },
         focus: {
-          marker: 'focus',
+          marker: 'Focus',
           title: 'Approach and Themes',
           paragraphs: [
             'We\u00a0work with artistic practices at\u00a0the intersection of\u00a0contemporary art, participation, and philanthropy, addressing themes that influence the quality of\u00a0life of\u00a0individuals in\u00a0society: social connectedness, access and inclusion, education and knowledge exchange, ecological and cultural sustainability.',
@@ -142,7 +142,7 @@
           ]
         },
         mediator: {
-          marker: 'directions',
+          marker: 'Directions',
           title: 'Tarski as a Mediating Project',
           intro: [
             'As experts in contemporary art, the art market, and philanthropy, we know how to reveal the value of complex and process-based practices.',
@@ -161,7 +161,7 @@
           conclusion: 'Tarski acts as a guide for this art — connecting artistic practices, the professional field, and a broader cultural context.'
         },
         structure: {
-          marker: 'structure',
+          marker: 'Structure',
           title: 'What Tarski Consists Of',
           items: [
             ['Advisory Board', 'Professionals from the fields of culture, education, business, and media who support the development of Tarski through their expertise, networks, and reputation.'],
@@ -174,7 +174,7 @@
         }
       },
       artists: {
-        label: 'network',
+        label: 'Network',
         title: 'A Network of Like-Minded Artists',
         items: {
           anastasia: {
