@@ -131,9 +131,9 @@
           marker: 'focus',
           title: 'Approach and Themes',
           paragraphs: [
-            'We work with artistic practices at the intersection of contemporary art, participation, and philanthropy, addressing themes that influence the quality of life of individuals in society: social connectedness, access and inclusion, education and knowledge exchange, ecological and cultural sustainability.',
+            'We work with artistic practices at the intersection of contemporary art, participation, and philanthropy.',
+            'We address themes that influence the quality of life of individuals in society: social connectedness, access and inclusion, education and knowledge exchange, ecological and cultural sustainability.',
             'We are interested in forms of interaction based on respect, care, and responsibility.',
-            'We also work with practices connected to ecological and cultural sustainability, and with the ways in which forms of interaction are built.',
             'We see art as a space of participation, dialogue, and shared experience, where people can be not only viewers, but also co-participants in what is taking place.'
           ]
         },
