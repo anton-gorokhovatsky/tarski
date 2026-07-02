@@ -1576,45 +1576,58 @@ html.has-open-dossier {
 
 .privacy-page {
   min-height: 100vh;
-  padding: 28px var(--page-padding-x) 80px;
+  padding: 20px var(--page-padding-x) 96px;
   background: var(--page-bg);
   color: var(--text);
 }
 
-.privacy-page__back {
+.privacy-page__header {
+  width: 100%;
+}
+
+.privacy-page__brand {
   display: inline-block;
-  color: var(--text);
-  font-size: 20px;
-  line-height: 1.2;
-  text-decoration: none;
+  width: clamp(300px, 22vw, 390px);
+  max-width: 62vw;
+}
+
+.privacy-page__brand img {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: var(--brand-filter);
 }
 
 .privacy-page__content {
-  width: min(100%, 760px);
-  margin: 18vh auto 0;
-}
-
-.privacy-page__eyebrow {
-  margin: 0 0 20px;
-  color: var(--muted-text);
-  font-size: 16px;
-  line-height: 1.2;
+  width: min(100%, var(--content-width));
+  margin: clamp(96px, 16vh, 180px) auto 0;
 }
 
 .privacy-page h1 {
-  margin: 0 0 44px;
-  font-size: clamp(42px, 8vw, 106px);
-  line-height: 0.95;
+  margin: 0 0 50px;
+  font-size: clamp(46px, 5.3vw, 82px);
+  line-height: 1;
   font-weight: 400;
   letter-spacing: 0;
-  overflow-wrap: anywhere;
+  word-break: normal;
+  overflow-wrap: normal;
+  hyphens: none;
+  text-wrap: balance;
 }
 
 .privacy-page p {
-  margin: 0 0 22px;
+  max-width: 780px;
+  margin: 0 0 21px;
   color: var(--text);
-  font-size: clamp(22px, 2.5vw, 34px);
-  line-height: 1.18;
+  font-size: clamp(20px, 1.65vw, 28px);
+  line-height: 1.28;
+}
+
+.privacy-page .privacy-page__eyebrow {
+  margin: 0 0 24px;
+  color: var(--muted-text);
+  font-size: clamp(15px, 1.35vw, 18px);
+  line-height: 1.2;
 }
 
 .privacy-page p:last-child {
@@ -1714,6 +1727,31 @@ html.has-open-dossier {
     flex-direction: column;
     gap: 18px;
     padding-bottom: 0;
+  }
+
+  .privacy-page {
+    padding-top: 16px;
+    padding-bottom: 72px;
+  }
+
+  .privacy-page__brand {
+    width: 100%;
+    max-width: none;
+  }
+
+  .privacy-page__content {
+    margin-top: 84px;
+  }
+
+  .privacy-page h1 {
+    margin-bottom: 34px;
+    font-size: clamp(36px, 9.8vw, 46px);
+    line-height: 1.02;
+  }
+
+  .privacy-page p {
+    font-size: 21px;
+    line-height: 1.25;
   }
 
   .brand {
@@ -2033,6 +2071,14 @@ html.has-open-dossier {
 }
 
 @media (max-width: 420px) {
+  .privacy-page h1 {
+    font-size: clamp(32px, 9vw, 36px);
+  }
+
+  .privacy-page p {
+    font-size: 20px;
+  }
+
   .superlead p,
   h1 {
     font-size: 34px;
