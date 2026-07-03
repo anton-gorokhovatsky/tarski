@@ -188,7 +188,8 @@
       + (Number.parseFloat(menuStyle.paddingRight) || 0);
     const toggleWidth = Number.parseFloat(menuStyle.getPropertyValue('--mobile-service-toggle-open-size'))
       || toggle.getBoundingClientRect().height;
-    const shellWidth = Math.ceil(panelWidth + gap + toggleWidth + padX);
+    const minShellWidth = Number.parseFloat(menuStyle.getPropertyValue('--mobile-service-shell-min-width')) || 0;
+    const shellWidth = Math.ceil(Math.max(minShellWidth, panelWidth + gap + toggleWidth + padX));
 
     menu.style.setProperty('--mobile-service-shell-width', `${shellWidth}px`);
 

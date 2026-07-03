@@ -2156,15 +2156,16 @@ html.has-open-dossier {
   }
 
   .mobile-floating-menu {
-    --mobile-island-shell-width: 292px;
+    --mobile-island-shell-width: 279px;
     --mobile-island-pad-y: 7px;
     --mobile-island-pad-x: 22px;
-    --mobile-island-pad-left: 21px;
-    --mobile-island-pad-right: 23.5px;
+    --mobile-island-pad-left: 13.65px;
+    --mobile-island-pad-right: 16.13px;
     --mobile-island-gap: 5px;
     --mobile-control-size: 42px;
     --mobile-active-pad-x: 13px;
     --mobile-service-shell-width: 211px;
+    --mobile-service-shell-min-width: 211px;
     --mobile-service-pad-left: 26px;
     --mobile-service-pad-right: 18.5px;
     --mobile-service-open-gap: 12px;
@@ -2642,11 +2643,12 @@ html.has-open-dossier {
     --mobile-control-size: 40px;
     --mobile-island-pad-y: 6px;
     --mobile-island-pad-x: 22px;
-    --mobile-island-pad-left: 21px;
-    --mobile-island-pad-right: 23.5px;
+    --mobile-island-pad-left: 13.65px;
+    --mobile-island-pad-right: 16.13px;
     --mobile-island-gap: 4px;
     --mobile-active-pad-x: 12px;
     --mobile-service-shell-width: 210px;
+    --mobile-service-shell-min-width: 211px;
     --mobile-service-pad-left: 26px;
     --mobile-service-pad-right: 18.5px;
     --mobile-service-open-gap: 11px;
