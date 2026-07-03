@@ -182,7 +182,7 @@
     const menuStyle = window.getComputedStyle(menu);
     const panelWidth = panel.getBoundingClientRect().width;
     const gap = Number.parseFloat(menuStyle.getPropertyValue('--mobile-service-open-gap')) || 0;
-    const padX = Number.parseFloat(menuStyle.getPropertyValue('--mobile-service-pad-x')) || 0;
+    const padX = Number.parseFloat(menuStyle.paddingLeft) || 0;
     const toggleWidth = Number.parseFloat(menuStyle.getPropertyValue('--mobile-service-toggle-open-size'))
       || toggle.getBoundingClientRect().height;
     const shellWidth = Math.ceil(panelWidth + gap + toggleWidth + padX * 2);

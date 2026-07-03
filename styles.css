@@ -2157,12 +2157,12 @@ html.has-open-dossier {
 
   .mobile-floating-menu {
     --mobile-island-shell-width: 292px;
-    --mobile-island-pad: 7px;
+    --mobile-island-pad-y: 7px;
+    --mobile-island-pad-x: 22px;
     --mobile-island-gap: 5px;
     --mobile-control-size: 42px;
     --mobile-active-pad-x: 13px;
-    --mobile-service-shell-width: 206px;
-    --mobile-service-pad-x: 17px;
+    --mobile-service-shell-width: 211px;
     --mobile-service-open-gap: 12px;
     --mobile-service-toggle-open-size: 32px;
     --mobile-island-morph: 420ms;
@@ -2179,7 +2179,7 @@ html.has-open-dossier {
     box-sizing: border-box;
     width: min(var(--mobile-island-shell-width), calc(100vw - 24px));
     max-width: calc(100vw - 24px);
-    padding: var(--mobile-island-pad);
+    padding: var(--mobile-island-pad-y) var(--mobile-island-pad-x);
     overflow: hidden;
     border-radius: 999px;
     background: var(--mobile-pill-bg);
@@ -2218,8 +2218,6 @@ html.has-open-dossier {
     gap: 0;
     min-width: 0;
     width: min(var(--mobile-service-shell-width), calc(100vw - 24px));
-    padding-right: var(--mobile-service-pad-x);
-    padding-left: var(--mobile-service-pad-x);
   }
 
   .mobile-menu-panel,
@@ -2359,10 +2357,10 @@ html.has-open-dossier {
   }
 
   .mobile-service.is-open {
-    flex: 0 0 auto;
-    justify-content: center;
-    gap: var(--mobile-service-open-gap);
-    width: max-content;
+    flex: 1 1 auto;
+    justify-content: space-between;
+    gap: 0;
+    width: 100%;
   }
 
   .mobile-service-toggle {
@@ -2432,6 +2430,9 @@ html.has-open-dossier {
   .mobile-service.is-open .mobile-service-toggle span {
     width: 0;
     opacity: 0;
+    transition:
+      width 120ms var(--ease-smooth),
+      opacity 1ms linear;
   }
 
   .mobile-service.is-open .mobile-service-toggle::after {
@@ -2629,15 +2630,15 @@ html.has-open-dossier {
 @media (max-width: 420px) {
   .mobile-floating-menu {
     --mobile-control-size: 40px;
-    --mobile-island-pad: 6px;
+    --mobile-island-pad-y: 6px;
+    --mobile-island-pad-x: 22px;
     --mobile-island-gap: 4px;
     --mobile-active-pad-x: 12px;
-    --mobile-service-shell-width: 202px;
-    --mobile-service-pad-x: 16px;
+    --mobile-service-shell-width: 210px;
     --mobile-service-open-gap: 11px;
     gap: var(--mobile-island-gap);
     right: auto;
-    padding: var(--mobile-island-pad);
+    padding: var(--mobile-island-pad-y) var(--mobile-island-pad-x);
   }
 
   .mobile-floating-menu.is-visible {
