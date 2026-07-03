@@ -2161,7 +2161,11 @@ html.has-open-dossier {
     --mobile-island-gap: 5px;
     --mobile-control-size: 42px;
     --mobile-active-pad-x: 13px;
-    --mobile-island-morph: 360ms;
+    --mobile-service-shell-width: 206px;
+    --mobile-service-pad-x: 17px;
+    --mobile-service-open-gap: 12px;
+    --mobile-service-toggle-open-size: 32px;
+    --mobile-island-morph: 420ms;
     position: relative;
     left: auto;
     right: auto;
@@ -2190,11 +2194,11 @@ html.has-open-dossier {
     transition:
       opacity var(--duration-fast) var(--ease-smooth),
       box-shadow var(--duration-fast) var(--ease-smooth),
-      gap var(--mobile-island-morph) var(--ease-spring),
-      padding var(--mobile-island-morph) var(--ease-spring),
-      min-width var(--mobile-island-morph) var(--ease-spring),
-      transform var(--mobile-island-morph) var(--ease-spring),
-      width var(--mobile-island-morph) var(--ease-spring);
+      gap var(--mobile-island-morph) var(--ease-smooth),
+      padding var(--mobile-island-morph) var(--ease-smooth),
+      min-width var(--mobile-island-morph) var(--ease-smooth),
+      transform var(--mobile-island-morph) var(--ease-smooth),
+      width var(--mobile-island-morph) var(--ease-smooth);
     will-change: transform, opacity, width;
   }
 
@@ -2213,6 +2217,9 @@ html.has-open-dossier {
   .mobile-floating-menu.is-service-open {
     gap: 0;
     min-width: 0;
+    width: min(var(--mobile-service-shell-width), calc(100vw - 24px));
+    padding-right: var(--mobile-service-pad-x);
+    padding-left: var(--mobile-service-pad-x);
   }
 
   .mobile-menu-panel,
@@ -2238,10 +2245,10 @@ html.has-open-dossier {
     background: transparent;
     box-shadow: none;
     transition:
-      width var(--mobile-island-morph) var(--ease-spring),
-      max-width var(--mobile-island-morph) var(--ease-spring),
+      width var(--mobile-island-morph) var(--ease-smooth),
+      max-width var(--mobile-island-morph) var(--ease-smooth),
       opacity var(--duration-fast) var(--ease-smooth),
-      transform var(--mobile-island-morph) var(--ease-spring);
+      transform var(--mobile-island-morph) var(--ease-smooth);
   }
 
   .mobile-menu-panel::before {
@@ -2295,10 +2302,10 @@ html.has-open-dossier {
     text-decoration: none;
     white-space: nowrap;
     transition:
-      width var(--mobile-island-morph) var(--ease-spring),
-      max-width var(--mobile-island-morph) var(--ease-spring),
+      width var(--mobile-island-morph) var(--ease-smooth),
+      max-width var(--mobile-island-morph) var(--ease-smooth),
       opacity var(--duration-fast) var(--ease-smooth),
-      transform var(--mobile-island-morph) var(--ease-spring);
+      transform var(--mobile-island-morph) var(--ease-smooth);
   }
 
   .mobile-floating-menu.is-service-open .mobile-menu-panel,
@@ -2345,15 +2352,17 @@ html.has-open-dossier {
     gap: 0;
     min-width: 0;
     transition:
-      flex var(--duration-normal) var(--ease-spring),
-      gap var(--mobile-island-morph) var(--ease-spring),
-      transform var(--mobile-island-morph) var(--ease-spring);
+      flex var(--mobile-island-morph) var(--ease-smooth),
+      gap var(--mobile-island-morph) var(--ease-smooth),
+      transform var(--mobile-island-morph) var(--ease-smooth),
+      width var(--mobile-island-morph) var(--ease-smooth);
   }
 
   .mobile-service.is-open {
     flex: 0 0 auto;
     justify-content: center;
-    gap: 12px;
+    gap: var(--mobile-service-open-gap);
+    width: max-content;
   }
 
   .mobile-service-toggle {
@@ -2380,7 +2389,7 @@ html.has-open-dossier {
     touch-action: manipulation;
     transition:
       transform var(--duration-fast) var(--ease-smooth),
-      width var(--duration-normal) var(--ease-spring);
+      width var(--mobile-island-morph) var(--ease-smooth);
   }
 
   .mobile-service-toggle:focus {
@@ -2408,15 +2417,16 @@ html.has-open-dossier {
 
   .mobile-service-toggle span {
     display: inline-block;
+    width: 18px;
     overflow: hidden;
     transition:
-      width var(--duration-normal) var(--ease-spring),
+      width var(--duration-normal) var(--ease-smooth),
       opacity var(--duration-fast) var(--ease-smooth);
   }
 
   .mobile-service.is-open .mobile-service-toggle {
     order: 2;
-    width: 32px;
+    width: var(--mobile-service-toggle-open-size);
   }
 
   .mobile-service.is-open .mobile-service-toggle span {
@@ -2435,6 +2445,7 @@ html.has-open-dossier {
 
   .mobile-service-panel {
     order: 1;
+    position: relative;
     display: inline-flex;
     align-items: center;
     gap: 11px;
@@ -2448,14 +2459,24 @@ html.has-open-dossier {
     opacity: 1;
     transition:
       opacity var(--duration-normal) var(--ease-smooth),
-      transform var(--mobile-island-morph) var(--ease-spring);
+      transform var(--mobile-island-morph) var(--ease-smooth);
     will-change: opacity, transform;
   }
 
   .mobile-service:not(.is-open) .mobile-service-panel {
+    position: absolute;
+    top: 50%;
+    right: 0;
     opacity: 0;
     pointer-events: none;
-    transform: translate3d(10px, 0, 0) scale(0.82);
+    transform: translate3d(8px, -50%, 0) scale(0.9);
+  }
+
+  .mobile-service.is-closing .mobile-service-panel {
+    position: relative;
+    opacity: 0;
+    pointer-events: none;
+    transform: translate3d(6px, 0, 0) scale(0.94);
   }
 
   .mobile-service-panel[hidden] {
@@ -2611,6 +2632,9 @@ html.has-open-dossier {
     --mobile-island-pad: 6px;
     --mobile-island-gap: 4px;
     --mobile-active-pad-x: 12px;
+    --mobile-service-shell-width: 202px;
+    --mobile-service-pad-x: 16px;
+    --mobile-service-open-gap: 11px;
     gap: var(--mobile-island-gap);
     right: auto;
     padding: var(--mobile-island-pad);
@@ -2637,7 +2661,7 @@ html.has-open-dossier {
   }
 
   .mobile-service.is-open .mobile-service-toggle {
-    width: 32px;
+    width: var(--mobile-service-toggle-open-size);
   }
 
   .mobile-mail-pill__icon {

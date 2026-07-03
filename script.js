@@ -166,28 +166,69 @@
   };
 
   let hidePanelTimer = null;
+  let collapseTimer = null;
+
+  const updateServiceShellWidth = () => {
+    if (!menu) return;
+
+    const wasHidden = panel.hidden;
+    const wasOpen = service.classList.contains('is-open');
+    const wasClosing = service.classList.contains('is-closing');
+
+    panel.hidden = false;
+    service.classList.remove('is-closing');
+    service.classList.add('is-open');
+
+    const menuStyle = window.getComputedStyle(menu);
+    const panelWidth = panel.getBoundingClientRect().width;
+    const gap = Number.parseFloat(menuStyle.getPropertyValue('--mobile-service-open-gap')) || 0;
+    const padX = Number.parseFloat(menuStyle.getPropertyValue('--mobile-service-pad-x')) || 0;
+    const toggleWidth = Number.parseFloat(menuStyle.getPropertyValue('--mobile-service-toggle-open-size'))
+      || toggle.getBoundingClientRect().height;
+    const shellWidth = Math.ceil(panelWidth + gap + toggleWidth + padX * 2);
+
+    menu.style.setProperty('--mobile-service-shell-width', `${shellWidth}px`);
+
+    service.classList.toggle('is-open', wasOpen);
+    service.classList.toggle('is-closing', wasClosing);
+    panel.hidden = wasHidden;
+  };
 
   const setOpen = (isOpen) => {
     window.clearTimeout(hidePanelTimer);
+    window.clearTimeout(collapseTimer);
 
     if (isOpen) {
+      updateServiceShellWidth();
       panel.hidden = false;
+      service.classList.remove('is-closing');
     }
 
     window.requestAnimationFrame(() => {
-      service.classList.toggle('is-open', isOpen);
-      menu?.classList.toggle('is-service-open', isOpen);
       toggle.setAttribute('aria-expanded', String(isOpen));
       toggle.setAttribute('aria-label', getLabel(isOpen));
       toggle.setAttribute('title', getLabel(isOpen));
+
+      if (isOpen) {
+        service.classList.add('is-open');
+        menu?.classList.add('is-service-open');
+        return;
+      }
+
+      service.classList.add('is-closing');
+      collapseTimer = window.setTimeout(() => {
+        service.classList.remove('is-open', 'is-closing');
+        menu?.classList.remove('is-service-open');
+      }, 220);
     });
 
     if (!isOpen) {
       hidePanelTimer = window.setTimeout(() => {
         if (!service.classList.contains('is-open')) {
           panel.hidden = true;
+          service.classList.remove('is-closing');
         }
-      }, 280);
+      }, 580);
     }
   };
 
@@ -217,10 +258,17 @@
 
   window.addEventListener('tarski:languagechange', () => {
     syncLanguageCode();
-    setOpen(toggle.getAttribute('aria-expanded') === 'true');
+    updateServiceShellWidth();
+    if (toggle.getAttribute('aria-expanded') === 'true') {
+      setOpen(true);
+    }
   });
 
+  window.addEventListener('resize', updateServiceShellWidth);
+  document.fonts?.ready?.then(updateServiceShellWidth);
+
   syncLanguageCode();
+  updateServiceShellWidth();
   setOpen(false);
 })();
 
