@@ -233,6 +233,7 @@
 
   const mainNav = document.querySelector('.main-nav');
   const mobileMenu = document.querySelector('[data-mobile-menu]');
+  const mobileMenuHome = document.querySelector('[data-mobile-menu-home]');
   const mobilePanel = mobileMenu?.querySelector('.mobile-menu-panel');
   const mobileScroller = mobileMenu?.querySelector('[data-mobile-menu-scroller]') || mobilePanel;
   const navLabel = mainNav?.querySelector('.nav-label');
@@ -339,6 +340,8 @@
     if (!mobilePanel || !mobileScroller) return;
 
     const activeLink = mobilePanel.querySelector('a.is-active[href^="#"]');
+    mobileMenu?.classList.toggle('is-cover-state', !activeLink);
+
     if (!activeLink) {
       mobilePanel.style.setProperty('--mobile-indicator-x', `${mobileCoverIndicatorX}px`);
       mobilePanel.style.setProperty('--mobile-indicator-opacity', '0');
@@ -450,8 +453,9 @@
     }
 
     const mainNav = document.querySelector('.main-nav');
+    const mobileHomeBottom = mobileMenuHome ? mobileMenuHome.getBoundingClientRect().bottom : null;
     const navBottom = mainNav ? mainNav.getBoundingClientRect().bottom : 0;
-    const shouldShow = navBottom < 0;
+    const shouldShow = mobileHomeBottom !== null ? mobileHomeBottom < 0 : navBottom < 0;
 
     mobileMenu.classList.toggle('is-visible', shouldShow);
 
