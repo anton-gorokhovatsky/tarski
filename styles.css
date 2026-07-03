@@ -1990,28 +1990,31 @@ html.has-open-dossier {
   }
 
   .site-footer {
-    padding-top: 120px;
+    padding-top: clamp(64px, 18vw, 88px);
   }
 
-  .site-footer__meta,
   .site-footer__disclaimer {
-    font-size: 15px;
+    font-size: 14px;
   }
 
   .site-footer__texts {
-    display: block;
-    margin-top: 12px;
-    padding-bottom: 18px;
+    display: grid;
+    gap: 8px;
+    margin-top: 14px;
+    padding-bottom: calc(132px + env(safe-area-inset-bottom));
   }
 
   .site-footer__meta {
     gap: 6px;
-    margin-bottom: 8px;
+    margin-bottom: 0;
     font-size: 13px;
+    line-height: 1.2;
   }
 
   .site-footer__disclaimer {
-    line-height: 1.18;
+    max-width: 100%;
+    padding-left: 0.45em;
+    line-height: 1.22;
   }
 
   .artist-dossier {
@@ -2115,15 +2118,18 @@ html.has-open-dossier {
     --mobile-control-size: 42px;
     --mobile-active-pad-x: 13px;
     position: fixed;
-    right: max(12px, var(--page-padding-x));
+    left: 50%;
+    right: auto;
     bottom: calc(14px + env(safe-area-inset-bottom));
     z-index: 80;
     display: flex;
     flex-direction: row;
     align-items: center;
+    justify-content: center;
     gap: var(--mobile-island-gap);
     max-width: calc(100vw - 24px);
     padding: var(--mobile-island-pad);
+    overflow: hidden;
     border-radius: 999px;
     background: var(--mobile-pill-bg);
     box-shadow: var(--mobile-bottom-pill-shadow);
@@ -2131,24 +2137,26 @@ html.has-open-dossier {
     -webkit-backdrop-filter: blur(26px) saturate(190%);
     opacity: 0;
     pointer-events: none;
-    transform: translate3d(0, 14px, 0) scale(0.97);
-    transform-origin: 100% 100%;
+    transform: translate3d(-50%, 14px, 0) scale(0.97);
+    transform-origin: 50% 100%;
     transition:
       opacity var(--duration-fast) var(--ease-smooth),
       gap var(--duration-fast) var(--ease-smooth),
       padding var(--duration-fast) var(--ease-smooth),
+      min-width var(--duration-normal) var(--ease-spring),
       transform var(--duration-normal) var(--ease-spring);
   }
 
   .mobile-floating-menu.is-visible {
     opacity: 1;
     pointer-events: auto;
-    transform: translateY(0);
+    transform: translate3d(-50%, 0, 0);
   }
 
   .mobile-floating-menu.is-service-open {
-    gap: 7px;
-    padding-right: 10px;
+    min-width: min(292px, calc(100vw - 24px));
+    gap: 8px;
+    padding-right: var(--mobile-island-pad);
   }
 
   .mobile-menu-panel,
@@ -2228,15 +2236,24 @@ html.has-open-dossier {
     transition: transform var(--duration-fast) var(--ease-smooth);
   }
 
-  .mobile-floating-menu.is-service-open .mobile-menu-panel a:not(.is-active):not([aria-current="true"]),
+  .mobile-floating-menu.is-service-open .mobile-menu-panel,
   .mobile-floating-menu.is-service-open .mobile-mail-pill {
+    flex-basis: 0;
     width: 0;
+    max-width: 0;
     min-width: 0;
     margin: 0;
     padding: 0;
+    overflow: hidden;
     opacity: 0;
     pointer-events: none;
     transform: scale(0.82);
+  }
+
+  .mobile-floating-menu.is-service-open .mobile-menu-panel a {
+    width: 0;
+    min-width: 0;
+    padding: 0;
   }
 
   .mobile-floating-menu.is-service-open .mobile-menu-scroller {
@@ -2256,22 +2273,28 @@ html.has-open-dossier {
 
   .mobile-service {
     position: relative;
+    flex: 0 0 auto;
     display: flex;
     flex-direction: row;
     align-items: center;
     gap: 0;
     min-width: 0;
-    transition: gap var(--duration-normal) var(--ease-spring);
+    transition:
+      flex var(--duration-normal) var(--ease-spring),
+      gap var(--duration-normal) var(--ease-spring);
   }
 
   .mobile-service.is-open {
-    gap: 11px;
+    flex: 1 1 auto;
+    justify-content: center;
+    gap: 12px;
   }
 
   .mobile-service-toggle {
     -webkit-appearance: none;
     appearance: none;
     display: inline-flex;
+    flex: 0 0 auto;
     align-items: center;
     justify-content: center;
     gap: 7px;
@@ -2317,8 +2340,22 @@ html.has-open-dossier {
       transform var(--duration-fast) var(--ease-smooth);
   }
 
+  .mobile-service-toggle span {
+    display: inline-block;
+    overflow: hidden;
+    transition:
+      width var(--duration-normal) var(--ease-spring),
+      opacity var(--duration-fast) var(--ease-smooth);
+  }
+
   .mobile-service.is-open .mobile-service-toggle {
-    width: 54px;
+    order: 2;
+    width: 32px;
+  }
+
+  .mobile-service.is-open .mobile-service-toggle span {
+    width: 0;
+    opacity: 0;
   }
 
   .mobile-service.is-open .mobile-service-toggle::after {
@@ -2331,6 +2368,7 @@ html.has-open-dossier {
   }
 
   .mobile-service-panel {
+    order: 1;
     display: inline-flex;
     align-items: center;
     gap: 11px;
@@ -2339,7 +2377,7 @@ html.has-open-dossier {
     border-radius: 999px;
     background: transparent;
     box-shadow: none;
-    transform-origin: 100% 50%;
+    transform-origin: 50% 50%;
     opacity: 1;
     transition:
       opacity var(--duration-fast) var(--ease-smooth),
@@ -2351,7 +2389,7 @@ html.has-open-dossier {
   }
 
   .mobile-service-panel .language-switcher {
-    gap: 10px;
+    gap: 12px;
     font-size: 14px;
   }
 
@@ -2362,6 +2400,7 @@ html.has-open-dossier {
   .mobile-service-panel .theme-toggle {
     width: 28px;
     height: 28px;
+    margin-left: 2px;
   }
 
   .mobile-menu-scroller {
@@ -2497,7 +2536,8 @@ html.has-open-dossier {
     --mobile-island-gap: 4px;
     --mobile-active-pad-x: 12px;
     gap: var(--mobile-island-gap);
-    right: 12px;
+    left: 50%;
+    right: auto;
     bottom: calc(12px + env(safe-area-inset-bottom));
     padding: var(--mobile-island-pad);
   }
@@ -2518,7 +2558,7 @@ html.has-open-dossier {
   }
 
   .mobile-service.is-open .mobile-service-toggle {
-    width: 56px;
+    width: 32px;
   }
 
   .mobile-mail-pill__icon {
