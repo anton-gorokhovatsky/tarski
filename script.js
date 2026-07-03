@@ -219,6 +219,7 @@
       collapseTimer = window.setTimeout(() => {
         service.classList.remove('is-open', 'is-closing');
         menu?.classList.remove('is-service-open');
+        window.dispatchEvent(new CustomEvent('tarski:mobileislandresize'));
       }, 220);
     });
 
@@ -284,6 +285,8 @@
   const mobileMenuHome = document.querySelector('[data-mobile-menu-home]');
   const mobilePanel = mobileMenu?.querySelector('.mobile-menu-panel');
   const mobileScroller = mobileMenu?.querySelector('[data-mobile-menu-scroller]') || mobilePanel;
+  const mobileMail = mobileMenu?.querySelector('.mobile-mail-pill');
+  const mobileService = mobileMenu?.querySelector('.mobile-service');
   const navLabel = mainNav?.querySelector('.nav-label');
   const mobileQuery = window.matchMedia('(max-width: 720px)');
   const fallbackSceneLabels = {
@@ -334,6 +337,7 @@
   let currentActiveId = null;
   let currentScene = document.documentElement.dataset.scene || 'cover';
   let scrollTimer = null;
+  let mobileIslandWidthTimer = null;
   const indicatorTimers = new WeakMap();
   const mobileCoverIndicatorX = 22;
 
@@ -425,6 +429,61 @@
     mobilePanel.classList.toggle('is-at-end', atEnd || maxScroll <= 2);
   };
 
+  const updateMobileIslandWidth = () => {
+    if (!mobileMenu || !mobilePanel || !mobileMail || !mobileService || !mobileQuery.matches) return;
+    if (mobileMenu.classList.contains('is-service-open')) return;
+
+    const toPx = (value) => Number.parseFloat(value) || 0;
+    const menuStyle = window.getComputedStyle(mobileMenu);
+    const scrollerStyle = window.getComputedStyle(mobileScroller);
+    const links = Array.from(mobilePanel.querySelectorAll('a'));
+    const firstLink = links[0];
+    const padX = toPx(menuStyle.paddingLeft) + toPx(menuStyle.paddingRight);
+    const shellGap = toPx(menuStyle.gap);
+    const linkGap = toPx(scrollerStyle.gap);
+    const getLinkWidth = (link) => {
+      const linkStyle = window.getComputedStyle(link);
+      const isActive = link.classList.contains('is-active')
+        || link.getAttribute('aria-current') === 'true'
+        || (mobileMenu.classList.contains('is-cover-state') && link === firstLink);
+
+      if (!isActive) {
+        return toPx(linkStyle.width);
+      }
+
+      const range = document.createRange();
+      range.selectNodeContents(link);
+      const textWidth = range.getBoundingClientRect().width;
+      range.detach();
+
+      const dotStyle = window.getComputedStyle(link, '::after');
+      return Math.ceil(
+        textWidth
+        + toPx(linkStyle.gap)
+        + toPx(dotStyle.width)
+        + toPx(linkStyle.paddingLeft)
+        + toPx(linkStyle.paddingRight)
+      );
+    };
+    const panelWidth = links.reduce((sum, link) => sum + getLinkWidth(link), 0)
+      + Math.max(0, links.length - 1) * linkGap;
+    const shellWidth = Math.ceil(
+      panelWidth
+      + toPx(window.getComputedStyle(mobileMail).width)
+      + toPx(window.getComputedStyle(mobileService).width)
+      + shellGap * 2
+      + padX
+    );
+
+    mobileMenu.style.setProperty('--mobile-island-shell-width', `${shellWidth}px`);
+  };
+
+  const scheduleMobileIslandWidth = () => {
+    updateMobileIslandWidth();
+    window.clearTimeout(mobileIslandWidthTimer);
+    mobileIslandWidthTimer = window.setTimeout(updateMobileIslandWidth, 260);
+  };
+
   const scrollActiveMobileLinkIntoView = (behavior = 'smooth') => {
     if (!mobilePanel || !mobileScroller || !mobileMenu || !mobileQuery.matches) return;
     if (!mobileMenu.classList.contains('is-visible')) return;
@@ -459,10 +518,12 @@
 
     if (hasChanged) {
       updateMenuIndicators(previousActiveId !== null);
+      scheduleMobileIslandWidth();
       window.clearTimeout(scrollTimer);
       scrollTimer = window.setTimeout(() => scrollActiveMobileLinkIntoView('smooth'), 40);
     } else {
       updateMenuIndicators(false);
+      scheduleMobileIslandWidth();
     }
   };
 
@@ -508,6 +569,7 @@
     mobileMenu.classList.toggle('is-visible', shouldShow);
 
     if (shouldShow) {
+      scheduleMobileIslandWidth();
       updateMobileScrollerMask();
       updateMobileIndicator(false);
       scrollActiveMobileLinkIntoView('auto');
@@ -517,12 +579,14 @@
   updateActive();
   updateMenuIndicators(false);
   updateMobileScrollerMask();
+  scheduleMobileIslandWidth();
   updateMobileMenuVisibility();
 
   window.addEventListener('scroll', () => {
     updateActive();
     updateNavLabel();
     updateMobileMenuVisibility();
+    scheduleMobileIslandWidth();
   }, { passive: true });
 
   mobileScroller?.addEventListener('scroll', () => {
@@ -534,6 +598,7 @@
     updateActive();
     updateNavLabel();
     updateMenuIndicators(false);
+    scheduleMobileIslandWidth();
     updateMobileScrollerMask();
     updateMobileMenuVisibility();
   });
@@ -542,10 +607,16 @@
     updateActive();
     updateNavLabel();
     updateMenuIndicators(false);
-    updateMobileScrollerMask();
-    updateMobileMenuVisibility();
-    window.setTimeout(() => scrollActiveMobileLinkIntoView('auto'), 40);
+    window.setTimeout(() => {
+      scheduleMobileIslandWidth();
+      updateMobileScrollerMask();
+      updateMobileMenuVisibility();
+      scrollActiveMobileLinkIntoView('auto');
+    }, 40);
   });
+
+  window.addEventListener('tarski:mobileislandresize', scheduleMobileIslandWidth);
+  document.fonts?.ready?.then(scheduleMobileIslandWidth);
 })();
 
 (() => {
