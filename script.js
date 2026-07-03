@@ -142,6 +142,7 @@
 
 (() => {
   const service = document.querySelector('[data-mobile-service]');
+  const menu = service?.closest('[data-mobile-menu]');
   const toggle = service?.querySelector('[data-mobile-service-toggle]');
   const panel = service?.querySelector('[data-mobile-service-panel]');
   const code = service?.querySelector('[data-mobile-service-code]');
@@ -166,6 +167,7 @@
 
   const setOpen = (isOpen) => {
     service.classList.toggle('is-open', isOpen);
+    menu?.classList.toggle('is-service-open', isOpen);
     toggle.setAttribute('aria-expanded', String(isOpen));
     toggle.setAttribute('aria-label', getLabel(isOpen));
     toggle.setAttribute('title', getLabel(isOpen));

@@ -2135,6 +2135,7 @@ html.has-open-dossier {
     transform-origin: 100% 100%;
     transition:
       opacity var(--duration-fast) var(--ease-smooth),
+      gap var(--duration-fast) var(--ease-smooth),
       transform var(--duration-normal) var(--ease-spring);
   }
 
@@ -2221,6 +2222,21 @@ html.has-open-dossier {
     transition: transform var(--duration-fast) var(--ease-smooth);
   }
 
+  .mobile-floating-menu.is-service-open .mobile-menu-panel a:not(.is-active):not([aria-current="true"]),
+  .mobile-floating-menu.is-service-open .mobile-mail-pill {
+    width: 0;
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    opacity: 0;
+    pointer-events: none;
+    transform: scale(0.82);
+  }
+
+  .mobile-floating-menu.is-service-open .mobile-menu-scroller {
+    gap: 0;
+  }
+
   .mobile-mail-pill:active {
     transform: scale(0.98);
   }
@@ -2238,6 +2254,12 @@ html.has-open-dossier {
     flex-direction: row;
     align-items: center;
     gap: 0;
+    min-width: 0;
+    transition: gap var(--duration-fast) var(--ease-smooth);
+  }
+
+  .mobile-service.is-open {
+    gap: var(--mobile-service-gap);
   }
 
   .mobile-service-toggle {
@@ -2303,20 +2325,19 @@ html.has-open-dossier {
   }
 
   .mobile-service-panel {
-    position: absolute;
-    right: 0;
-    bottom: calc(100% + 8px);
     display: inline-flex;
     align-items: center;
     gap: var(--mobile-service-gap);
     width: max-content;
-    padding: var(--mobile-service-pad-y) var(--mobile-service-pad-x);
+    padding: 0 var(--mobile-service-pad-x) 0 0;
     border-radius: 999px;
-    background: var(--mobile-pill-bg);
-    box-shadow: var(--mobile-bottom-pill-shadow);
-    backdrop-filter: blur(26px) saturate(190%);
-    -webkit-backdrop-filter: blur(26px) saturate(190%);
-    transform-origin: 100% 100%;
+    background: transparent;
+    box-shadow: none;
+    transform-origin: 100% 50%;
+    opacity: 1;
+    transition:
+      opacity var(--duration-fast) var(--ease-smooth),
+      transform var(--duration-normal) var(--ease-spring);
   }
 
   .mobile-service-panel[hidden] {
@@ -2457,8 +2478,7 @@ html.has-open-dossier {
     .mobile-menu-panel a[aria-current="true"],
     .mobile-mail-pill,
     .mobile-service-toggle,
-    .mobile-floating-menu,
-    .mobile-service-panel {
+    .mobile-floating-menu {
       background: var(--mobile-pill-fallback-bg);
     }
   }
