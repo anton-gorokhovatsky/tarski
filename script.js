@@ -165,13 +165,30 @@
     code.textContent = languageCodes[language] || language.toUpperCase();
   };
 
+  let hidePanelTimer = null;
+
   const setOpen = (isOpen) => {
-    service.classList.toggle('is-open', isOpen);
-    menu?.classList.toggle('is-service-open', isOpen);
-    toggle.setAttribute('aria-expanded', String(isOpen));
-    toggle.setAttribute('aria-label', getLabel(isOpen));
-    toggle.setAttribute('title', getLabel(isOpen));
-    panel.hidden = !isOpen;
+    window.clearTimeout(hidePanelTimer);
+
+    if (isOpen) {
+      panel.hidden = false;
+    }
+
+    window.requestAnimationFrame(() => {
+      service.classList.toggle('is-open', isOpen);
+      menu?.classList.toggle('is-service-open', isOpen);
+      toggle.setAttribute('aria-expanded', String(isOpen));
+      toggle.setAttribute('aria-label', getLabel(isOpen));
+      toggle.setAttribute('title', getLabel(isOpen));
+    });
+
+    if (!isOpen) {
+      hidePanelTimer = window.setTimeout(() => {
+        if (!service.classList.contains('is-open')) {
+          panel.hidden = true;
+        }
+      }, 280);
+    }
   };
 
   toggle.addEventListener('click', (event) => {
