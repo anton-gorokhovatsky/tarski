@@ -2110,10 +2110,10 @@ html.has-open-dossier {
   }
 
   .mobile-floating-menu {
-    --mobile-service-pad-x: 16px;
-    --mobile-service-pad-y: 10px;
-    --mobile-service-gap: 12px;
+    --mobile-island-pad: 7px;
+    --mobile-island-gap: 5px;
     --mobile-control-size: 42px;
+    --mobile-active-pad-x: 13px;
     position: fixed;
     right: max(12px, var(--page-padding-x));
     bottom: calc(14px + env(safe-area-inset-bottom));
@@ -2121,9 +2121,9 @@ html.has-open-dossier {
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 6px;
+    gap: var(--mobile-island-gap);
     max-width: calc(100vw - 24px);
-    padding: 6px;
+    padding: var(--mobile-island-pad);
     border-radius: 999px;
     background: var(--mobile-pill-bg);
     box-shadow: var(--mobile-bottom-pill-shadow);
@@ -2136,6 +2136,7 @@ html.has-open-dossier {
     transition:
       opacity var(--duration-fast) var(--ease-smooth),
       gap var(--duration-fast) var(--ease-smooth),
+      padding var(--duration-fast) var(--ease-smooth),
       transform var(--duration-normal) var(--ease-spring);
   }
 
@@ -2143,6 +2144,11 @@ html.has-open-dossier {
     opacity: 1;
     pointer-events: auto;
     transform: translateY(0);
+  }
+
+  .mobile-floating-menu.is-service-open {
+    gap: 7px;
+    padding-right: 10px;
   }
 
   .mobile-menu-panel,
@@ -2208,7 +2214,7 @@ html.has-open-dossier {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: var(--mobile-control-size);
+    width: calc(var(--mobile-control-size) - 2px);
     height: var(--mobile-control-size);
     padding: 0;
     border-radius: 999px;
@@ -2243,7 +2249,7 @@ html.has-open-dossier {
 
   .mobile-mail-pill__icon {
     display: block;
-    width: 26px;
+    width: 29px;
     height: auto;
     filter: var(--brand-filter);
   }
@@ -2255,11 +2261,11 @@ html.has-open-dossier {
     align-items: center;
     gap: 0;
     min-width: 0;
-    transition: gap var(--duration-fast) var(--ease-smooth);
+    transition: gap var(--duration-normal) var(--ease-spring);
   }
 
   .mobile-service.is-open {
-    gap: var(--mobile-service-gap);
+    gap: 11px;
   }
 
   .mobile-service-toggle {
@@ -2285,7 +2291,7 @@ html.has-open-dossier {
     touch-action: manipulation;
     transition:
       transform var(--duration-fast) var(--ease-smooth),
-      width var(--duration-fast) var(--ease-smooth);
+      width var(--duration-normal) var(--ease-spring);
   }
 
   .mobile-service-toggle:focus {
@@ -2312,7 +2318,7 @@ html.has-open-dossier {
   }
 
   .mobile-service.is-open .mobile-service-toggle {
-    width: 58px;
+    width: 54px;
   }
 
   .mobile-service.is-open .mobile-service-toggle::after {
@@ -2327,9 +2333,9 @@ html.has-open-dossier {
   .mobile-service-panel {
     display: inline-flex;
     align-items: center;
-    gap: var(--mobile-service-gap);
+    gap: 11px;
     width: max-content;
-    padding: 0 var(--mobile-service-pad-x) 0 0;
+    padding: 0;
     border-radius: 999px;
     background: transparent;
     box-shadow: none;
@@ -2345,7 +2351,7 @@ html.has-open-dossier {
   }
 
   .mobile-service-panel .language-switcher {
-    gap: 9px;
+    gap: 10px;
     font-size: 14px;
   }
 
@@ -2364,7 +2370,7 @@ html.has-open-dossier {
     position: relative;
     z-index: 4;
     align-items: center;
-    gap: 4px;
+    gap: var(--mobile-island-gap);
     width: auto;
     height: auto;
     padding: 0;
@@ -2452,11 +2458,11 @@ html.has-open-dossier {
   .mobile-menu-panel a[aria-current="true"] {
     width: auto;
     min-width: var(--mobile-control-size);
-    max-width: min(52vw, 190px);
-    padding: 0 8px 0 14px;
-    background: var(--mobile-pill-bg);
+    max-width: min(48vw, 176px);
+    padding: 0 7px 0 var(--mobile-active-pad-x);
+    background: transparent;
     color: var(--mobile-pill-text);
-    box-shadow: var(--mobile-bottom-pill-shadow);
+    box-shadow: none;
     font-size: 16px;
   }
 
@@ -2487,10 +2493,13 @@ html.has-open-dossier {
 @media (max-width: 420px) {
   .mobile-floating-menu {
     --mobile-control-size: 40px;
-    gap: 6px;
+    --mobile-island-pad: 6px;
+    --mobile-island-gap: 4px;
+    --mobile-active-pad-x: 12px;
+    gap: var(--mobile-island-gap);
     right: 12px;
     bottom: calc(12px + env(safe-area-inset-bottom));
-    padding: 5px;
+    padding: var(--mobile-island-pad);
   }
 
   .mobile-menu-panel {
@@ -2513,11 +2522,11 @@ html.has-open-dossier {
   }
 
   .mobile-mail-pill__icon {
-    width: 26px;
+    width: 28px;
   }
 
   .mobile-menu-scroller {
-    gap: 5px;
+    gap: var(--mobile-island-gap);
     padding: 0;
   }
 
@@ -2530,8 +2539,8 @@ html.has-open-dossier {
 
   .mobile-menu-panel a.is-active,
   .mobile-menu-panel a[aria-current="true"] {
-    max-width: min(50vw, 180px);
-    padding: 0 8px 0 13px;
+    max-width: min(46vw, 168px);
+    padding: 0 6px 0 var(--mobile-active-pad-x);
     font-size: 15px;
   }
 }
