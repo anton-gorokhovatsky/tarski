@@ -167,6 +167,16 @@
 
   let hidePanelTimer = null;
   let collapseTimer = null;
+  let handoffTimer = null;
+  let returningTimer = null;
+
+  const prefersReducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const setToggleState = (isOpen) => {
+    toggle.setAttribute('aria-expanded', String(isOpen));
+    toggle.setAttribute('aria-label', getLabel(isOpen));
+    toggle.setAttribute('title', getLabel(isOpen));
+  };
 
   const updateServiceShellWidth = () => {
     if (!menu) return;
@@ -202,30 +212,66 @@
   const setOpen = (isOpen) => {
     window.clearTimeout(hidePanelTimer);
     window.clearTimeout(collapseTimer);
+    window.clearTimeout(handoffTimer);
+    window.clearTimeout(returningTimer);
+
+    const isActive = service.classList.contains('is-open')
+      || service.classList.contains('is-closing')
+      || menu?.classList.contains('is-service-open')
+      || menu?.classList.contains('is-service-handoff')
+      || menu?.classList.contains('is-service-returning')
+      || toggle.getAttribute('aria-expanded') === 'true';
+
+    if (!isOpen && !isActive) {
+      setToggleState(false);
+      panel.hidden = true;
+      service.classList.remove('is-open', 'is-closing');
+      menu?.classList.remove('is-service-open', 'is-service-handoff', 'is-service-returning');
+      return;
+    }
 
     if (isOpen) {
       updateServiceShellWidth();
       panel.hidden = false;
       service.classList.remove('is-closing');
+      menu?.classList.remove('is-service-returning');
+
+      if (service.classList.contains('is-open') || menu?.classList.contains('is-service-open')) {
+        setToggleState(true);
+        service.classList.add('is-open');
+        menu?.classList.add('is-service-open');
+        menu?.classList.remove('is-service-handoff');
+        return;
+      }
+
+      menu?.classList.add('is-service-handoff');
     }
 
     window.requestAnimationFrame(() => {
-      toggle.setAttribute('aria-expanded', String(isOpen));
-      toggle.setAttribute('aria-label', getLabel(isOpen));
-      toggle.setAttribute('title', getLabel(isOpen));
+      const handoffDelay = prefersReducedMotion() ? 0 : 160;
+      const returningDelay = prefersReducedMotion() ? 0 : 400;
+
+      setToggleState(isOpen);
 
       if (isOpen) {
-        service.classList.add('is-open');
-        menu?.classList.add('is-service-open');
+        handoffTimer = window.setTimeout(() => {
+          service.classList.add('is-open');
+          menu?.classList.add('is-service-open');
+          menu?.classList.remove('is-service-handoff');
+        }, handoffDelay);
         return;
       }
 
       service.classList.add('is-closing');
       collapseTimer = window.setTimeout(() => {
         service.classList.remove('is-open', 'is-closing');
-        menu?.classList.remove('is-service-open');
+        menu?.classList.remove('is-service-open', 'is-service-handoff');
+        menu?.classList.add('is-service-returning');
         window.dispatchEvent(new CustomEvent('tarski:mobileislandresize'));
-      }, 220);
+        returningTimer = window.setTimeout(() => {
+          menu?.classList.remove('is-service-returning');
+        }, returningDelay);
+      }, handoffDelay);
     });
 
     if (!isOpen) {
@@ -234,7 +280,7 @@
           panel.hidden = true;
           service.classList.remove('is-closing');
         }
-      }, 580);
+      }, prefersReducedMotion() ? 0 : 720);
     }
   };
 

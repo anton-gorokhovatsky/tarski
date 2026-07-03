@@ -53,7 +53,8 @@
   --page-padding-x: 45px;
   --content-width: 890px;
   --menu-width: 199px;
-  --font-sans: "CoFo Robert Sans", "CoFo Sans", Arial, Helvetica, sans-serif;
+  --font-ui-latin: "CoFo Robert Sans", "CoFo Sans", Arial, Helvetica, sans-serif;
+  --font-sans: var(--font-ui-latin);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -435,7 +436,10 @@ a:hover {
   align-items: baseline;
   gap: 7px;
   color: var(--text);
+  font-family: var(--font-ui-latin);
   font-size: 13px;
+  font-feature-settings: normal;
+  font-variant-numeric: lining-nums tabular-nums;
   line-height: 1;
 }
 
@@ -2170,7 +2174,11 @@ html.has-open-dossier {
     --mobile-service-pad-right: 18.5px;
     --mobile-service-open-gap: 12px;
     --mobile-service-toggle-open-size: 32px;
-    --mobile-island-morph: 420ms;
+    --mobile-island-morph: 480ms;
+    --mobile-island-content-fade: 160ms;
+    --mobile-island-content-shift: 380ms;
+    --mobile-island-content-collapse: 360ms;
+    --mobile-island-collapse-delay: 140ms;
     position: relative;
     left: auto;
     right: auto;
@@ -2254,10 +2262,45 @@ html.has-open-dossier {
     background: transparent;
     box-shadow: none;
     transition:
-      width var(--mobile-island-morph) var(--ease-smooth),
-      max-width var(--mobile-island-morph) var(--ease-smooth),
-      opacity var(--duration-fast) var(--ease-smooth),
-      transform var(--mobile-island-morph) var(--ease-smooth);
+      width var(--mobile-island-content-collapse) var(--ease-smooth),
+      max-width var(--mobile-island-content-collapse) var(--ease-smooth),
+      opacity var(--mobile-island-content-fade) var(--ease-smooth),
+      transform var(--mobile-island-content-shift) var(--ease-smooth);
+    will-change: width, opacity, transform;
+  }
+
+  .mobile-floating-menu.is-service-handoff .mobile-menu-panel,
+  .mobile-floating-menu.is-service-handoff .mobile-mail-pill {
+    opacity: 0;
+    pointer-events: none;
+    transform: translate3d(-16px, 0, 0) scale(0.98);
+  }
+
+  .mobile-floating-menu.is-service-returning .mobile-menu-panel,
+  .mobile-floating-menu.is-service-returning .mobile-mail-pill {
+    opacity: 0;
+    pointer-events: none;
+    transform: translate3d(16px, 0, 0) scale(0.98);
+  }
+
+  .mobile-floating-menu.is-service-handoff .mobile-menu-panel a,
+  .mobile-floating-menu.is-service-returning .mobile-menu-panel a {
+    opacity: 0;
+  }
+
+  .mobile-floating-menu.is-service-returning .mobile-service-toggle span {
+    width: 0;
+    opacity: 0;
+  }
+
+  .mobile-floating-menu.is-service-returning .mobile-service-toggle {
+    opacity: 0;
+    pointer-events: none;
+    transform: translate3d(16px, 0, 0) scale(0.98);
+    transition:
+      opacity 1ms linear,
+      transform var(--mobile-island-content-shift) var(--ease-smooth),
+      width var(--mobile-island-morph) var(--ease-smooth);
   }
 
   .mobile-menu-panel::before {
@@ -2311,15 +2354,15 @@ html.has-open-dossier {
     text-decoration: none;
     white-space: nowrap;
     transition:
-      width var(--mobile-island-morph) var(--ease-smooth),
-      max-width var(--mobile-island-morph) var(--ease-smooth),
-      opacity var(--duration-fast) var(--ease-smooth),
-      transform var(--mobile-island-morph) var(--ease-smooth);
+      width var(--mobile-island-content-collapse) var(--ease-smooth),
+      max-width var(--mobile-island-content-collapse) var(--ease-smooth),
+      opacity var(--mobile-island-content-fade) var(--ease-smooth),
+      transform var(--mobile-island-content-shift) var(--ease-smooth);
+    will-change: width, opacity, transform;
   }
 
   .mobile-floating-menu.is-service-open .mobile-menu-panel,
   .mobile-floating-menu.is-service-open .mobile-mail-pill {
-    flex-basis: 0;
     width: 0;
     max-width: 0;
     min-width: 0;
@@ -2328,13 +2371,24 @@ html.has-open-dossier {
     overflow: hidden;
     opacity: 0;
     pointer-events: none;
-    transform: translate3d(-8px, 0, 0) scale(0.82);
+    transform: translate3d(-16px, 0, 0) scale(0.98);
+    transition:
+      opacity var(--mobile-island-content-fade) var(--ease-smooth),
+      transform var(--mobile-island-content-shift) var(--ease-smooth),
+      width var(--mobile-island-content-collapse) var(--ease-smooth) var(--mobile-island-collapse-delay),
+      max-width var(--mobile-island-content-collapse) var(--ease-smooth) var(--mobile-island-collapse-delay);
   }
 
   .mobile-floating-menu.is-service-open .mobile-menu-panel a {
     width: 0;
     min-width: 0;
     padding: 0;
+    opacity: 0;
+    transition:
+      opacity var(--mobile-island-content-fade) var(--ease-smooth),
+      width var(--mobile-island-content-collapse) var(--ease-smooth) var(--mobile-island-collapse-delay),
+      min-width var(--mobile-island-content-collapse) var(--ease-smooth) var(--mobile-island-collapse-delay),
+      padding var(--mobile-island-content-collapse) var(--ease-smooth) var(--mobile-island-collapse-delay);
   }
 
   .mobile-floating-menu.is-service-open .mobile-menu-scroller {
@@ -2390,6 +2444,9 @@ html.has-open-dossier {
     box-shadow: none;
     cursor: pointer;
     font: inherit;
+    font-family: var(--font-ui-latin);
+    font-feature-settings: normal;
+    font-variant-numeric: lining-nums tabular-nums;
     font-size: 13px;
     line-height: 1;
     letter-spacing: 0;
@@ -2397,6 +2454,7 @@ html.has-open-dossier {
     -webkit-tap-highlight-color: transparent;
     touch-action: manipulation;
     transition:
+      opacity var(--duration-fast) var(--ease-smooth),
       transform var(--duration-fast) var(--ease-smooth),
       width var(--mobile-island-morph) var(--ease-smooth);
   }
@@ -2475,20 +2533,39 @@ html.has-open-dossier {
     will-change: opacity, transform;
   }
 
+  .mobile-service.is-open .mobile-service-panel {
+    transition-delay: 55ms, 55ms;
+  }
+
   .mobile-service:not(.is-open) .mobile-service-panel {
     position: absolute;
-    top: 50%;
+    top: 0;
     right: 0;
     opacity: 0;
     pointer-events: none;
-    transform: translate3d(8px, -50%, 0) scale(0.9);
+    transform: translate3d(16px, 0, 0) scale(0.98);
+  }
+
+  .mobile-service:not(.is-open):not(.is-closing) .mobile-service-panel {
+    transition: none;
   }
 
   .mobile-service.is-closing .mobile-service-panel {
     position: relative;
     opacity: 0;
     pointer-events: none;
-    transform: translate3d(6px, 0, 0) scale(0.94);
+    transform: translate3d(16px, 0, 0) scale(0.98);
+    transition-delay: 0ms, 0ms;
+  }
+
+  .mobile-service.is-closing .mobile-service-toggle {
+    opacity: 0;
+    pointer-events: none;
+    transform: translate3d(0, 0, 0) scale(0.98);
+    transition:
+      opacity 100ms var(--ease-smooth),
+      transform var(--mobile-island-content-shift) var(--ease-smooth),
+      width var(--mobile-island-morph) var(--ease-smooth);
   }
 
   .mobile-service-panel[hidden] {
@@ -2574,6 +2651,11 @@ html.has-open-dossier {
       padding var(--duration-fast) var(--ease-smooth),
       transform var(--duration-fast) var(--ease-smooth),
       width var(--duration-fast) var(--ease-smooth);
+  }
+
+  :root[data-scene="artists"] .mobile-menu-panel a:first-child:not(.is-active) {
+    width: 31px;
+    min-width: 31px;
   }
 
   .mobile-menu-panel a:active {
