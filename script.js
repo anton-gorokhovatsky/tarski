@@ -429,7 +429,7 @@
 })();
 
 (() => {
-  const navLinks = Array.from(document.querySelectorAll('.main-nav a[href^="#"], .mobile-menu-panel a[href^="#"], .mobile-menu-expanded a[href^="#"]'));
+  const navLinks = Array.from(document.querySelectorAll('.main-nav a[href^="#"], .mobile-menu-expanded a[href^="#"]'));
   const primaryNavLinks = Array.from(document.querySelectorAll('.main-nav a[href^="#"]'));
   const sections = primaryNavLinks
     .map((link) => document.querySelector(link.getAttribute('href')))
@@ -438,8 +438,6 @@
   const mainNav = document.querySelector('.main-nav');
   const mobileMenu = document.querySelector('[data-mobile-menu]');
   const mobileMenuHome = document.querySelector('[data-mobile-menu-home]');
-  const mobilePanel = mobileMenu?.querySelector('.mobile-menu-panel');
-  const mobileScroller = mobileMenu?.querySelector('[data-mobile-menu-scroller]') || mobilePanel;
   const mobileToggle = mobileMenu?.querySelector('[data-mobile-menu-toggle]');
   const mobileMail = mobileMenu?.querySelector('.mobile-mail-pill');
   const mobileService = mobileMenu?.querySelector('.mobile-service');
@@ -451,9 +449,13 @@
     artists: 'Сеть'
   };
   const getSceneLabels = () => window.tarskiI18n?.getSceneLabels?.() || fallbackSceneLabels;
-  const getLabelSources = () => Array.from(document.querySelectorAll('.editorial-block'));
+  const getLabelSources = () => Array.from(document.querySelectorAll('.section-intro, .editorial-block'));
 
   const getSourceLabel = (source) => {
+    if (source.matches('.section-intro')) {
+      return source.dataset.sectionLabel?.trim();
+    }
+
     return source.querySelector('.editorial-block__marker')?.textContent.trim();
   };
 
@@ -461,6 +463,16 @@
     if (currentScene === 'cover') {
       const sceneLabels = getSceneLabels();
       return sceneLabels.cover || fallbackSceneLabels.cover;
+    }
+
+    const sceneRoot = document.getElementById(currentScene);
+    const sceneIntro = Array.from(sceneRoot?.children || []).find((element) => element.classList?.contains('section-intro'));
+    if (sceneIntro) {
+      const rect = sceneIntro.getBoundingClientRect();
+      if (rect.bottom > 0 && rect.top < window.innerHeight * 0.65) {
+        const introLabel = getSourceLabel(sceneIntro);
+        if (introLabel) return introLabel;
+      }
     }
 
     const anchor = window.innerHeight * 0.42;
@@ -471,7 +483,13 @@
       const rect = source.getBoundingClientRect();
       if (rect.bottom < 0 || rect.top > window.innerHeight) return;
 
-      const distance = Math.abs(rect.top - anchor);
+      if (rect.top <= anchor && rect.bottom >= anchor) {
+        currentSource = source;
+        closestDistance = 0;
+        return;
+      }
+
+      const distance = Math.min(Math.abs(rect.top - anchor), Math.abs(rect.bottom - anchor));
       if (distance < closestDistance) {
         closestDistance = distance;
         currentSource = source;
@@ -495,8 +513,6 @@
   let scrollTimer = null;
   let mobileIslandWidthTimer = null;
   const indicatorTimers = new WeakMap();
-  const mobileCoverIndicatorX = 22;
-
   const pulseIndicator = (container) => {
     if (!container) return;
 
@@ -544,102 +560,21 @@
     }
   };
 
-  const updateMobileIndicator = (animate = false) => {
-    if (!mobilePanel || !mobileScroller) return;
-
-    const activeLink = mobilePanel.querySelector('a.is-active[href^="#"]');
-    mobileMenu?.classList.toggle('is-cover-state', !activeLink);
-
-    if (!activeLink) {
-      mobilePanel.style.setProperty('--mobile-indicator-x', `${mobileCoverIndicatorX}px`);
-      mobilePanel.style.setProperty('--mobile-indicator-opacity', '0');
-      return;
-    }
-
-    const panelRect = mobilePanel.getBoundingClientRect();
-    const linkRect = activeLink.getBoundingClientRect();
-    const indicatorX = linkRect.left - panelRect.left;
-
-    mobilePanel.style.setProperty('--mobile-indicator-x', `${indicatorX.toFixed(2)}px`);
-    mobilePanel.style.setProperty('--mobile-indicator-opacity', '1');
-
-    if (animate && mobileQuery.matches) {
-      pulseIndicator(mobilePanel);
-    }
-  };
-
   const updateMenuIndicators = (animate = false) => {
     updateDesktopIndicator(animate);
-    updateMobileIndicator(animate);
-  };
-
-  const updateMobileScrollerMask = () => {
-    if (!mobilePanel || !mobileScroller) return;
-
-    const maxScroll = Math.max(0, mobileScroller.scrollWidth - mobileScroller.clientWidth);
-    const atStart = mobileScroller.scrollLeft <= 2;
-    const atEnd = mobileScroller.scrollLeft >= maxScroll - 2;
-
-    mobilePanel.classList.toggle('has-overflow', maxScroll > 2);
-    mobilePanel.classList.toggle('is-at-start', atStart);
-    mobilePanel.classList.toggle('is-at-end', atEnd || maxScroll <= 2);
   };
 
   const updateMobileIslandWidth = () => {
     if (!mobileMenu || !mobileMail || !mobileService || !mobileQuery.matches) return;
     if (mobileMenu.classList.contains('is-service-open') || mobileMenu.classList.contains('is-menu-open')) return;
+    if (!mobileToggle) return;
 
     const toPx = (value) => Number.parseFloat(value) || 0;
     const menuStyle = window.getComputedStyle(mobileMenu);
     const padX = toPx(menuStyle.paddingLeft) + toPx(menuStyle.paddingRight);
     const shellGap = toPx(menuStyle.gap);
-    if (mobileToggle) {
-      const shellWidth = Math.ceil(
-        toPx(window.getComputedStyle(mobileToggle).width)
-        + toPx(window.getComputedStyle(mobileMail).width)
-        + toPx(window.getComputedStyle(mobileService).width)
-        + shellGap * 2
-        + padX
-      );
-
-      mobileMenu.style.setProperty('--mobile-island-shell-width', `${shellWidth}px`);
-      return;
-    }
-
-    if (!mobilePanel || !mobileScroller) return;
-
-    const scrollerStyle = window.getComputedStyle(mobileScroller);
-    const links = Array.from(mobilePanel.querySelectorAll('a'));
-    const firstLink = links[0];
-    const linkGap = toPx(scrollerStyle.gap);
-    const getLinkWidth = (link) => {
-      const linkStyle = window.getComputedStyle(link);
-      const isActive = link.classList.contains('is-active')
-        || link.getAttribute('aria-current') === 'true'
-        || (mobileMenu.classList.contains('is-cover-state') && link === firstLink);
-
-      if (!isActive) {
-        return toPx(linkStyle.width);
-      }
-
-      const range = document.createRange();
-      range.selectNodeContents(link);
-      const textWidth = range.getBoundingClientRect().width;
-      range.detach();
-
-      const dotStyle = window.getComputedStyle(link, '::after');
-      return Math.ceil(
-        textWidth
-        + toPx(linkStyle.gap)
-        + toPx(dotStyle.width)
-        + toPx(linkStyle.paddingLeft)
-        + toPx(linkStyle.paddingRight)
-      );
-    };
-    const panelWidth = links.reduce((sum, link) => sum + getLinkWidth(link), 0)
-      + Math.max(0, links.length - 1) * linkGap;
     const shellWidth = Math.ceil(
-      panelWidth
+      toPx(window.getComputedStyle(mobileToggle).width)
       + toPx(window.getComputedStyle(mobileMail).width)
       + toPx(window.getComputedStyle(mobileService).width)
       + shellGap * 2
@@ -653,22 +588,6 @@
     updateMobileIslandWidth();
     window.clearTimeout(mobileIslandWidthTimer);
     mobileIslandWidthTimer = window.setTimeout(updateMobileIslandWidth, 260);
-  };
-
-  const scrollActiveMobileLinkIntoView = (behavior = 'smooth') => {
-    if (!mobilePanel || !mobileScroller || !mobileMenu || !mobileQuery.matches) return;
-    if (!mobileMenu.classList.contains('is-visible')) return;
-
-    const activeMobileLink = mobilePanel.querySelector('a.is-active');
-    if (!activeMobileLink) return;
-
-    activeMobileLink.scrollIntoView({
-      behavior,
-      block: 'nearest',
-      inline: 'center'
-    });
-
-    window.setTimeout(updateMobileScrollerMask, behavior === 'smooth' ? 260 : 0);
   };
 
   const setActive = (id) => {
@@ -727,8 +646,6 @@
 
     if (!mobileQuery.matches) {
       mobileMenu.classList.remove('is-visible');
-      updateMobileScrollerMask();
-      updateMobileIndicator(false);
       return;
     }
 
@@ -741,15 +658,11 @@
 
     if (shouldShow) {
       scheduleMobileIslandWidth();
-      updateMobileScrollerMask();
-      updateMobileIndicator(false);
-      scrollActiveMobileLinkIntoView('auto');
     }
   };
 
   updateActive();
   updateMenuIndicators(false);
-  updateMobileScrollerMask();
   scheduleMobileIslandWidth();
   updateMobileMenuVisibility();
 
@@ -760,17 +673,11 @@
     scheduleMobileIslandWidth();
   }, { passive: true });
 
-  mobileScroller?.addEventListener('scroll', () => {
-    updateMobileScrollerMask();
-    updateMobileIndicator(false);
-  }, { passive: true });
-
   window.addEventListener('resize', () => {
     updateActive();
     updateNavLabel();
     updateMenuIndicators(false);
     scheduleMobileIslandWidth();
-    updateMobileScrollerMask();
     updateMobileMenuVisibility();
   });
 
@@ -780,9 +687,7 @@
     updateMenuIndicators(false);
     window.setTimeout(() => {
       scheduleMobileIslandWidth();
-      updateMobileScrollerMask();
       updateMobileMenuVisibility();
-      scrollActiveMobileLinkIntoView('auto');
     }, 40);
   });
 
