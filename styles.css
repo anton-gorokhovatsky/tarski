@@ -186,6 +186,14 @@
     "Noto Sans JP",
     "Noto Sans CJK JP",
     sans-serif;
+  --font-serif-display:
+    "Noto Serif Tarski",
+    "Hiragino Mincho ProN",
+    "Yu Mincho",
+    YuMincho,
+    "Noto Serif JP",
+    "Noto Serif CJK JP",
+    serif;
 }
 
 @font-face {
@@ -1540,7 +1548,7 @@ li::before {
   margin: 0 0 12px;
   font-size: clamp(38px, 4.9vw, 82px);
   line-height: 0.94;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-serif-display);
   font-weight: 400;
   letter-spacing: 0;
   hyphens: none;
