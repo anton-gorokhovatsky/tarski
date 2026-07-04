@@ -1565,7 +1565,7 @@ html.has-open-dossier {
   --footer-column-gap: 34px;
   --footer-signature-width: min(100%, calc(100vw - (var(--page-padding-x) * 2) - var(--menu-width) - 84px));
   --footer-legal-column: min(680px, calc(var(--footer-signature-width) - var(--footer-meta-column) - var(--footer-column-gap)));
-  min-height: auto;
+  min-height: 100svh;
   padding-top: clamp(156px, 22vh, 220px);
   padding-bottom: 34px;
   text-align: left;
