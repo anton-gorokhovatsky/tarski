@@ -1522,6 +1522,7 @@ li::before {
 .artist-dossier__media img {
   display: block;
   width: 100%;
+  max-width: 100%;
   height: auto;
   min-height: 0;
   max-height: min(60svh, 600px);
