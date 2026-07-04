@@ -1432,7 +1432,11 @@ li::before {
   position: relative;
   display: grid;
   grid-template-columns: var(--dossier-media-width) minmax(0, 1fr);
-  gap: var(--dossier-column-gap);
+  grid-template-areas:
+    "media content"
+    "gallery content";
+  column-gap: var(--dossier-column-gap);
+  row-gap: 10px;
   align-items: start;
   width: min(1320px, calc(100vw - (var(--page-padding-x) * 2) - var(--menu-width) - 8px));
   max-height: min(760px, calc(100svh - 36px));
@@ -1528,6 +1532,7 @@ li::before {
 }
 
 .artist-dossier__media {
+  grid-area: media;
   align-self: start;
   width: var(--dossier-media-width);
   max-width: 100%;
@@ -1541,7 +1546,51 @@ li::before {
   object-fit: contain;
 }
 
+.artist-dossier__gallery-block {
+  grid-area: gallery;
+  width: var(--dossier-media-width);
+  max-width: 100%;
+}
+
+.artist-dossier__gallery-block[hidden] {
+  display: none;
+}
+
+.artist-dossier__gallery {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  width: 100%;
+}
+
+.artist-dossier__gallery[hidden] {
+  display: none;
+}
+
+.artist-dossier__gallery img {
+  display: block;
+  width: 100%;
+  height: auto;
+  min-width: 0;
+}
+
+.artist-dossier__gallery-image--wide {
+  grid-column: 1 / -1;
+}
+
+.artist-dossier__credit {
+  margin: 10px 0 0;
+  color: var(--muted-text);
+  font-size: 12px;
+  line-height: 1.15;
+}
+
+.artist-dossier__credit[hidden] {
+  display: none;
+}
+
 .artist-dossier__content {
+  grid-area: content;
   min-width: 0;
   overflow-x: hidden;
   padding-top: 2px;
@@ -2181,6 +2230,10 @@ html.has-open-dossier {
     --dossier-media-width: min(62vw, 270px);
     --dossier-column-gap: 18px;
     grid-template-columns: 1fr;
+    grid-template-areas:
+      "media"
+      "content"
+      "gallery";
     gap: 18px;
     width: 100%;
     max-height: calc(100svh - 18px);
@@ -2193,9 +2246,14 @@ html.has-open-dossier {
     transform-origin: 50% 100%;
   }
 
-  .artist-dossier__media img {
+  .artist-dossier__media > img {
     width: var(--dossier-media-width);
     max-height: 42svh;
+  }
+
+  .artist-dossier__gallery img {
+    width: 100%;
+    max-height: none;
   }
 
   .artist-dossier__content {
@@ -2243,7 +2301,7 @@ html.has-open-dossier {
     width: min(58vw, 168px);
   }
 
-  .artist-dossier__media img {
+  .artist-dossier__media > img {
     width: min(66vw, 235px);
   }
 

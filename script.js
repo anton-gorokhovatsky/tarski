@@ -868,6 +868,9 @@
   const dossier = document.querySelector('[data-artist-dossier]');
   const panel = dossier?.querySelector('.artist-dossier__panel');
   const image = dossier?.querySelector('[data-artist-dossier-image]');
+  const galleryBlock = dossier?.querySelector('[data-artist-dossier-gallery-block]');
+  const gallery = dossier?.querySelector('[data-artist-dossier-gallery]');
+  const credit = dossier?.querySelector('[data-artist-dossier-credit]');
   const name = dossier?.querySelector('[data-artist-dossier-name]');
   const role = dossier?.querySelector('[data-artist-dossier-role]');
   const text = dossier?.querySelector('[data-artist-dossier-text]');
@@ -883,7 +886,7 @@
     'artist-no-excuse-group': 'assets/artist-index/0015.jpg.webp'
   };
 
-  if (!dossier || !panel || !image || !name || !role || !text || !links || !cards.length) return;
+  if (!dossier || !panel || !image || !galleryBlock || !gallery || !credit || !name || !role || !text || !links || !cards.length) return;
 
   const cardsById = new Map(cards.map((card) => [card.id, card]));
   let activeTrigger = null;
@@ -919,6 +922,16 @@
     const cardRole = card.querySelector('.artist-card__role');
     const cardLinks = Array.from(card.querySelectorAll('.artist-card__link'));
     const copy = Array.from(card.querySelectorAll('.artist-card__body > p:not(.artist-card__role)'));
+    const galleryTemplate = card.querySelector('[data-artist-gallery]');
+    const galleryItems = galleryTemplate
+      ? Array.from(galleryTemplate.content.querySelectorAll('img')).map((item) => ({
+        src: item.getAttribute('src') || '',
+        alt: item.getAttribute('alt') || '',
+        width: item.getAttribute('width') || '',
+        height: item.getAttribute('height') || '',
+        isWide: item.classList.contains('artist-card__gallery-image--wide')
+      })).filter((item) => item.src)
+      : [];
 
     return {
       id: card.id,
@@ -927,7 +940,9 @@
       name: cardName?.textContent.trim() || '',
       role: cardRole?.textContent.trim() || '',
       copy,
-      links: cardLinks
+      links: cardLinks,
+      galleryItems,
+      galleryCredit: galleryTemplate?.dataset.credit || ''
     };
   };
 
@@ -954,14 +969,37 @@
     const data = getCardData(card);
     activeCard = card;
     activeTrigger = trigger || document.activeElement;
+    const galleryImages = data.galleryItems.map((item) => {
+      const galleryImage = document.createElement('img');
+      galleryImage.className = 'artist-dossier__gallery-image';
+
+      if (item.isWide) {
+        galleryImage.classList.add('artist-dossier__gallery-image--wide');
+      }
+
+      galleryImage.src = item.src;
+      galleryImage.alt = item.alt;
+      if (item.width) galleryImage.width = Number(item.width);
+      if (item.height) galleryImage.height = Number(item.height);
+      galleryImage.loading = 'lazy';
+      galleryImage.decoding = 'async';
+
+      return galleryImage;
+    });
 
     panel.dataset.artistId = card.id;
     image.src = data.imageSrc;
     image.alt = data.imageAlt;
+    gallery.replaceChildren(...galleryImages);
+    gallery.hidden = galleryImages.length === 0;
+    credit.textContent = data.galleryCredit;
+    credit.hidden = !data.galleryCredit;
+    galleryBlock.hidden = galleryImages.length === 0 && !data.galleryCredit;
     name.textContent = data.name;
     role.textContent = data.role;
     text.replaceChildren(...data.copy.map((item) => item.cloneNode(true)));
     links.replaceChildren(...data.links.map((item) => item.cloneNode(true)));
+    panel.scrollTop = 0;
 
     dossier.classList.add('is-open');
     dossier.setAttribute('aria-hidden', 'false');
