@@ -510,7 +510,6 @@
 
   let currentActiveId = null;
   let currentScene = document.documentElement.dataset.scene || 'cover';
-  let scrollTimer = null;
   let mobileIslandWidthTimer = null;
   const indicatorTimers = new WeakMap();
   const pulseIndicator = (container) => {
@@ -608,13 +607,11 @@
 
     if (hasChanged) {
       updateMenuIndicators(previousActiveId !== null);
-      scheduleMobileIslandWidth();
-      window.clearTimeout(scrollTimer);
-      scrollTimer = window.setTimeout(() => scrollActiveMobileLinkIntoView('smooth'), 40);
     } else {
       updateMenuIndicators(false);
-      scheduleMobileIslandWidth();
     }
+
+    scheduleMobileIslandWidth();
   };
 
   const updateActive = () => {
