@@ -55,6 +55,7 @@
   --menu-width: 199px;
   --font-ui-latin: "CoFo Robert Sans", "CoFo Sans", Arial, Helvetica, sans-serif;
   --font-sans: var(--font-ui-latin);
+  --font-serif-display: "Noto Serif Tarski", Georgia, "Times New Roman", serif;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -157,6 +158,24 @@
     "Noto Sans JP",
     "Noto Sans CJK JP",
     sans-serif;
+}
+
+@font-face {
+  font-family: "Noto Serif Tarski";
+  src: url("assets/fonts/noto-serif-semicondensed-regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-stretch: semi-condensed;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Noto Serif Tarski";
+  src: url("assets/fonts/noto-serif-semicondensed-regular-italic.ttf") format("truetype");
+  font-weight: 400;
+  font-style: italic;
+  font-stretch: semi-condensed;
+  font-display: swap;
 }
 
 /*
@@ -903,17 +922,16 @@ li::before {
   position: relative;
   z-index: 2;
   isolation: isolate;
-  display: flex;
-  flex-direction: column;
-  flex-wrap: nowrap;
-  justify-content: center;
-  align-items: center;
+  display: grid;
+  justify-items: center;
   gap: 0.02em;
   width: var(--artist-index-width);
   margin: -10px auto 96px;
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: clamp(44px, 5.7vw, 86px);
-  line-height: 0.98;
+  font-family: var(--font-serif-display);
+  font-weight: 400;
+  font-stretch: semi-condensed;
+  font-size: clamp(42px, 5.15vw, 78px);
+  line-height: 0.92;
   text-align: center;
 }
 
@@ -951,6 +969,7 @@ li::before {
 }
 
 .artist-index__link {
+  --artist-link-x: 0px;
   position: relative;
   z-index: 1;
   display: block;
@@ -959,14 +978,49 @@ li::before {
   color: var(--text);
   text-decoration: none;
   transform-origin: center baseline;
+  transform: translate3d(var(--artist-link-x), 0, 0);
   transition:
     color var(--duration-fast) var(--ease-smooth),
     opacity var(--duration-fast) var(--ease-smooth),
     transform var(--duration-normal) var(--ease-smooth);
 }
 
+.artist-index__link:nth-child(1) {
+  justify-self: start;
+  margin-left: 16%;
+}
+
 .artist-index__link:nth-child(2n) {
   font-style: italic;
+}
+
+.artist-index__link:nth-child(2) {
+  --artist-link-x: 0.36em;
+}
+
+.artist-index__link:nth-child(3) {
+  justify-self: start;
+  margin-left: 3%;
+}
+
+.artist-index__link:nth-child(4) {
+  justify-self: start;
+  margin-left: 12%;
+}
+
+.artist-index__link:nth-child(5) {
+  justify-self: end;
+  margin-right: 12%;
+}
+
+.artist-index__link:nth-child(6) {
+  justify-self: start;
+  margin-left: 0;
+}
+
+.artist-index__link:nth-child(7) {
+  justify-self: end;
+  margin-right: 18%;
 }
 
 .artist-index__link:focus-visible {
@@ -974,7 +1028,7 @@ li::before {
   text-decoration: underline;
   text-decoration-thickness: 0.04em;
   text-underline-offset: 0.08em;
-  transform: translateY(-0.04em) scale(1.025);
+  transform: translate3d(var(--artist-link-x), -0.04em, 0) scale(1.025);
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -1049,7 +1103,7 @@ li::before {
     z-index: 3;
     color: #fff;
     mix-blend-mode: difference;
-    transform: translateY(-0.04em) scale(1.025);
+    transform: translate3d(var(--artist-link-x), -0.04em, 0) scale(1.025);
   }
 
   :root[data-effective-theme="dark"] .artist-index:has(.artist-index__link:nth-child(1):is(:hover, :focus-visible)) {
@@ -1930,6 +1984,7 @@ html.has-open-dossier {
   .artist-index {
     width: 100%;
     justify-content: flex-start;
+    justify-items: start;
     align-items: flex-start;
     gap: 0.04em;
     margin: 0 0 48px;
@@ -1943,7 +1998,11 @@ html.has-open-dossier {
     display: none;
   }
 
-  .artist-index__link {
+  .artist-index .artist-index__link {
+    --artist-link-x: 0px;
+    justify-self: start;
+    margin-left: 0;
+    margin-right: 0;
     width: auto;
     max-width: 100%;
   }
@@ -2540,7 +2599,7 @@ html.has-open-dossier {
     width: 29px;
     height: auto;
     filter: var(--brand-filter);
-    transform: translate3d(1px, 1px, 0);
+    transform: translate3d(-1px, 1px, 0);
     transform-origin: 50% 50%;
   }
 

@@ -1,2 +1,4 @@
 .DS_Store
-assets/fonts/
+assets/fonts/*
+!assets/fonts/noto-serif-semicondensed-regular.ttf
+!assets/fonts/noto-serif-semicondensed-regular-italic.ttf
