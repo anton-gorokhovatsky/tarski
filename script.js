@@ -943,6 +943,13 @@
     });
   };
 
+  const syncDossierHash = (id) => {
+    const hash = `#${id}`;
+    if (window.location.hash === hash) return;
+
+    window.history.replaceState(null, '', hash);
+  };
+
   const openDossier = (card, trigger = null) => {
     const data = getCardData(card);
     activeCard = card;
@@ -960,6 +967,7 @@
     dossier.setAttribute('aria-hidden', 'false');
     document.documentElement.classList.add('has-open-dossier');
     setCurrentIndexLink(card.id);
+    syncDossierHash(card.id);
 
     window.setTimeout(() => focusWithoutScroll(panel), 0);
   };
