@@ -1426,13 +1426,17 @@ li::before {
 }
 
 .artist-dossier__panel {
+  --dossier-panel-padding: clamp(30px, 3.2vw, 42px);
+  --dossier-media-width: clamp(320px, 24vw, 410px);
+  --dossier-column-gap: clamp(50px, 4.8vw, 68px);
   position: relative;
   display: grid;
-  grid-template-columns: minmax(300px, 0.64fr) minmax(0, 1.08fr);
-  gap: clamp(30px, 3.4vw, 56px);
+  grid-template-columns: var(--dossier-media-width) minmax(0, 1fr);
+  gap: var(--dossier-column-gap);
+  align-items: start;
   width: min(1320px, calc(100vw - (var(--page-padding-x) * 2) - var(--menu-width) - 8px));
   max-height: min(760px, calc(100svh - 36px));
-  padding: clamp(20px, 3vw, 34px);
+  padding: var(--dossier-panel-padding);
   overflow: auto;
   overflow-x: hidden;
   border: 0;
@@ -1525,22 +1529,23 @@ li::before {
 
 .artist-dossier__media {
   align-self: start;
+  width: var(--dossier-media-width);
+  max-width: 100%;
 }
 
 .artist-dossier__media img {
   display: block;
   width: 100%;
-  max-width: 100%;
   height: auto;
   min-height: 0;
-  max-height: min(60svh, 600px);
   object-fit: contain;
 }
 
 .artist-dossier__content {
   min-width: 0;
   overflow-x: hidden;
-  padding-right: 28px;
+  padding-top: 2px;
+  padding-right: clamp(36px, 4vw, 58px);
 }
 
 .artist-dossier h2 {
@@ -1811,6 +1816,12 @@ html.has-open-dossier {
     grid-template-columns: 96px minmax(0, 1fr);
     column-gap: 24px;
     margin-top: 72px;
+  }
+
+  .artist-dossier__panel {
+    --dossier-panel-padding: 26px;
+    --dossier-media-width: min(34vw, 300px);
+    --dossier-column-gap: 32px;
   }
 }
 
@@ -2166,11 +2177,14 @@ html.has-open-dossier {
   }
 
   .artist-dossier__panel {
+    --dossier-panel-padding: 18px var(--page-padding-x) calc(24px + env(safe-area-inset-bottom));
+    --dossier-media-width: min(62vw, 270px);
+    --dossier-column-gap: 18px;
     grid-template-columns: 1fr;
     gap: 18px;
     width: 100%;
     max-height: calc(100svh - 18px);
-    padding: 18px var(--page-padding-x) calc(24px + env(safe-area-inset-bottom));
+    padding: var(--dossier-panel-padding);
     border-right: 0;
     border-bottom: 0;
     border-left: 0;
@@ -2180,7 +2194,7 @@ html.has-open-dossier {
   }
 
   .artist-dossier__media img {
-    width: min(62vw, 270px);
+    width: var(--dossier-media-width);
     max-height: 42svh;
   }
 
