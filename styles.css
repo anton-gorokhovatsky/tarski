@@ -19,6 +19,18 @@
   --duration-slow: 420ms;
   --duration-focus: 680ms;
   --duration-indicator: 460ms;
+  --matte-pill-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.38));
+  --matte-panel-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.74), rgba(242, 242, 242, 0.56));
+  --matte-pill-fallback-bg: rgba(242, 242, 242, 0.96);
+  --matte-scrim-bg: linear-gradient(90deg, rgba(242, 242, 242, 0.2), rgba(242, 242, 242, 0.66));
+  --matte-backdrop-filter: blur(26px) saturate(190%);
+  --matte-panel-backdrop-filter: blur(32px) saturate(168%);
+  --matte-panel-shadow:
+    0 34px 96px rgba(0, 0, 0, 0.14),
+    0 10px 34px rgba(0, 0, 0, 0.08);
+  --matte-panel-border:
+    inset 0 0 0 1px color-mix(in srgb, var(--text) 8%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.38);
   --shadow-indicator:
     drop-shadow(0 2px 1px rgba(0, 0, 0, 0.24))
     drop-shadow(0 9px 12px rgba(0, 0, 0, 0.14));
@@ -30,11 +42,11 @@
     inset 0 1px 0 rgba(255, 255, 255, 0.28);
   --brand-filter: none;
   --indicator-filter: var(--shadow-indicator);
-  --mobile-pill-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.38));
+  --mobile-pill-bg: var(--matte-pill-bg);
   --mobile-pill-text: #000;
   --mobile-pill-shadow: var(--shadow-mobile-pill);
   --mobile-bottom-pill-shadow: var(--shadow-mobile-bottom-pill);
-  --mobile-pill-fallback-bg: rgba(242, 242, 242, 0.96);
+  --mobile-pill-fallback-bg: var(--matte-pill-fallback-bg);
   --focus-text-muted: #b8b8b8;
   --focus-transition-duration: var(--duration-fast);
   --cursor-trail-rgb: 0 0 0;
@@ -67,6 +79,16 @@
     --rule: rgba(255, 255, 255, 0.18);
     --artist-rule: rgba(255, 255, 255, 0.1);
     --artist-image-muted-opacity: 0.52;
+    --matte-pill-bg: linear-gradient(135deg, rgba(46, 46, 46, 0.76), rgba(18, 18, 18, 0.58));
+    --matte-panel-bg: linear-gradient(135deg, rgba(42, 42, 42, 0.74), rgba(16, 16, 16, 0.58));
+    --matte-pill-fallback-bg: rgba(16, 16, 16, 0.96);
+    --matte-scrim-bg: linear-gradient(90deg, rgba(16, 16, 16, 0.24), rgba(16, 16, 16, 0.72));
+    --matte-panel-shadow:
+      0 34px 104px rgba(0, 0, 0, 0.46),
+      0 10px 38px rgba(0, 0, 0, 0.32);
+    --matte-panel-border:
+      inset 0 0 0 1px color-mix(in srgb, var(--text) 12%, transparent),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08);
     --shadow-indicator:
       drop-shadow(0 2px 1px rgba(0, 0, 0, 0.5))
       drop-shadow(0 9px 14px rgba(0, 0, 0, 0.34));
@@ -80,11 +102,9 @@
     --indicator-filter:
       invert(1)
       var(--shadow-indicator);
-    --mobile-pill-bg: linear-gradient(135deg, rgba(46, 46, 46, 0.76), rgba(18, 18, 18, 0.58));
     --mobile-pill-text: #f2f2f2;
     --mobile-pill-shadow: var(--shadow-mobile-pill);
     --mobile-bottom-pill-shadow: var(--shadow-mobile-bottom-pill);
-    --mobile-pill-fallback-bg: rgba(16, 16, 16, 0.96);
     --focus-text-muted: #787878;
     --cursor-trail-rgb: 242 242 242;
     --scene-label-opacity: 0.76;
@@ -99,6 +119,16 @@
   --rule: rgba(255, 255, 255, 0.18);
   --artist-rule: rgba(255, 255, 255, 0.1);
   --artist-image-muted-opacity: 0.52;
+  --matte-pill-bg: linear-gradient(135deg, rgba(46, 46, 46, 0.76), rgba(18, 18, 18, 0.58));
+  --matte-panel-bg: linear-gradient(135deg, rgba(42, 42, 42, 0.74), rgba(16, 16, 16, 0.58));
+  --matte-pill-fallback-bg: rgba(16, 16, 16, 0.96);
+  --matte-scrim-bg: linear-gradient(90deg, rgba(16, 16, 16, 0.24), rgba(16, 16, 16, 0.72));
+  --matte-panel-shadow:
+    0 34px 104px rgba(0, 0, 0, 0.46),
+    0 10px 38px rgba(0, 0, 0, 0.32);
+  --matte-panel-border:
+    inset 0 0 0 1px color-mix(in srgb, var(--text) 12%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
   --shadow-indicator:
     drop-shadow(0 2px 1px rgba(0, 0, 0, 0.5))
     drop-shadow(0 9px 14px rgba(0, 0, 0, 0.34));
@@ -112,11 +142,9 @@
   --indicator-filter:
     invert(1)
     var(--shadow-indicator);
-  --mobile-pill-bg: linear-gradient(135deg, rgba(46, 46, 46, 0.76), rgba(18, 18, 18, 0.58));
   --mobile-pill-text: #f2f2f2;
   --mobile-pill-shadow: var(--shadow-mobile-pill);
   --mobile-bottom-pill-shadow: var(--shadow-mobile-bottom-pill);
-  --mobile-pill-fallback-bg: rgba(16, 16, 16, 0.96);
   --focus-text-muted: #787878;
   --cursor-trail-rgb: 242 242 242;
   --scene-label-opacity: 0.76;
@@ -1375,18 +1403,14 @@ li::before {
   position: fixed;
   inset: 0;
   border: 0;
-  background:
-    linear-gradient(90deg, rgba(242, 242, 242, 0.22), rgba(242, 242, 242, 0.74));
+  background: var(--matte-scrim-bg);
   cursor: pointer;
   opacity: 0;
+  backdrop-filter: blur(10px) saturate(118%);
+  -webkit-backdrop-filter: blur(10px) saturate(118%);
   transition:
     background var(--duration-normal) var(--ease-smooth),
     opacity var(--duration-normal) var(--ease-smooth);
-}
-
-:root[data-effective-theme="dark"] .artist-dossier__scrim {
-  background:
-    linear-gradient(90deg, rgba(16, 16, 16, 0.24), rgba(16, 16, 16, 0.78));
 }
 
 .artist-dossier.is-open .artist-dossier__scrim {
@@ -1404,15 +1428,14 @@ li::before {
   overflow: auto;
   overflow-x: hidden;
   border: 0;
+  border-radius: 8px;
   outline: 0;
-  background: var(--page-bg);
-  background: color-mix(in srgb, var(--page-bg) 94%, transparent);
+  background: var(--matte-panel-bg);
   box-shadow:
-    0 34px 86px rgba(0, 0, 0, 0.16),
-    inset 0 0 0 1px color-mix(in srgb, var(--text) 12%, transparent),
-    inset 0 1px 0 rgba(255, 255, 255, 0.28);
-  backdrop-filter: blur(28px) saturate(150%);
-  -webkit-backdrop-filter: blur(28px) saturate(150%);
+    var(--matte-panel-shadow),
+    var(--matte-panel-border);
+  backdrop-filter: var(--matte-panel-backdrop-filter);
+  -webkit-backdrop-filter: var(--matte-panel-backdrop-filter);
   opacity: 0;
   transform: translate3d(28px, 0, 0) scale(0.985);
   transform-origin: 100% 50%;
@@ -1425,16 +1448,19 @@ li::before {
   outline: 0;
 }
 
-:root[data-effective-theme="dark"] .artist-dossier__panel {
-  box-shadow:
-    0 34px 96px rgba(0, 0, 0, 0.45),
-    inset 0 0 0 1px color-mix(in srgb, var(--text) 14%, transparent),
-    inset 0 1px 0 rgba(255, 255, 255, 0.08);
-}
-
 .artist-dossier.is-open .artist-dossier__panel {
   opacity: 1;
   transform: translate3d(0, 0, 0) scale(1);
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .artist-dossier__scrim {
+    background: color-mix(in srgb, var(--page-bg) 86%, transparent);
+  }
+
+  .artist-dossier__panel {
+    background: var(--page-bg);
+  }
 }
 
 .artist-dossier__close {
@@ -2139,6 +2165,7 @@ html.has-open-dossier {
     border-right: 0;
     border-bottom: 0;
     border-left: 0;
+    border-radius: 8px 8px 0 0;
     transform: translate3d(0, 26px, 0);
     transform-origin: 50% 100%;
   }
@@ -2301,8 +2328,8 @@ html.has-open-dossier {
     border-radius: 999px;
     background: var(--mobile-pill-bg);
     box-shadow: var(--mobile-pill-shadow);
-    backdrop-filter: blur(26px) saturate(190%);
-    -webkit-backdrop-filter: blur(26px) saturate(190%);
+    backdrop-filter: var(--matte-backdrop-filter);
+    -webkit-backdrop-filter: var(--matte-backdrop-filter);
     isolation: isolate;
     opacity: 1;
     pointer-events: auto;
