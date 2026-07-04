@@ -1509,14 +1509,17 @@ html.has-open-dossier {
 .site-footer {
   --footer-meta-column: 132px;
   --footer-column-gap: 34px;
-  --footer-legal-column: calc(var(--content-width) - var(--footer-meta-column) - var(--footer-column-gap));
-  padding-top: 200px;
+  --footer-signature-width: min(100%, calc(100vw - (var(--page-padding-x) * 2) - var(--menu-width) - 84px));
+  --footer-legal-column: min(680px, calc(var(--footer-signature-width) - var(--footer-meta-column) - var(--footer-column-gap)));
+  min-height: calc(100svh - 20px);
+  padding-top: clamp(156px, 22vh, 220px);
+  padding-bottom: 34px;
   text-align: left;
 }
 
 .site-footer__logo {
   display: block;
-  width: 100%;
+  width: var(--footer-signature-width);
   height: auto;
   filter: var(--brand-filter);
 }
@@ -1525,14 +1528,12 @@ html.has-open-dossier {
   display: grid;
   grid-template-columns:
     var(--footer-meta-column)
-    minmax(0, var(--footer-legal-column))
-    minmax(0, 1fr);
+    minmax(0, var(--footer-legal-column));
   column-gap: var(--footer-column-gap);
-  width: 100%;
-  margin: 12px 0 0;
-  padding: 18px 0 32px;
+  width: var(--footer-signature-width);
+  margin: clamp(12px, 1.1vw, 16px) 0 0;
+  padding: 0;
   align-items: start;
-  border-top: 1px solid var(--rule);
 }
 
 .site-footer__meta,
@@ -1708,6 +1709,8 @@ html.has-open-dossier {
   .site-footer {
     --footer-meta-column: 96px;
     --footer-column-gap: 24px;
+    --footer-signature-width: 100%;
+    padding-top: 120px;
   }
 
   .site-footer__texts {
@@ -2009,7 +2012,9 @@ html.has-open-dossier {
   }
 
   .site-footer {
-    padding-top: clamp(64px, 18vw, 88px);
+    padding-top: clamp(72px, 20vw, 96px);
+    min-height: max(640px, calc(100svh - 88px));
+    padding-bottom: calc(104px + env(safe-area-inset-bottom));
   }
 
   .site-footer__disclaimer {
@@ -2020,9 +2025,9 @@ html.has-open-dossier {
     display: grid;
     grid-template-columns: 1fr;
     gap: 8px;
-    margin-top: 14px;
-    padding-top: 14px;
-    padding-bottom: calc(16px + env(safe-area-inset-bottom));
+    margin-top: 12px;
+    padding-top: 0;
+    padding-bottom: 0;
   }
 
   .site-footer__meta {
