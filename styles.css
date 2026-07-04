@@ -2654,8 +2654,8 @@ html.has-open-dossier {
   }
 
   :root[data-scene="artists"] .mobile-menu-panel a:first-child:not(.is-active) {
-    width: 31px;
-    min-width: 31px;
+    width: 25px;
+    min-width: 25px;
   }
 
   .mobile-menu-panel a:active {
