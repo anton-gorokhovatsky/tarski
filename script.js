@@ -215,6 +215,10 @@
     window.clearTimeout(handoffTimer);
     window.clearTimeout(returningTimer);
 
+    if (isOpen) {
+      window.dispatchEvent(new CustomEvent('tarski:mobileserviceopen'));
+    }
+
     const isActive = service.classList.contains('is-open')
       || service.classList.contains('is-closing')
       || menu?.classList.contains('is-service-open')
@@ -317,6 +321,7 @@
   });
 
   window.addEventListener('resize', updateServiceShellWidth);
+  window.addEventListener('tarski:mobilemenuopen', () => setOpen(false));
   document.fonts?.ready?.then(updateServiceShellWidth);
 
   syncLanguageCode();
@@ -325,7 +330,106 @@
 })();
 
 (() => {
-  const navLinks = Array.from(document.querySelectorAll('.main-nav a[href^="#"], .mobile-menu-panel a[href^="#"]'));
+  const menu = document.querySelector('[data-mobile-menu]');
+  const toggle = document.querySelector('[data-mobile-menu-toggle]');
+  const drawer = document.querySelector('[data-mobile-menu-drawer]');
+  const panel = menu?.querySelector('.mobile-menu-expanded');
+  const closeControls = Array.from(document.querySelectorAll('[data-mobile-menu-close]'));
+
+  if (!menu || !toggle || !drawer || !panel) return;
+
+  let hideTimer = null;
+  let returnTimer = null;
+
+  const prefersReducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const getLabel = (isOpen) => {
+    const path = isOpen ? 'ui.menuClose' : 'ui.menuOpen';
+    const fallback = isOpen ? 'Закрыть меню' : 'Открыть меню';
+    return window.tarskiI18n?.t(path) || fallback;
+  };
+
+  const syncToggleState = (isOpen) => {
+    const label = getLabel(isOpen);
+    toggle.setAttribute('aria-expanded', String(isOpen));
+    toggle.setAttribute('aria-label', label);
+    toggle.setAttribute('title', label);
+  };
+
+  const setOpen = (isOpen, options = {}) => {
+    window.clearTimeout(hideTimer);
+    window.clearTimeout(returnTimer);
+
+    if (isOpen) {
+      window.dispatchEvent(new CustomEvent('tarski:mobilemenuopen'));
+      drawer.hidden = false;
+      panel.hidden = false;
+      menu.classList.remove('is-menu-returning');
+      syncToggleState(true);
+      panel.getBoundingClientRect();
+
+      window.requestAnimationFrame(() => {
+        menu.classList.add('is-menu-open');
+        drawer.classList.add('is-open');
+        window.dispatchEvent(new CustomEvent('tarski:mobileislandresize'));
+        if (options.focus) {
+          window.setTimeout(() => panel.focus({ preventScroll: true }), prefersReducedMotion() ? 0 : 220);
+        }
+      });
+      return;
+    }
+
+    drawer.classList.remove('is-open');
+    menu.classList.add('is-menu-returning');
+    menu.classList.remove('is-menu-open');
+    syncToggleState(false);
+    window.dispatchEvent(new CustomEvent('tarski:mobileislandresize'));
+
+    returnTimer = window.setTimeout(() => {
+      menu.classList.remove('is-menu-returning');
+    }, prefersReducedMotion() ? 0 : 520);
+
+    hideTimer = window.setTimeout(() => {
+      if (!drawer.classList.contains('is-open')) {
+        drawer.hidden = true;
+        panel.hidden = true;
+      }
+    }, prefersReducedMotion() ? 0 : 520);
+  };
+
+  toggle.addEventListener('click', (event) => {
+    event.stopPropagation();
+    setOpen(toggle.getAttribute('aria-expanded') !== 'true', { focus: event.detail > 0 });
+    if (event.detail > 0) {
+      toggle.blur();
+    }
+  });
+
+  closeControls.forEach((control) => {
+    control.addEventListener('click', () => setOpen(false));
+  });
+
+  panel.addEventListener('click', (event) => {
+    if (event.target.closest('a')) {
+      setOpen(false);
+    }
+  });
+
+  window.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+      setOpen(false);
+    }
+  });
+
+  window.addEventListener('tarski:mobileserviceopen', () => setOpen(false));
+  window.addEventListener('tarski:languagechange', () => {
+    syncToggleState(toggle.getAttribute('aria-expanded') === 'true');
+  });
+
+  syncToggleState(false);
+})();
+
+(() => {
+  const navLinks = Array.from(document.querySelectorAll('.main-nav a[href^="#"], .mobile-menu-panel a[href^="#"], .mobile-menu-expanded a[href^="#"]'));
   const primaryNavLinks = Array.from(document.querySelectorAll('.main-nav a[href^="#"]'));
   const sections = primaryNavLinks
     .map((link) => document.querySelector(link.getAttribute('href')))
@@ -336,6 +440,7 @@
   const mobileMenuHome = document.querySelector('[data-mobile-menu-home]');
   const mobilePanel = mobileMenu?.querySelector('.mobile-menu-panel');
   const mobileScroller = mobileMenu?.querySelector('[data-mobile-menu-scroller]') || mobilePanel;
+  const mobileToggle = mobileMenu?.querySelector('[data-mobile-menu-toggle]');
   const mobileMail = mobileMenu?.querySelector('.mobile-mail-pill');
   const mobileService = mobileMenu?.querySelector('.mobile-service');
   const navLabel = mainNav?.querySelector('.nav-label');
@@ -481,16 +586,31 @@
   };
 
   const updateMobileIslandWidth = () => {
-    if (!mobileMenu || !mobilePanel || !mobileMail || !mobileService || !mobileQuery.matches) return;
-    if (mobileMenu.classList.contains('is-service-open')) return;
+    if (!mobileMenu || !mobileMail || !mobileService || !mobileQuery.matches) return;
+    if (mobileMenu.classList.contains('is-service-open') || mobileMenu.classList.contains('is-menu-open')) return;
 
     const toPx = (value) => Number.parseFloat(value) || 0;
     const menuStyle = window.getComputedStyle(mobileMenu);
+    const padX = toPx(menuStyle.paddingLeft) + toPx(menuStyle.paddingRight);
+    const shellGap = toPx(menuStyle.gap);
+    if (mobileToggle) {
+      const shellWidth = Math.ceil(
+        toPx(window.getComputedStyle(mobileToggle).width)
+        + toPx(window.getComputedStyle(mobileMail).width)
+        + toPx(window.getComputedStyle(mobileService).width)
+        + shellGap * 2
+        + padX
+      );
+
+      mobileMenu.style.setProperty('--mobile-island-shell-width', `${shellWidth}px`);
+      return;
+    }
+
+    if (!mobilePanel || !mobileScroller) return;
+
     const scrollerStyle = window.getComputedStyle(mobileScroller);
     const links = Array.from(mobilePanel.querySelectorAll('a'));
     const firstLink = links[0];
-    const padX = toPx(menuStyle.paddingLeft) + toPx(menuStyle.paddingRight);
-    const shellGap = toPx(menuStyle.gap);
     const linkGap = toPx(scrollerStyle.gap);
     const getLinkWidth = (link) => {
       const linkStyle = window.getComputedStyle(link);

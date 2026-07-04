@@ -26,6 +26,9 @@
         mainNav: 'Основная навигация',
         mobileNav: 'Закреплённая мобильная навигация',
         mobilePanel: 'Разделы страницы',
+        menuOpen: 'Открыть меню',
+        menuClose: 'Закрыть меню',
+        menuContact: 'Контакты',
         language: 'Выбор языка',
         languageNames: {
           ru: 'Русский',
@@ -79,6 +82,9 @@
         mainNav: 'Main navigation',
         mobileNav: 'Fixed mobile navigation',
         mobilePanel: 'Page sections',
+        menuOpen: 'Open menu',
+        menuClose: 'Close menu',
+        menuContact: 'Contact',
         language: 'Language',
         languageNames: {
           ru: 'Russian',
@@ -230,6 +236,9 @@
         mainNav: 'メインナビゲーション',
         mobileNav: '固定モバイルナビゲーション',
         mobilePanel: 'ページ内セクション',
+        menuOpen: 'メニューを開く',
+        menuClose: 'メニューを閉じる',
+        menuContact: '連絡先',
         language: '言語',
         languageNames: {
           ru: 'ロシア語',
@@ -564,7 +573,19 @@
     setAttr(document.querySelector('.site-header'), 'aria-label', data.ui.header);
     setAttr(document.querySelector('.main-nav'), 'aria-label', data.ui.mainNav);
     setAttr(document.querySelector('[data-mobile-menu]'), 'aria-label', data.ui.mobileNav);
+    setAttr(document.querySelector('[data-mobile-menu-drawer]'), 'aria-label', data.ui.scenes.cover);
     setAttr(document.querySelector('#mobile-menu-panel'), 'aria-label', data.ui.mobilePanel);
+    document.querySelectorAll('[data-mobile-menu-toggle]').forEach((toggle) => {
+      const isOpen = toggle.getAttribute('aria-expanded') === 'true';
+      const label = isOpen ? data.ui.menuClose : data.ui.menuOpen;
+
+      setAttr(toggle, 'aria-label', label);
+      setAttr(toggle, 'title', label);
+    });
+    document.querySelectorAll('[data-mobile-menu-close]').forEach((toggle) => {
+      setAttr(toggle, 'aria-label', data.ui.menuClose);
+      setAttr(toggle, 'title', data.ui.menuClose);
+    });
     document.querySelectorAll('[data-mobile-service-toggle]').forEach((toggle) => {
       const isOpen = toggle.getAttribute('aria-expanded') === 'true';
       const label = isOpen ? data.ui.serviceClose : data.ui.serviceOpen;
@@ -574,9 +595,13 @@
     });
 
     setText(document.querySelector('.nav-label'), data.ui.scenes[document.documentElement.dataset.scene || 'cover']);
-    setTexts(document.querySelectorAll('.main-nav a[href="#about"], .mobile-menu-scroller a[href="#about"]'), [data.ui.nav.about, data.ui.nav.about]);
-    setTexts(document.querySelectorAll('.main-nav a[href="#artists"], .mobile-menu-scroller a[href="#artists"]'), [data.ui.nav.artists, data.ui.nav.artists]);
+    setText(document.querySelector('[data-mobile-menu-toggle-label]'), data.ui.scenes.cover);
+    setText(document.querySelector('[data-mobile-menu-title]'), data.ui.scenes.cover);
+    setText(document.querySelector('[data-mobile-menu-contact-label]'), data.ui.menuContact);
+    setTexts(document.querySelectorAll('.main-nav a[href="#about"], .mobile-menu-scroller a[href="#about"], .mobile-menu-expanded a[href="#about"]'), [data.ui.nav.about, data.ui.nav.about, data.ui.nav.about]);
+    setTexts(document.querySelectorAll('.main-nav a[href="#artists"], .mobile-menu-scroller a[href="#artists"], .mobile-menu-expanded a[href="#artists"]'), [data.ui.nav.artists, data.ui.nav.artists, data.ui.nav.artists]);
     setText(document.querySelector('.nav-mail'), data.ui.nav.mail);
+    setText(document.querySelector('[data-mobile-menu-mail-action]'), data.ui.nav.mail);
     setAttr(document.querySelector('.mobile-mail-pill'), 'aria-label', data.ui.nav.mail);
     setAttr(document.querySelector('.mobile-mail-pill'), 'title', data.ui.nav.mail);
     setAttr(document.querySelector('.artist-dossier__scrim'), 'aria-label', data.ui.closeDetails);
