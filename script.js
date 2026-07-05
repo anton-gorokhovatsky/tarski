@@ -911,6 +911,8 @@ const getVisibleFocusableElements = (root) => {
   };
 
   const scrollArtistLinkToFocus = (event) => {
+    if (event.currentTarget.classList.contains('artist-index__link')) return;
+
     const hash = event.currentTarget.getAttribute('href');
     if (!hash?.startsWith('#')) return;
 
@@ -983,6 +985,7 @@ const getVisibleFocusableElements = (root) => {
   let activeTrigger = null;
   let activeCard = null;
   let openTimerId = null;
+  let closeTimerId = null;
 
   const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const getOpenDetailsPrefix = () => window.tarskiI18n?.t('ui.openDetails') || 'Открыть подробности: ';
@@ -1052,17 +1055,86 @@ const getVisibleFocusableElements = (root) => {
     });
   };
 
-  const syncDossierHash = (id) => {
+  const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+
+  const setPanelOrigin = (trigger) => {
+    if (!(trigger instanceof HTMLElement) || reducedMotion()) {
+      panel.style.removeProperty('--dossier-origin-x');
+      panel.style.removeProperty('--dossier-origin-y');
+      panel.style.removeProperty('--dossier-enter-x');
+      panel.style.removeProperty('--dossier-enter-y');
+      return;
+    }
+
+    const sourceRect = trigger.getBoundingClientRect();
+    const panelRect = panel.getBoundingClientRect();
+    if (!sourceRect.width || !sourceRect.height || !panelRect.width || !panelRect.height) return;
+
+    const sourceX = sourceRect.left + sourceRect.width / 2;
+    const sourceY = sourceRect.top + sourceRect.height / 2;
+    const panelX = panelRect.left + panelRect.width / 2;
+    const panelY = panelRect.top + panelRect.height / 2;
+    const originX = clamp(((sourceX - panelRect.left) / panelRect.width) * 100, 8, 92);
+    const originY = clamp(((sourceY - panelRect.top) / panelRect.height) * 100, 10, 90);
+    const enterX = clamp((sourceX - panelX) * 0.045, -24, 24);
+    const enterY = clamp((sourceY - panelY) * 0.045, -18, 18);
+
+    panel.style.setProperty('--dossier-origin-x', `${originX.toFixed(2)}%`);
+    panel.style.setProperty('--dossier-origin-y', `${originY.toFixed(2)}%`);
+    panel.style.setProperty('--dossier-enter-x', `${enterX.toFixed(1)}px`);
+    panel.style.setProperty('--dossier-enter-y', `${enterY.toFixed(1)}px`);
+  };
+
+  const animateDossierContent = () => {
+    if (reducedMotion()) return;
+
+    panel.classList.remove('is-content-entering');
+    void panel.offsetWidth;
+    panel.classList.add('is-content-entering');
+  };
+
+  const syncDossierHash = (id, mode = 'replace') => {
     const hash = `#${id}`;
     if (window.location.hash === hash) return;
 
-    window.history.replaceState(null, '', hash);
+    const method = mode === 'push' ? 'pushState' : 'replaceState';
+    window.history[method](null, '', hash);
   };
 
-  const openDossier = (card, trigger = null) => {
+  const syncClosedDossierHash = () => {
+    if (!activeCard || window.location.hash !== `#${activeCard.id}`) return;
+
+    window.history.replaceState(null, '', '#artists');
+  };
+
+  const openDossier = (card, trigger = null, options = {}) => {
+    const {
+      history = 'replace',
+      focus = true,
+      forceRefresh = false
+    } = options;
+
+    if (
+      !forceRefresh &&
+      activeCard === card &&
+      dossier.classList.contains('is-open') &&
+      !dossier.classList.contains('is-closing')
+    ) {
+      if (focus) window.setTimeout(() => focusWithoutScroll(panel), 0);
+      syncDossierHash(card.id, history);
+      return;
+    }
+
     const data = getCardData(card);
+    const isSwitching = dossier.classList.contains('is-open') && activeCard && activeCard !== card;
     activeCard = card;
-    activeTrigger = trigger || document.activeElement;
+    activeTrigger = trigger instanceof HTMLElement
+      ? trigger
+      : (activeTrigger instanceof HTMLElement ? activeTrigger : null);
+    window.clearTimeout(closeTimerId);
+    closeTimerId = null;
+    dossier.classList.remove('is-closing');
+    setPanelOrigin(trigger);
     const galleryImages = data.galleryItems.map((item) => {
       const galleryImage = document.createElement('img');
       galleryImage.className = 'artist-dossier__gallery-image';
@@ -1109,30 +1181,58 @@ const getVisibleFocusableElements = (root) => {
     document.documentElement.classList.add('has-open-dossier');
     setCurrentIndexLink(card.id);
     setDossierTriggerState(card.id);
-    syncDossierHash(card.id);
+    syncDossierHash(card.id, history);
 
-    window.setTimeout(() => focusWithoutScroll(panel), 0);
-  };
-
-  const closeDossier = () => {
-    if (!dossier.classList.contains('is-open')) return;
-
-    dossier.classList.remove('is-open');
-    dossier.setAttribute('aria-hidden', 'true');
-    dossier.inert = true;
-    document.documentElement.classList.remove('has-open-dossier');
-    window.clearTimeout(openTimerId);
-    indexLinks.forEach((link) => link.removeAttribute('aria-current'));
-    setDossierTriggerState();
-    delete panel.dataset.artistId;
-    panel.classList.remove('has-gallery');
-
-    if (activeTrigger instanceof HTMLElement) {
-      focusWithoutScroll(activeTrigger);
+    if (isSwitching) {
+      animateDossierContent();
     }
 
-    activeTrigger = null;
-    activeCard = null;
+    if (focus) window.setTimeout(() => focusWithoutScroll(panel), 0);
+  };
+
+  const closeDossier = (options = {}) => {
+    const {
+      restoreFocus = true,
+      updateHash = true
+    } = options;
+
+    if (!dossier.classList.contains('is-open') && !dossier.classList.contains('is-closing')) return;
+
+    const triggerToRestore = activeTrigger instanceof HTMLElement
+      ? activeTrigger
+      : activeCard?.querySelector('.artist-card__name');
+
+    dossier.classList.remove('is-open');
+    dossier.classList.add('is-closing');
+    dossier.inert = true;
+    window.clearTimeout(openTimerId);
+    window.clearTimeout(closeTimerId);
+    indexLinks.forEach((link) => link.removeAttribute('aria-current'));
+    setDossierTriggerState();
+
+    if (updateHash) {
+      syncClosedDossierHash();
+    }
+
+    if (restoreFocus && triggerToRestore instanceof HTMLElement) {
+      focusWithoutScroll(triggerToRestore);
+    }
+
+    const finishClose = () => {
+      dossier.classList.remove('is-closing');
+      dossier.setAttribute('aria-hidden', 'true');
+      document.documentElement.classList.remove('has-open-dossier');
+      delete panel.dataset.artistId;
+      panel.classList.remove('has-gallery', 'is-content-entering');
+      activeTrigger = null;
+      activeCard = null;
+    };
+
+    if (reducedMotion()) {
+      finishClose();
+    } else {
+      closeTimerId = window.setTimeout(finishClose, 420);
+    }
   };
 
   cards.forEach((card) => {
@@ -1149,12 +1249,12 @@ const getVisibleFocusableElements = (root) => {
       trigger.setAttribute('aria-controls', panel.id);
       trigger.setAttribute('aria-expanded', 'false');
       trigger.setAttribute('aria-label', `${getOpenDetailsPrefix()}${getCardName(card)}`);
-      trigger.addEventListener('click', () => openDossier(card, trigger));
+      trigger.addEventListener('click', () => openDossier(card, trigger, { history: 'push' }));
       trigger.addEventListener('keydown', (event) => {
         if (event.key !== 'Enter' && event.key !== ' ') return;
 
         event.preventDefault();
-        openDossier(card, trigger);
+        openDossier(card, trigger, { history: 'push' });
       });
     });
   });
@@ -1172,7 +1272,7 @@ const getVisibleFocusableElements = (root) => {
 
       event.preventDefault();
       window.clearTimeout(openTimerId);
-      openTimerId = window.setTimeout(() => openDossier(card, link), reducedMotion() ? 0 : 560);
+      openDossier(card, link, { history: 'push' });
     });
   });
 
@@ -1216,9 +1316,9 @@ const getVisibleFocusableElements = (root) => {
     const id = window.location.hash.slice(1);
     const card = cardsById.get(id);
     if (card) {
-      openDossier(card);
+      openDossier(card, null, { history: 'replace' });
     } else if (dossier.classList.contains('is-open')) {
-      closeDossier();
+      closeDossier({ updateHash: false });
     }
   });
 
@@ -1226,13 +1326,13 @@ const getVisibleFocusableElements = (root) => {
     syncDetailTriggerLabels();
 
     if (activeCard && dossier.classList.contains('is-open')) {
-      openDossier(activeCard, activeTrigger);
+      openDossier(activeCard, activeTrigger, { forceRefresh: true });
     }
   });
 
   const initialCard = cardsById.get(window.location.hash.slice(1));
   if (initialCard) {
-    window.setTimeout(() => openDossier(initialCard), 360);
+    window.setTimeout(() => openDossier(initialCard, null, { history: 'replace' }), 360);
   }
 })();
 

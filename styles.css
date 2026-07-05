@@ -1259,6 +1259,10 @@ li::before {
 
 .artist-card__detail-trigger {
   cursor: pointer;
+  transition:
+    filter var(--duration-normal) var(--ease-smooth),
+    opacity var(--duration-normal) var(--ease-smooth),
+    text-decoration-color var(--duration-normal) var(--ease-smooth);
 }
 
 .artist-card__detail-trigger:focus-visible {
@@ -1266,6 +1270,23 @@ li::before {
   text-decoration: underline;
   text-decoration-thickness: 1px;
   text-underline-offset: 0.1em;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .artist-card__name.artist-card__detail-trigger {
+    text-decoration-line: underline;
+    text-decoration-color: transparent;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.1em;
+  }
+
+  .artist-card__name.artist-card__detail-trigger:hover {
+    text-decoration-color: currentColor;
+  }
+
+  .artist-card__image.artist-card__detail-trigger:hover {
+    filter: drop-shadow(0 12px 22px color-mix(in srgb, currentColor 9%, transparent));
+  }
 }
 
 .artist-card__image.artist-card__detail-trigger:focus-visible {
@@ -1392,6 +1413,11 @@ li::before {
   visibility: visible;
 }
 
+.artist-dossier.is-closing {
+  pointer-events: none;
+  visibility: visible;
+}
+
 .artist-dossier__scrim {
   -webkit-appearance: none;
   appearance: none;
@@ -1416,6 +1442,10 @@ li::before {
   --dossier-panel-padding: clamp(30px, 3.2vw, 42px);
   --dossier-media-width: clamp(320px, 24vw, 410px);
   --dossier-column-gap: clamp(50px, 4.8vw, 68px);
+  --dossier-origin-x: 100%;
+  --dossier-origin-y: 50%;
+  --dossier-enter-x: 28px;
+  --dossier-enter-y: 0px;
   position: relative;
   display: grid;
   grid-template-columns: var(--dossier-media-width) minmax(0, 1fr);
@@ -1440,8 +1470,8 @@ li::before {
   backdrop-filter: var(--matte-panel-backdrop-filter);
   -webkit-backdrop-filter: var(--matte-panel-backdrop-filter);
   opacity: 0;
-  transform: translate3d(28px, 0, 0) scale(0.985);
-  transform-origin: 100% 50%;
+  transform: translate3d(var(--dossier-enter-x), var(--dossier-enter-y), 0) scale(0.985);
+  transform-origin: var(--dossier-origin-x) var(--dossier-origin-y);
   transition:
     opacity var(--duration-normal) var(--ease-smooth),
     transform var(--duration-focus) var(--ease-smooth);
@@ -1454,6 +1484,36 @@ li::before {
 .artist-dossier.is-open .artist-dossier__panel {
   opacity: 1;
   transform: translate3d(0, 0, 0) scale(1);
+}
+
+.artist-dossier__media,
+.artist-dossier__content,
+.artist-dossier__gallery-block {
+  transition:
+    opacity var(--duration-normal) var(--ease-smooth),
+    transform var(--duration-normal) var(--ease-smooth);
+}
+
+.artist-dossier__panel.is-content-entering .artist-dossier__media,
+.artist-dossier__panel.is-content-entering .artist-dossier__content,
+.artist-dossier__panel.is-content-entering .artist-dossier__gallery-block {
+  animation: dossier-content-enter var(--duration-focus) var(--ease-smooth) both;
+}
+
+.artist-dossier__panel.is-content-entering .artist-dossier__content {
+  animation-delay: 45ms;
+}
+
+@keyframes dossier-content-enter {
+  from {
+    opacity: 0.82;
+    transform: translate3d(0, 8px, 0);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
 }
 
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
