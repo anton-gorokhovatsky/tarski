@@ -895,6 +895,7 @@
 
   const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const getOpenDetailsPrefix = () => window.tarskiI18n?.t('ui.openDetails') || 'Открыть подробности: ';
+  const getLinksGroupLabel = () => window.tarskiI18n?.t('ui.links.group') || 'Ссылки';
   const getCardName = (card) => card.querySelector('.artist-card__name')?.textContent.trim() || 'художника';
 
   const syncDetailTriggerLabels = () => {
@@ -1010,8 +1011,16 @@
     role.textContent = data.role;
     text.replaceChildren(...data.copy.map((item) => item.cloneNode(true)));
     links.replaceChildren(...data.links.map((item) => item.cloneNode(true)));
+    if (data.links.length) {
+      links.setAttribute('role', 'group');
+      links.setAttribute('aria-label', `${getLinksGroupLabel()}: ${data.name}`);
+    } else {
+      links.removeAttribute('role');
+      links.removeAttribute('aria-label');
+    }
     panel.scrollTop = 0;
 
+    dossier.inert = false;
     dossier.classList.add('is-open');
     dossier.setAttribute('aria-hidden', 'false');
     document.documentElement.classList.add('has-open-dossier');
@@ -1027,6 +1036,7 @@
 
     dossier.classList.remove('is-open');
     dossier.setAttribute('aria-hidden', 'true');
+    dossier.inert = true;
     document.documentElement.classList.remove('has-open-dossier');
     window.clearTimeout(openTimerId);
     indexLinks.forEach((link) => link.removeAttribute('aria-current'));

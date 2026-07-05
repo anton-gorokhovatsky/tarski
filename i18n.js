@@ -51,6 +51,7 @@
         openDetails: 'Открыть подробности: ',
         closeDetails: 'Закрыть подробности',
         links: {
+          group: 'Ссылки',
           site: 'Сайт',
           instagram: 'Инстаграм'
         },
@@ -106,6 +107,7 @@
         openDetails: 'Open details: ',
         closeDetails: 'Close details',
         links: {
+          group: 'Links',
           site: 'Website',
           instagram: 'Instagram'
         },
@@ -259,6 +261,7 @@
         openDetails: '詳細を開く：',
         closeDetails: '詳細を閉じる',
         links: {
+          group: 'リンク',
           site: 'ウェブサイト',
           instagram: 'Instagram'
         },
@@ -679,7 +682,7 @@
       setText(card.querySelector('.artist-card__role'), artist?.role);
       setText(card.querySelector('.artist-card__body > p:not(.artist-card__role)'), artist?.text);
       setAttr(card.querySelector('.artist-card__image'), 'alt', displayName);
-      setAttr(card.querySelector('.artist-card__links'), 'aria-label', displayName ? `${data.ui.nav.artists}: ${displayName}` : undefined);
+      setAttr(card.querySelector('.artist-card__links'), 'aria-label', displayName ? `${data.ui.links.group}: ${displayName}` : undefined);
       setAttr(card.querySelector('.artist-card__link--site'), 'aria-label', displayName ? `${data.ui.links.site}: ${displayName}` : undefined);
       setAttr(card.querySelector('.artist-card__link--instagram'), 'aria-label', displayName ? `${data.ui.links.instagram}: ${displayName}` : undefined);
     });

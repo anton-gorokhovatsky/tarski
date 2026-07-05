@@ -150,7 +150,7 @@
         </nav>
 
         <aside class="mobile-menu-drawer" data-mobile-menu-drawer hidden>
-          <button class="mobile-menu-drawer__scrim" type="button" data-mobile-menu-close aria-label="Закрыть меню"></button>
+          <button class="mobile-menu-drawer__scrim" type="button" data-mobile-menu-close aria-label="Закрыть меню" tabindex="-1"></button>
         </aside>
       </div>
 
@@ -278,7 +278,7 @@
               <div class="artist-card__body">
                 <div class="artist-card__header">
                   <h2 class="artist-card__name">Анастасия Даль</h2>
-                  <div class="artist-card__links" role="group" aria-label="Ссылки художницы">
+                  <div class="artist-card__links" role="group" aria-label="Ссылки">
                     <a class="artist-card__link artist-card__link--site" href="https://anastasiadahl.wordpress.com/" aria-label="Сайт Анастасии Даль"></a>
                     <a class="artist-card__link artist-card__link--instagram" href="https://www.instagram.com/anastasia_dahl/" aria-label="Инстаграм Анастасии Даль"></a>
                   </div>
@@ -295,7 +295,7 @@
               <div class="artist-card__body">
                 <div class="artist-card__header">
                   <h2 class="artist-card__name">Институт развития художе&shy;ственных ситуаций (ИРХС)</h2>
-                  <div class="artist-card__links" role="group" aria-label="Ссылки художницы">
+                  <div class="artist-card__links" role="group" aria-label="Ссылки">
                     <a class="artist-card__link artist-card__link--site" href="https://irhs.art/" aria-label="Сайт ИРХС"></a>
                     <a class="artist-card__link artist-card__link--instagram" href="https://www.instagram.com/institute_situations" aria-label="Инстаграм ИРХС"></a>
                   </div>
@@ -312,7 +312,7 @@
               <div class="artist-card__body">
                 <div class="artist-card__header">
                   <h2 class="artist-card__name">Надежда Ишкиняева</h2>
-                  <div class="artist-card__links" role="group" aria-label="Ссылки художницы">
+                  <div class="artist-card__links" role="group" aria-label="Ссылки">
                     <a class="artist-card__link artist-card__link--instagram" href="https://www.instagram.com/ish_nadya/" aria-label="Инстаграм Надежды Ишкиняевой"></a>
                   </div>
                 </div>
@@ -350,7 +350,7 @@
               <div class="artist-card__body">
                 <div class="artist-card__header">
                   <h2 class="artist-card__name">Алина Кугуш</h2>
-                  <div class="artist-card__links" role="group" aria-label="Ссылки художницы">
+                  <div class="artist-card__links" role="group" aria-label="Ссылки">
                     <a class="artist-card__link artist-card__link--site" href="https://kugush.com/" aria-label="Сайт Алины Кугуш"></a>
                     <a class="artist-card__link artist-card__link--instagram" href="https://www.instagram.com/kugush_artist/" aria-label="Инстаграм Алины Кугуш"></a>
                   </div>
@@ -367,7 +367,7 @@
               <div class="artist-card__body">
                 <div class="artist-card__header">
                   <h2 class="artist-card__name">Никаких оправданий</h2>
-                  <div class="artist-card__links" role="group" aria-label="Ссылки художницы">
+                  <div class="artist-card__links" role="group" aria-label="Ссылки">
                     <a class="artist-card__link artist-card__link--site" href="https://noexcusegroup.tilda.ws/" aria-label="Сайт коллектива «Никаких оправданий»"></a>
                     <a class="artist-card__link artist-card__link--instagram" href="https://www.instagram.com/no_excuse_group/" aria-label="Инстаграм коллектива «Никаких оправданий»"></a>
                   </div>
@@ -384,7 +384,7 @@
               <div class="artist-card__body">
                 <div class="artist-card__header">
                   <h2 class="artist-card__name">Дарья Орлова</h2>
-                  <div class="artist-card__links" role="group" aria-label="Ссылки художницы">
+                  <div class="artist-card__links" role="group" aria-label="Ссылки">
                     <a class="artist-card__link artist-card__link--instagram" href="https://www.instagram.com/darian_orlova" aria-label="Инстаграм Дарьи Орловой"></a>
                   </div>
                 </div>
@@ -410,15 +410,15 @@
       </footer>
     </div>
 
-    <aside class="artist-dossier" data-artist-dossier aria-hidden="true">
-      <button class="artist-dossier__scrim" type="button" data-artist-dossier-close aria-label="Закрыть подробности"></button>
+    <aside class="artist-dossier" data-artist-dossier aria-hidden="true" inert>
+      <button class="artist-dossier__scrim" type="button" data-artist-dossier-close aria-label="Закрыть подробности" tabindex="-1"></button>
       <section id="artist-dossier-panel" class="artist-dossier__panel" role="dialog" aria-modal="true" aria-labelledby="artist-dossier-title" tabindex="-1">
         <button class="artist-dossier__close" type="button" data-artist-dossier-close aria-label="Закрыть подробности"></button>
         <div class="artist-dossier__media">
           <img data-artist-dossier-image alt="" />
         </div>
         <div class="artist-dossier__content">
-          <div class="artist-dossier__links" data-artist-dossier-links></div>
+          <div class="artist-dossier__links" data-artist-dossier-links role="group" aria-label="Ссылки"></div>
           <h2 id="artist-dossier-title" data-artist-dossier-name></h2>
           <p class="artist-dossier__role" data-artist-dossier-role></p>
           <div class="artist-dossier__text" data-artist-dossier-text></div>
@@ -430,7 +430,7 @@
       </section>
     </aside>
 
-    <script src="i18n.js?v=20260704-island-refactor-2"></script>
-    <script src="script.js?v=20260705-maintenance"></script>
+    <script src="i18n.js?v=20260705-dossier-accessibility"></script>
+    <script src="script.js?v=20260705-dossier-accessibility"></script>
   </body>
 </html>
