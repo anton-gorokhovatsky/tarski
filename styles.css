@@ -1105,6 +1105,7 @@ li::before {
 
 .artist-index__link:nth-child(7) {
   justify-self: end;
+  margin-top: 0.16em;
   margin-right: 18%;
 }
 
@@ -1601,18 +1602,19 @@ li::before {
 }
 
 .artist-dossier__close {
+  --dossier-close-y: calc(var(--dossier-close-inset) - var(--dossier-panel-padding-block) - var(--dossier-panel-padding-block));
   -webkit-appearance: none;
   appearance: none;
   position: sticky;
-  top: var(--dossier-close-inset);
-  grid-column: 1 / -1;
-  grid-row: 1 / -1;
+  top: var(--dossier-panel-padding-block);
+  grid-column: 2;
+  grid-row: 1;
   align-self: start;
   justify-self: end;
   width: 34px;
   height: 34px;
   margin:
-    calc(var(--dossier-close-inset) - var(--dossier-panel-padding-block))
+    0
     calc(var(--dossier-close-inset) - var(--dossier-panel-padding-inline))
     0
     0;
@@ -1624,6 +1626,7 @@ li::before {
   cursor: pointer;
   opacity: 0.78;
   z-index: 4;
+  transform: translate3d(0, var(--dossier-close-y), 0);
   transition:
     color var(--duration-fast) var(--ease-smooth),
     opacity var(--duration-fast) var(--ease-smooth),
@@ -1654,7 +1657,7 @@ li::before {
 .artist-dossier__close:focus-visible {
   color: var(--text);
   opacity: 1;
-  transform: rotate(6deg);
+  transform: translate3d(0, var(--dossier-close-y), 0) rotate(6deg);
 }
 
 .artist-dossier__close:focus-visible {
@@ -2386,6 +2389,10 @@ html.has-open-dossier {
     border-radius: 8px 8px 0 0;
     transform: translate3d(0, 26px, 0);
     transform-origin: 50% 100%;
+  }
+
+  .artist-dossier__close {
+    grid-column: 1;
   }
 
   .artist-dossier__media > img {
