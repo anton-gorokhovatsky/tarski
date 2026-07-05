@@ -1,3 +1,33 @@
+const focusWithoutScroll = (element) => {
+  if (!(element instanceof HTMLElement)) return;
+
+  try {
+    element.focus({ preventScroll: true });
+  } catch (error) {
+    element.focus();
+  }
+};
+
+const getVisibleFocusableElements = (root) => {
+  if (!root) return [];
+
+  const focusableSelector = [
+    'a[href]',
+    'button:not([disabled])',
+    'input:not([disabled])',
+    'select:not([disabled])',
+    'textarea:not([disabled])',
+    '[tabindex]:not([tabindex="-1"])'
+  ].join(', ');
+
+  return Array.from(root.querySelectorAll(focusableSelector)).filter((element) => (
+    element instanceof HTMLElement
+    && !element.hidden
+    && !element.closest('[hidden]')
+    && element.offsetParent !== null
+  ));
+};
+
 (() => {
   const iconLink = document.querySelector('link[rel~="icon"]');
   const reduceMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -340,6 +370,7 @@
 
   let hideTimer = null;
   let returnTimer = null;
+  let activeTrigger = null;
 
   const prefersReducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const getLabel = (isOpen) => {
@@ -360,9 +391,11 @@
     window.clearTimeout(returnTimer);
 
     if (isOpen) {
+      activeTrigger = document.activeElement instanceof HTMLElement ? document.activeElement : toggle;
       window.dispatchEvent(new CustomEvent('tarski:mobilemenuopen'));
       drawer.hidden = false;
       panel.hidden = false;
+      panel.setAttribute('aria-hidden', 'false');
       menu.classList.remove('is-menu-returning');
       syncToggleState(true);
       panel.getBoundingClientRect();
@@ -378,11 +411,19 @@
       return;
     }
 
+    const shouldRestoreFocus = options.restoreFocus !== false;
     drawer.classList.remove('is-open');
     menu.classList.add('is-menu-returning');
     menu.classList.remove('is-menu-open');
+    panel.setAttribute('aria-hidden', 'true');
     syncToggleState(false);
     window.dispatchEvent(new CustomEvent('tarski:mobileislandresize'));
+
+    if (shouldRestoreFocus && activeTrigger instanceof HTMLElement) {
+      window.setTimeout(() => focusWithoutScroll(activeTrigger), 0);
+    }
+
+    activeTrigger = null;
 
     returnTimer = window.setTimeout(() => {
       menu.classList.remove('is-menu-returning');
@@ -410,13 +451,42 @@
 
   panel.addEventListener('click', (event) => {
     if (event.target.closest('a')) {
-      setOpen(false);
+      setOpen(false, { restoreFocus: false });
     }
   });
 
   window.addEventListener('keydown', (event) => {
     if (event.key === 'Escape') {
+      if (menu.classList.contains('is-menu-open')) {
+        event.preventDefault();
+      }
       setOpen(false);
+      return;
+    }
+
+    if (event.key !== 'Tab' || !menu.classList.contains('is-menu-open')) {
+      return;
+    }
+
+    const focusableElements = getVisibleFocusableElements(panel);
+    if (!focusableElements.length) {
+      event.preventDefault();
+      focusWithoutScroll(panel);
+      return;
+    }
+
+    const firstElement = focusableElements[0];
+    const lastElement = focusableElements[focusableElements.length - 1];
+
+    if (!panel.contains(document.activeElement)) {
+      event.preventDefault();
+      focusWithoutScroll(event.shiftKey ? lastElement : firstElement);
+    } else if (event.shiftKey && document.activeElement === firstElement) {
+      event.preventDefault();
+      focusWithoutScroll(lastElement);
+    } else if (!event.shiftKey && document.activeElement === lastElement) {
+      event.preventDefault();
+      focusWithoutScroll(firstElement);
     }
   });
 
@@ -909,14 +979,6 @@
     });
   };
 
-  const focusWithoutScroll = (element) => {
-    try {
-      element.focus({ preventScroll: true });
-    } catch (error) {
-      element.focus();
-    }
-  };
-
   const getCardData = (card) => {
     const cardImage = card.querySelector('.artist-card__image');
     const cardName = card.querySelector('.artist-card__name');
@@ -1052,10 +1114,6 @@
     activeCard = null;
   };
 
-  const getFocusableElements = () => Array.from(panel.querySelectorAll(
-    'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'
-  )).filter((element) => element.offsetParent !== null);
-
   cards.forEach((card) => {
     const detailTriggers = [
       card.querySelector('.artist-card__image'),
@@ -1111,7 +1169,7 @@
       return;
     }
 
-    const focusableElements = getFocusableElements();
+    const focusableElements = getVisibleFocusableElements(panel);
     if (!focusableElements.length) {
       event.preventDefault();
       focusWithoutScroll(panel);
@@ -1121,7 +1179,10 @@
     const firstElement = focusableElements[0];
     const lastElement = focusableElements[focusableElements.length - 1];
 
-    if (event.shiftKey && document.activeElement === firstElement) {
+    if (!panel.contains(document.activeElement)) {
+      event.preventDefault();
+      focusWithoutScroll(event.shiftKey ? lastElement : firstElement);
+    } else if (event.shiftKey && document.activeElement === firstElement) {
       event.preventDefault();
       focusWithoutScroll(lastElement);
     } else if (!event.shiftKey && document.activeElement === lastElement) {

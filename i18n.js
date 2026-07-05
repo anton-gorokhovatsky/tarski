@@ -28,6 +28,9 @@
         menuOpen: 'Открыть меню',
         menuClose: 'Закрыть меню',
         menuContact: 'Контакты',
+        sectionLinks: 'Разделы страницы',
+        projectDescription: 'Описание проекта',
+        artistNavigation: 'Навигация по художникам',
         language: 'Выбор языка',
         languageNames: {
           ru: 'Русский',
@@ -84,6 +87,9 @@
         menuOpen: 'Open menu',
         menuClose: 'Close menu',
         menuContact: 'Contact',
+        sectionLinks: 'Page sections',
+        projectDescription: 'Project description',
+        artistNavigation: 'Artist navigation',
         language: 'Language',
         languageNames: {
           ru: 'Russian',
@@ -238,6 +244,9 @@
         menuOpen: 'メニューを開く',
         menuClose: 'メニューを閉じる',
         menuContact: '連絡先',
+        sectionLinks: 'ページセクション',
+        projectDescription: 'プロジェクト説明',
+        artistNavigation: 'アーティストナビゲーション',
         language: '言語',
         languageNames: {
           ru: 'ロシア語',
@@ -597,6 +606,9 @@
     setText(document.querySelector('[data-mobile-menu-toggle-label]'), data.ui.scenes.cover);
     setText(document.querySelector('[data-mobile-menu-title]'), data.ui.scenes.cover);
     setText(document.querySelector('[data-mobile-menu-contact-label]'), data.ui.menuContact);
+    setAttr(document.querySelector('.mobile-menu-drawer__links'), 'aria-label', data.ui.sectionLinks);
+    setAttr(document.querySelector('.superlead'), 'aria-label', data.ui.projectDescription);
+    setAttr(document.querySelector('.artist-index'), 'aria-label', data.ui.artistNavigation);
     setTexts(document.querySelectorAll('.main-nav a[href="#about"], .mobile-menu-expanded a[href="#about"]'), [data.ui.nav.about, data.ui.nav.about]);
     setTexts(document.querySelectorAll('.main-nav a[href="#artists"], .mobile-menu-expanded a[href="#artists"]'), [data.ui.nav.artists, data.ui.nav.artists]);
     setText(document.querySelector('.nav-mail'), data.ui.nav.mail);
