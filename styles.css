@@ -1597,6 +1597,14 @@ li::before {
   padding-right: clamp(36px, 4vw, 58px);
 }
 
+@media (min-width: 721px) {
+  .artist-dossier__panel.has-gallery .artist-dossier__content {
+    position: sticky;
+    top: var(--dossier-panel-padding);
+    align-self: start;
+  }
+}
+
 .artist-dossier h2 {
   max-width: 100%;
   margin: 0 0 12px;

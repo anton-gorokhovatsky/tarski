@@ -988,6 +988,7 @@
     });
 
     panel.dataset.artistId = card.id;
+    panel.classList.toggle('has-gallery', galleryImages.length > 0);
     image.src = data.imageSrc;
     image.alt = data.imageAlt;
     gallery.replaceChildren(...galleryImages);
@@ -1018,6 +1019,7 @@
     document.documentElement.classList.remove('has-open-dossier');
     indexLinks.forEach((link) => link.removeAttribute('aria-current'));
     delete panel.dataset.artistId;
+    panel.classList.remove('has-gallery');
 
     if (activeTrigger instanceof HTMLElement) {
       focusWithoutScroll(activeTrigger);
