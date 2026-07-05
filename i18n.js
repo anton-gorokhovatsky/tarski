@@ -31,6 +31,11 @@
         sectionLinks: 'Разделы страницы',
         projectDescription: 'Описание проекта',
         artistNavigation: 'Навигация по художникам',
+        artistView: {
+          label: 'Представление художников',
+          cloud: 'Облако',
+          list: 'Список'
+        },
         language: 'Выбор языка',
         languageNames: {
           ru: 'Русский',
@@ -91,6 +96,11 @@
         sectionLinks: 'Page sections',
         projectDescription: 'Project description',
         artistNavigation: 'Artist navigation',
+        artistView: {
+          label: 'Artist view',
+          cloud: 'Cloud',
+          list: 'List'
+        },
         language: 'Language',
         languageNames: {
           ru: 'Russian',
@@ -249,6 +259,11 @@
         sectionLinks: 'ページセクション',
         projectDescription: 'プロジェクト説明',
         artistNavigation: 'アーティストナビゲーション',
+        artistView: {
+          label: 'アーティスト表示',
+          cloud: 'クラウド',
+          list: 'リスト'
+        },
         language: '言語',
         languageNames: {
           ru: 'ロシア語',
@@ -613,6 +628,9 @@
     setAttr(document.querySelector('.mobile-menu-drawer__links'), 'aria-label', data.ui.sectionLinks);
     setAttr(document.querySelector('.superlead'), 'aria-label', data.ui.projectDescription);
     setAttr(document.querySelector('.artist-index'), 'aria-label', data.ui.artistNavigation);
+    setAttr(document.querySelector('[data-artists-view-switch]'), 'aria-label', data.ui.artistView?.label);
+    setText(document.querySelector('[data-artists-view-option="cloud"]'), data.ui.artistView?.cloud);
+    setText(document.querySelector('[data-artists-view-option="list"]'), data.ui.artistView?.list);
     setTexts(document.querySelectorAll('.main-nav a[href="#about"], .mobile-menu-expanded a[href="#about"]'), [data.ui.nav.about, data.ui.nav.about]);
     setTexts(document.querySelectorAll('.main-nav a[href="#artists"], .mobile-menu-expanded a[href="#artists"]'), [data.ui.nav.artists, data.ui.nav.artists]);
     setText(document.querySelector('.nav-mail'), data.ui.nav.mail);

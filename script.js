@@ -784,6 +784,41 @@ const getVisibleFocusableElements = (root) => {
 })();
 
 (() => {
+  const section = document.querySelector('.artists-section');
+  const switcher = section?.querySelector('[data-artists-view-switch]');
+  const buttons = Array.from(section?.querySelectorAll('[data-artists-view-option]') || []);
+  const artistIndex = section?.querySelector('.artist-index');
+  const artistsList = section?.querySelector('.artists-list');
+  const viewModes = new Set(['cloud', 'list']);
+
+  if (!section || !switcher || !buttons.length || !artistIndex || !artistsList) return;
+
+  const setView = (view) => {
+    const nextView = viewModes.has(view) ? view : 'cloud';
+    section.dataset.artistsView = nextView;
+    artistIndex.setAttribute('aria-hidden', String(nextView === 'list'));
+    artistsList.setAttribute('aria-hidden', String(nextView === 'cloud'));
+
+    buttons.forEach((button) => {
+      const isActive = button.dataset.artistsViewOption === nextView;
+      button.classList.toggle('is-active', isActive);
+      button.setAttribute('aria-pressed', String(isActive));
+    });
+
+    window.dispatchEvent(new CustomEvent('tarski:artistsviewchange', {
+      detail: { view: nextView }
+    }));
+  };
+
+  switcher.hidden = false;
+  buttons.forEach((button) => {
+    button.addEventListener('click', () => setView(button.dataset.artistsViewOption));
+  });
+
+  setView('cloud');
+})();
+
+(() => {
   const standaloneTextItems = Array.from(document.querySelectorAll('main.content h1, main.content h2, main.content h3, main.content p, main.content ul, main.content .editorial-disclosure'))
     .filter((item) => (
       !item.closest('.artist-card') &&
@@ -796,25 +831,27 @@ const getVisibleFocusableElements = (root) => {
     anchor: elements[0],
     elements,
     getRect() {
-      return rectElements.reduce((bounds, element) => {
-        const rect = element.getBoundingClientRect();
+      return rectElements
+        .filter((element) => element.offsetParent !== null)
+        .reduce((bounds, element) => {
+          const rect = element.getBoundingClientRect();
 
-        if (!bounds) {
+          if (!bounds) {
+            return {
+              top: rect.top,
+              right: rect.right,
+              bottom: rect.bottom,
+              left: rect.left
+            };
+          }
+
           return {
-            top: rect.top,
-            right: rect.right,
-            bottom: rect.bottom,
-            left: rect.left
+            top: Math.min(bounds.top, rect.top),
+            right: Math.max(bounds.right, rect.right),
+            bottom: Math.max(bounds.bottom, rect.bottom),
+            left: Math.min(bounds.left, rect.left)
           };
-        }
-
-        return {
-          top: Math.min(bounds.top, rect.top),
-          right: Math.max(bounds.right, rect.right),
-          bottom: Math.max(bounds.bottom, rect.bottom),
-          left: Math.min(bounds.left, rect.left)
-        };
-      }, null);
+        }, null);
     }
   });
 
@@ -949,6 +986,10 @@ const getVisibleFocusableElements = (root) => {
   window.addEventListener('scroll', scheduleTextFocusUpdate, { passive: true });
   window.addEventListener('resize', scheduleTextFocusUpdate);
   window.addEventListener('tarski:languagechange', () => {
+    scheduleTextFocusUpdate();
+    window.setTimeout(scheduleTextFocusUpdate, 260);
+  });
+  window.addEventListener('tarski:artistsviewchange', () => {
     scheduleTextFocusUpdate();
     window.setTimeout(scheduleTextFocusUpdate, 260);
   });

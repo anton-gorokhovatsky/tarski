@@ -61,7 +61,7 @@
     <meta name="twitter:description" content="Среда изучения и поддержки социально ориентированного и вовлекающего искусства." />
     <meta name="twitter:image" content="https://tarski.ru/assets/og-image.png?v=20260704-footer-og" />
     <link rel="icon" href="assets/favicon.svg?v=20260701-caps-favicon" type="image/svg+xml" sizes="any" />
-    <link rel="stylesheet" href="styles.css?v=20260705-dossier-motion" />
+    <link rel="stylesheet" href="styles.css?v=20260705-artists-view" />
   </head>
   <body>
     <noscript><div><img src="https://mc.yandex.ru/watch/110320853" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
@@ -262,6 +262,11 @@
             <h1 id="artists-title">Сеть художников-единомышленников</h1>
           </div>
 
+          <div class="artists-view-switch" data-artists-view-switch role="group" aria-label="Представление художников" hidden>
+            <button class="artists-view-switch__button is-active" type="button" data-artists-view-option="cloud" aria-pressed="true">Облако</button>
+            <button class="artists-view-switch__button" type="button" data-artists-view-option="list" aria-pressed="false">Список</button>
+          </div>
+
           <nav class="artist-index" aria-label="Навигация по художникам">
             <a class="artist-index__link" href="#artist-anastasia-dahl">Анастасия Даль</a>
             <a class="artist-index__link" href="#artist-irhs" aria-label="Институт развития художественных ситуаций">ИРХС</a>
@@ -431,6 +436,6 @@
     </aside>
 
     <script src="i18n.js?v=20260705-service-a11y"></script>
-    <script src="script.js?v=20260705-dossier-motion"></script>
+    <script src="script.js?v=20260705-artists-view"></script>
   </body>
 </html>

@@ -936,6 +936,68 @@ li::before {
   margin-bottom: 56px;
 }
 
+.artists-view-switch {
+  display: inline-flex;
+  gap: 2px;
+  align-items: center;
+  margin: -24px 0 44px;
+  padding: 3px;
+  border-radius: 999px;
+  background: var(--matte-panel-bg);
+  box-shadow:
+    0 18px 40px color-mix(in srgb, var(--shadow-color) 10%, transparent),
+    inset 0 0 0 1px color-mix(in srgb, currentColor 8%, transparent);
+  color: var(--muted-text);
+  backdrop-filter: blur(14px) saturate(112%);
+  -webkit-backdrop-filter: blur(14px) saturate(112%);
+}
+
+.artists-view-switch[hidden] {
+  display: none;
+}
+
+.artists-view-switch__button {
+  -webkit-appearance: none;
+  appearance: none;
+  min-width: 76px;
+  min-height: 32px;
+  padding: 5px 15px 6px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 15px;
+  line-height: 1;
+  letter-spacing: 0;
+  cursor: pointer;
+  transition:
+    background-color var(--duration-fast) var(--ease-smooth),
+    color var(--duration-fast) var(--ease-smooth),
+    opacity var(--duration-fast) var(--ease-smooth),
+    transform var(--duration-fast) var(--ease-smooth);
+}
+
+.artists-view-switch__button:hover {
+  color: var(--text);
+}
+
+.artists-view-switch__button:focus-visible {
+  outline: 0;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.12em;
+}
+
+.artists-view-switch__button.is-active {
+  background: color-mix(in srgb, var(--text) 8%, transparent);
+  color: var(--text);
+}
+
+.artists-view-switch__button:active {
+  transform: scale(0.985);
+}
+
 .artist-index {
   --artist-index-width: min(1120px, calc(100vw - (var(--page-padding-x) * 2) - var(--menu-width) - 80px));
   --artist-index-preview-fit: contain;
@@ -1162,6 +1224,15 @@ li::before {
   display: flex;
   flex-direction: column;
   gap: 0;
+}
+
+.artists-section[data-artists-view="cloud"] .artists-list,
+.artists-section[data-artists-view="list"] .artist-index {
+  display: none;
+}
+
+.artists-section[data-artists-view="list"] .artists-list {
+  margin-top: 8px;
 }
 
 .artist-card {
@@ -1439,9 +1510,12 @@ li::before {
 }
 
 .artist-dossier__panel {
-  --dossier-panel-padding: clamp(30px, 3.2vw, 42px);
+  --dossier-panel-padding-block: clamp(30px, 3.2vw, 42px);
+  --dossier-panel-padding-inline: var(--dossier-panel-padding-block);
+  --dossier-panel-padding: var(--dossier-panel-padding-block) var(--dossier-panel-padding-inline);
   --dossier-media-width: clamp(320px, 24vw, 410px);
   --dossier-column-gap: clamp(50px, 4.8vw, 68px);
+  --dossier-close-inset: clamp(16px, 1.25vw, 22px);
   --dossier-origin-x: 100%;
   --dossier-origin-y: 50%;
   --dossier-enter-x: 28px;
@@ -1529,11 +1603,19 @@ li::before {
 .artist-dossier__close {
   -webkit-appearance: none;
   appearance: none;
-  position: absolute;
-  top: 14px;
-  right: 14px;
+  position: sticky;
+  top: var(--dossier-close-inset);
+  grid-column: 1 / -1;
+  grid-row: 1 / -1;
+  align-self: start;
+  justify-self: end;
   width: 34px;
   height: 34px;
+  margin:
+    calc(var(--dossier-close-inset) - var(--dossier-panel-padding-block))
+    calc(var(--dossier-close-inset) - var(--dossier-panel-padding-inline))
+    0
+    0;
   padding: 0;
   border: 1px solid currentColor;
   border-radius: 999px;
@@ -1541,6 +1623,7 @@ li::before {
   color: var(--muted-text);
   cursor: pointer;
   opacity: 0.78;
+  z-index: 4;
   transition:
     color var(--duration-fast) var(--ease-smooth),
     opacity var(--duration-fast) var(--ease-smooth),
@@ -1923,7 +2006,8 @@ html.has-open-dossier {
   }
 
   .artist-dossier__panel {
-    --dossier-panel-padding: 26px;
+    --dossier-panel-padding-block: 26px;
+    --dossier-panel-padding-inline: 26px;
     --dossier-media-width: min(34vw, 300px);
     --dossier-column-gap: 32px;
   }
@@ -2281,9 +2365,12 @@ html.has-open-dossier {
   }
 
   .artist-dossier__panel {
-    --dossier-panel-padding: 18px var(--page-padding-x) calc(24px + env(safe-area-inset-bottom));
+    --dossier-panel-padding-block: 18px;
+    --dossier-panel-padding-inline: var(--page-padding-x);
+    --dossier-panel-padding: var(--dossier-panel-padding-block) var(--dossier-panel-padding-inline) calc(24px + env(safe-area-inset-bottom));
     --dossier-media-width: min(62vw, 270px);
     --dossier-column-gap: 18px;
+    --dossier-close-inset: 18px;
     grid-template-columns: 1fr;
     grid-template-areas:
       "media"
