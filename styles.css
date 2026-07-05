@@ -1535,6 +1535,8 @@ li::before {
   padding: var(--dossier-panel-padding);
   overflow: auto;
   overflow-x: hidden;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
   border: 0;
   border-radius: 8px;
   outline: 0;
@@ -1550,6 +1552,11 @@ li::before {
   transition:
     opacity var(--duration-normal) var(--ease-smooth),
     transform var(--duration-focus) var(--ease-smooth);
+}
+
+.artist-dossier__panel::-webkit-scrollbar {
+  width: 0;
+  height: 0;
 }
 
 .artist-dossier__panel:focus {
