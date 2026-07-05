@@ -214,19 +214,6 @@
   font-display: swap;
 }
 
-/*
-  Если будут финальные web-font файлы, положи их в assets/fonts/
-  и раскомментируй пример ниже. Trial-файлы лучше не публиковать.
-
-@font-face {
-  font-family: "CoFo Robert Sans";
-  src: url("assets/fonts/CoFoRobertSans-Regular.woff2") format("woff2");
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-*/
-
 * {
   box-sizing: border-box;
 }

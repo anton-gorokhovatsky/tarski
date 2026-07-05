@@ -958,6 +958,16 @@
     });
   };
 
+  const setDossierTriggerState = (id = null) => {
+    const triggerSelector = '.artist-card__detail-trigger, .artist-index__link[href^="#artist-"]';
+
+    document.querySelectorAll(triggerSelector).forEach((trigger) => {
+      const triggerHash = trigger instanceof HTMLAnchorElement ? trigger.hash.slice(1) : '';
+      const triggerCardId = trigger.closest('.artist-card')?.id || triggerHash;
+      trigger.setAttribute('aria-expanded', String(Boolean(id) && triggerCardId === id));
+    });
+  };
+
   const syncDossierHash = (id) => {
     const hash = `#${id}`;
     if (window.location.hash === hash) return;
@@ -1006,6 +1016,7 @@
     dossier.setAttribute('aria-hidden', 'false');
     document.documentElement.classList.add('has-open-dossier');
     setCurrentIndexLink(card.id);
+    setDossierTriggerState(card.id);
     syncDossierHash(card.id);
 
     window.setTimeout(() => focusWithoutScroll(panel), 0);
@@ -1017,7 +1028,9 @@
     dossier.classList.remove('is-open');
     dossier.setAttribute('aria-hidden', 'true');
     document.documentElement.classList.remove('has-open-dossier');
+    window.clearTimeout(openTimerId);
     indexLinks.forEach((link) => link.removeAttribute('aria-current'));
+    setDossierTriggerState();
     delete panel.dataset.artistId;
     panel.classList.remove('has-gallery');
 
@@ -1043,6 +1056,9 @@
       trigger.classList.add('artist-card__detail-trigger');
       trigger.setAttribute('role', 'button');
       trigger.setAttribute('tabindex', '0');
+      trigger.setAttribute('aria-haspopup', 'dialog');
+      trigger.setAttribute('aria-controls', panel.id);
+      trigger.setAttribute('aria-expanded', 'false');
       trigger.setAttribute('aria-label', `${getOpenDetailsPrefix()}${getCardName(card)}`);
       trigger.addEventListener('click', () => openDossier(card, trigger));
       trigger.addEventListener('keydown', (event) => {
@@ -1056,11 +1072,16 @@
 
   indexLinks.forEach((link) => {
     link.setAttribute('aria-haspopup', 'dialog');
-    link.addEventListener('click', () => {
+    link.setAttribute('aria-controls', panel.id);
+    link.setAttribute('aria-expanded', 'false');
+    link.addEventListener('click', (event) => {
+      if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+
       const id = link.hash.slice(1);
       const card = cardsById.get(id);
       if (!card) return;
 
+      event.preventDefault();
       window.clearTimeout(openTimerId);
       openTimerId = window.setTimeout(() => openDossier(card, link), reducedMotion() ? 0 : 560);
     });
@@ -1104,6 +1125,8 @@
     const card = cardsById.get(id);
     if (card) {
       openDossier(card);
+    } else if (dossier.classList.contains('is-open')) {
+      closeDossier();
     }
   });
 
