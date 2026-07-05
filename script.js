@@ -199,6 +199,7 @@ const getVisibleFocusableElements = (root) => {
   let collapseTimer = null;
   let handoffTimer = null;
   let returningTimer = null;
+  let activeTrigger = null;
 
   const prefersReducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -239,15 +240,16 @@ const getVisibleFocusableElements = (root) => {
     panel.hidden = wasHidden;
   };
 
-  const setOpen = (isOpen) => {
+  const setPanelHiddenState = (isHidden) => {
+    panel.hidden = isHidden;
+    panel.setAttribute('aria-hidden', String(isHidden));
+  };
+
+  const setOpen = (isOpen, options = {}) => {
     window.clearTimeout(hidePanelTimer);
     window.clearTimeout(collapseTimer);
     window.clearTimeout(handoffTimer);
     window.clearTimeout(returningTimer);
-
-    if (isOpen) {
-      window.dispatchEvent(new CustomEvent('tarski:mobileserviceopen'));
-    }
 
     const isActive = service.classList.contains('is-open')
       || service.classList.contains('is-closing')
@@ -256,17 +258,25 @@ const getVisibleFocusableElements = (root) => {
       || menu?.classList.contains('is-service-returning')
       || toggle.getAttribute('aria-expanded') === 'true';
 
+    if (isOpen) {
+      if (!isActive) {
+        activeTrigger = document.activeElement instanceof HTMLElement ? document.activeElement : toggle;
+      }
+      window.dispatchEvent(new CustomEvent('tarski:mobileserviceopen'));
+    }
+
     if (!isOpen && !isActive) {
       setToggleState(false);
-      panel.hidden = true;
+      setPanelHiddenState(true);
       service.classList.remove('is-open', 'is-closing');
       menu?.classList.remove('is-service-open', 'is-service-handoff', 'is-service-returning');
+      activeTrigger = null;
       return;
     }
 
     if (isOpen) {
       updateServiceShellWidth();
-      panel.hidden = false;
+      setPanelHiddenState(false);
       service.classList.remove('is-closing');
       menu?.classList.remove('is-service-returning');
 
@@ -309,9 +319,17 @@ const getVisibleFocusableElements = (root) => {
     });
 
     if (!isOpen) {
+      const shouldRestoreFocus = options.restoreFocus !== false;
+      if (shouldRestoreFocus && activeTrigger instanceof HTMLElement && service.contains(document.activeElement)) {
+        const triggerToRestore = activeTrigger;
+        window.setTimeout(() => focusWithoutScroll(triggerToRestore), 0);
+      }
+
+      activeTrigger = null;
+
       hidePanelTimer = window.setTimeout(() => {
         if (!service.classList.contains('is-open')) {
-          panel.hidden = true;
+          setPanelHiddenState(true);
           service.classList.remove('is-closing');
         }
       }, prefersReducedMotion() ? 0 : 720);
@@ -332,12 +350,15 @@ const getVisibleFocusableElements = (root) => {
 
   document.addEventListener('click', (event) => {
     if (!service.contains(event.target)) {
-      setOpen(false);
+      setOpen(false, { restoreFocus: false });
     }
   });
 
   window.addEventListener('keydown', (event) => {
     if (event.key === 'Escape') {
+      if (toggle.getAttribute('aria-expanded') === 'true') {
+        event.preventDefault();
+      }
       setOpen(false);
     }
   });

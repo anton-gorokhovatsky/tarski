@@ -49,6 +49,7 @@
         },
         themeDark: 'Включить темную тему',
         themeLight: 'Включить светлую тему',
+        serviceSettings: 'Настройки сайта',
         serviceOpen: 'Открыть настройки сайта',
         serviceClose: 'Закрыть настройки сайта',
         openDetails: 'Открыть подробности: ',
@@ -108,6 +109,7 @@
         },
         themeDark: 'Switch to dark theme',
         themeLight: 'Switch to light theme',
+        serviceSettings: 'Site settings',
         serviceOpen: 'Open site settings',
         serviceClose: 'Close site settings',
         openDetails: 'Open details: ',
@@ -265,6 +267,7 @@
         },
         themeDark: 'ダークテーマに切り替える',
         themeLight: 'ライトテーマに切り替える',
+        serviceSettings: 'サイト設定',
         serviceOpen: 'サイト設定を開く',
         serviceClose: 'サイト設定を閉じる',
         openDetails: '詳細を開く：',
@@ -601,6 +604,7 @@
       setAttr(toggle, 'aria-label', label);
       setAttr(toggle, 'title', label);
     });
+    setAttr(document.querySelector('[data-mobile-service-panel]'), 'aria-label', data.ui.serviceSettings);
 
     setText(document.querySelector('.nav-label'), data.ui.scenes[document.documentElement.dataset.scene || 'cover']);
     setText(document.querySelector('[data-mobile-menu-toggle-label]'), data.ui.scenes.cover);
