@@ -1,4 +1,4 @@
 .DS_Store
 assets/fonts/*
-!assets/fonts/noto-serif-semicondensed-regular.ttf
-!assets/fonts/noto-serif-semicondensed-regular-italic.ttf
+!assets/fonts/noto-serif-tarski-regular.woff2
+!assets/fonts/noto-serif-tarski-regular-italic.woff2

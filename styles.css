@@ -198,7 +198,7 @@
 
 @font-face {
   font-family: "Noto Serif Tarski";
-  src: url("assets/fonts/noto-serif-semicondensed-regular.ttf") format("truetype");
+  src: url("assets/fonts/noto-serif-tarski-regular.woff2") format("woff2");
   font-weight: 400;
   font-style: normal;
   font-stretch: semi-condensed;
@@ -207,7 +207,7 @@
 
 @font-face {
   font-family: "Noto Serif Tarski";
-  src: url("assets/fonts/noto-serif-semicondensed-regular-italic.ttf") format("truetype");
+  src: url("assets/fonts/noto-serif-tarski-regular-italic.woff2") format("woff2");
   font-weight: 400;
   font-style: italic;
   font-stretch: semi-condensed;
@@ -2329,31 +2329,57 @@ html.has-open-dossier {
   }
 
   .mobile-floating-menu {
-    /* Compact shell geometry. */
-    --mobile-island-shell-width: 212px;
-    --mobile-island-pad-y: 7px;
-    --mobile-island-pad-left: 13.65px;
-    --mobile-island-pad-right: 16.13px;
-    --mobile-island-gap: 5px;
-    --mobile-control-size: 42px;
-    --mobile-island-max-width: calc(100vw - 24px);
+    /* Island geometry tokens. */
+    --island-control-size: 42px;
+    --island-compact-width: 212px;
+    --island-compact-pad-y: 7px;
+    --island-compact-pad-left: 13.65px;
+    --island-compact-pad-right: 16.13px;
+    --island-compact-gap: 5px;
+    --island-max-width: calc(100vw - 24px);
+    --island-menu-width: min(390px, calc(100vw - 24px));
+    --island-menu-height: 360px;
+    --island-service-width: 211px;
+    --island-service-min-width: 211px;
+    --island-service-pad-left: 26px;
+    --island-service-pad-right: 18.5px;
+    --island-service-gap: 12px;
+    --island-service-toggle-size: 32px;
 
-    /* Service-state geometry. */
-    --mobile-service-shell-width: 211px;
-    --mobile-service-shell-min-width: 211px;
-    --mobile-service-pad-left: 26px;
-    --mobile-service-pad-right: 18.5px;
-    --mobile-service-open-gap: 12px;
-    --mobile-service-toggle-open-size: 32px;
+    /* Island motion tokens. */
+    --island-motion-morph: 480ms;
+    --island-motion-content-fade: 160ms;
+    --island-motion-content-shift: 380ms;
+    --island-motion-content-collapse: 360ms;
+    --island-motion-collapse-delay: 140ms;
+    --island-motion-handoff-shift: translate3d(-16px, 0, 0) scale(0.98);
+    --island-motion-return-shift: translate3d(16px, 0, 0) scale(0.98);
+    --island-motion-menu-shift: translate3d(0, 18px, 0) scale(0.96);
 
-    /* Shared motion contract for island morphs and child controls. */
-    --mobile-island-morph: 480ms;
-    --mobile-menu-expanded-width: min(390px, calc(100vw - 24px));
-    --mobile-menu-expanded-height: 360px;
-    --mobile-island-content-fade: 160ms;
-    --mobile-island-content-shift: 380ms;
-    --mobile-island-content-collapse: 360ms;
-    --mobile-island-collapse-delay: 140ms;
+    /* JS-facing aliases for dynamic shell measurements. */
+    --mobile-control-size: var(--island-control-size);
+    --mobile-island-shell-width: var(--island-compact-width);
+    --mobile-island-pad-y: var(--island-compact-pad-y);
+    --mobile-island-pad-left: var(--island-compact-pad-left);
+    --mobile-island-pad-right: var(--island-compact-pad-right);
+    --mobile-island-gap: var(--island-compact-gap);
+    --mobile-island-max-width: var(--island-max-width);
+    --mobile-menu-expanded-width: var(--island-menu-width);
+    --mobile-menu-expanded-height: var(--island-menu-height);
+    --mobile-service-shell-width: var(--island-service-width);
+    --mobile-service-shell-min-width: var(--island-service-min-width);
+    --mobile-service-pad-left: var(--island-service-pad-left);
+    --mobile-service-pad-right: var(--island-service-pad-right);
+    --mobile-service-open-gap: var(--island-service-gap);
+    --mobile-service-toggle-open-size: var(--island-service-toggle-size);
+    --mobile-island-morph: var(--island-motion-morph);
+    --mobile-island-content-fade: var(--island-motion-content-fade);
+    --mobile-island-content-shift: var(--island-motion-content-shift);
+    --mobile-island-content-collapse: var(--island-motion-content-collapse);
+    --mobile-island-collapse-delay: var(--island-motion-collapse-delay);
+    --mobile-island-handoff-shift: var(--island-motion-handoff-shift);
+    --mobile-island-return-shift: var(--island-motion-return-shift);
+    --mobile-island-menu-shift: var(--island-motion-menu-shift);
     --mobile-island-shell-transition:
       opacity var(--duration-fast) var(--ease-smooth),
       box-shadow var(--duration-fast) var(--ease-smooth),
@@ -2378,9 +2404,6 @@ html.has-open-dossier {
       max-width var(--mobile-island-content-collapse) var(--ease-smooth) var(--mobile-island-collapse-delay),
       min-width var(--mobile-island-content-collapse) var(--ease-smooth) var(--mobile-island-collapse-delay),
       padding var(--mobile-island-content-collapse) var(--ease-smooth) var(--mobile-island-collapse-delay);
-    --mobile-island-handoff-shift: translate3d(-16px, 0, 0) scale(0.98);
-    --mobile-island-return-shift: translate3d(16px, 0, 0) scale(0.98);
-    --mobile-island-menu-shift: translate3d(0, 18px, 0) scale(0.96);
     position: relative;
     left: auto;
     right: auto;
@@ -3051,17 +3074,17 @@ html.has-open-dossier {
 
 @media (max-width: 420px) {
   .mobile-floating-menu {
-    --mobile-control-size: 40px;
-    --mobile-island-pad-y: 6px;
-    --mobile-island-pad-left: 13.65px;
-    --mobile-island-pad-right: 16.13px;
-    --mobile-island-gap: 4px;
-    --mobile-service-shell-width: 210px;
-    --mobile-service-shell-min-width: 211px;
-    --mobile-service-pad-left: 26px;
-    --mobile-service-pad-right: 18.5px;
-    --mobile-service-open-gap: 11px;
-    --mobile-menu-expanded-height: 331px;
+    --island-control-size: 40px;
+    --island-compact-pad-y: 6px;
+    --island-compact-pad-left: 13.65px;
+    --island-compact-pad-right: 16.13px;
+    --island-compact-gap: 4px;
+    --island-service-width: 210px;
+    --island-service-min-width: 211px;
+    --island-service-pad-left: 26px;
+    --island-service-pad-right: 18.5px;
+    --island-service-gap: 11px;
+    --island-menu-height: 331px;
     gap: var(--mobile-island-gap);
     right: auto;
   }
