@@ -708,6 +708,12 @@ const getVisibleFocusableElements = (root) => {
   const updateActive = () => {
     if (!sections.length) return;
 
+    if (window.location.hash.slice(1).startsWith('artist-')) {
+      setActive('artists');
+      updateNavLabel();
+      return;
+    }
+
     const marker = window.scrollY + window.innerHeight * 0.52;
     const firstSection = sections[0];
     const coverExitOffset = firstSection.offsetTop - window.innerHeight * 0.06;
