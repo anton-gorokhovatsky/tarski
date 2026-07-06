@@ -15,4 +15,6 @@ This repository is the production source for https://tarski.ru/.
 - This is a static GitHub Pages site with no build step.
 - For HTML/CSS changes, run `git diff --check`.
 - For JavaScript changes, run a syntax check on `script.js` and/or `i18n.js` when those files changed.
+- When adding or replacing image assets, run `node tools/check-media-assets.mjs` and keep artist images below the documented hard limit.
 - For visual changes, verify the affected mobile and desktop states in a local browser before publishing.
+- For modal changes, verify Escape close, Tab focus trapping, focus return, and direct artist hashes.

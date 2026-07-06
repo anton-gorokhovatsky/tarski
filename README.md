@@ -13,12 +13,29 @@ Static GitHub Pages site for Tarski.
 - `robots.txt` and `sitemap.xml` — indexing helpers.
 - `yandex_887484d1e6af8b3b.html` — Yandex Webmaster verification file.
 - `.nojekyll` — keeps GitHub Pages from running Jekyll over the site.
+- `tools/check-media-assets.mjs` — lightweight media-size guard for new images.
 
 The site supports Russian, English and Japanese versions, automatic light/dark theme selection via `prefers-color-scheme`, and a manual theme switcher.
 
 ## Local preview
 
 Open `index.html` in a browser. No build step is required.
+
+## Media hygiene
+
+Keep new gallery images editorially useful but web-sized. For artist images, use an 1800px long edge as the default export size, prefer WebP or optimized JPEG, and keep the target weight under 650 KiB. The hard guard is 900 KiB for artist images; larger files should be resized or recompressed before publishing.
+
+Before pushing new media, run:
+
+```text
+node tools/check-media-assets.mjs
+```
+
+Warnings are acceptable when an image visibly needs the extra detail; failures should be fixed before publishing.
+
+## Accessibility notes
+
+Artist dossiers and the mobile menu are modal dialogs. When changing them, preserve `role="dialog"`, `aria-modal`, Escape close, Tab focus trapping, focus return to the opener, and direct hash links such as `#artist-anastasia-dahl`.
 
 ## GitHub Pages
 
