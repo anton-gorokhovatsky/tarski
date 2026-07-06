@@ -1161,6 +1161,31 @@ const getVisibleFocusableElements = (root) => {
     window.history.replaceState(null, '', '#artists');
   };
 
+  const isVisibleElement = (element) => (
+    element instanceof HTMLElement
+    && !element.hidden
+    && !element.closest('[hidden]')
+    && element.offsetParent !== null
+  );
+
+  const getDossierFocusReturnTarget = () => {
+    if (isVisibleElement(activeTrigger)) return activeTrigger;
+
+    const currentIndexLink = activeCard
+      ? indexLinks.find((link) => link.getAttribute('href') === `#${activeCard.id}`)
+      : null;
+    if (isVisibleElement(currentIndexLink)) return currentIndexLink;
+
+    const visibleCardTrigger = activeCard
+      ? Array
+        .from(activeCard.querySelectorAll('.artist-card__detail-trigger'))
+        .find(isVisibleElement)
+      : null;
+    if (visibleCardTrigger) return visibleCardTrigger;
+
+    return document.querySelector('[data-artists-view-option="cloud"]');
+  };
+
   const openDossier = (card, trigger = null, options = {}) => {
     const {
       history = 'replace',
@@ -1270,9 +1295,7 @@ const getVisibleFocusableElements = (root) => {
 
     if (!dossier.classList.contains('is-open') && !dossier.classList.contains('is-closing')) return;
 
-    const triggerToRestore = activeTrigger instanceof HTMLElement
-      ? activeTrigger
-      : activeCard?.querySelector('.artist-card__name');
+    const triggerToRestore = getDossierFocusReturnTarget();
 
     dossier.classList.remove('is-open');
     dossier.classList.add('is-closing');
