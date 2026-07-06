@@ -810,9 +810,36 @@ const getVisibleFocusableElements = (root) => {
     }));
   };
 
+  const moveViewFocus = (currentIndex, step) => {
+    const nextIndex = (currentIndex + step + buttons.length) % buttons.length;
+    const nextButton = buttons[nextIndex];
+    if (!nextButton) return;
+
+    setView(nextButton.dataset.artistsViewOption);
+    focusWithoutScroll(nextButton);
+  };
+
   switcher.hidden = false;
-  buttons.forEach((button) => {
+  buttons.forEach((button, index) => {
     button.addEventListener('click', () => setView(button.dataset.artistsViewOption));
+    button.addEventListener('keydown', (event) => {
+      if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
+        event.preventDefault();
+        moveViewFocus(index, -1);
+      } else if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
+        event.preventDefault();
+        moveViewFocus(index, 1);
+      } else if (event.key === 'Home') {
+        event.preventDefault();
+        setView(buttons[0].dataset.artistsViewOption);
+        focusWithoutScroll(buttons[0]);
+      } else if (event.key === 'End') {
+        const lastButton = buttons[buttons.length - 1];
+        event.preventDefault();
+        setView(lastButton.dataset.artistsViewOption);
+        focusWithoutScroll(lastButton);
+      }
+    });
   });
 
   setView('cloud');
