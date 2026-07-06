@@ -1707,6 +1707,15 @@ li::before {
   display: none;
 }
 
+.artist-dossier__gallery-item {
+  min-width: 0;
+  margin: 0;
+}
+
+.artist-dossier__gallery-item--wide {
+  grid-column: 1 / -1;
+}
+
 .artist-dossier__gallery img {
   display: block;
   width: 100%;
@@ -1714,7 +1723,28 @@ li::before {
   min-width: 0;
 }
 
-.artist-dossier__gallery-image--wide {
+.artist-dossier__gallery-caption {
+  margin-top: 6px;
+  color: var(--muted-text);
+  font-size: 11px;
+  line-height: 1.15;
+}
+
+.artist-dossier__panel[data-gallery-layout="essay"] {
+  --dossier-media-width: clamp(360px, 31vw, 520px);
+  --dossier-column-gap: clamp(46px, 4.2vw, 64px);
+}
+
+.artist-dossier__panel[data-gallery-layout="essay"] .artist-dossier__gallery {
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.artist-dossier__panel[data-gallery-layout="essay"] .artist-dossier__gallery-item {
+  grid-column: span 3;
+}
+
+.artist-dossier__panel[data-gallery-layout="essay"] .artist-dossier__gallery-item--wide {
   grid-column: 1 / -1;
 }
 
@@ -2410,6 +2440,18 @@ html.has-open-dossier {
   .artist-dossier__gallery img {
     width: 100%;
     max-height: none;
+  }
+
+  .artist-dossier__panel[data-gallery-layout="essay"] .artist-dossier__gallery {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .artist-dossier__panel[data-gallery-layout="essay"] .artist-dossier__gallery-item {
+    grid-column: span 1;
+  }
+
+  .artist-dossier__panel[data-gallery-layout="essay"] .artist-dossier__gallery-item--wide {
+    grid-column: 1 / -1;
   }
 
   .artist-dossier__content {

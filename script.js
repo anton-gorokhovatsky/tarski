@@ -1019,6 +1019,11 @@ const getVisibleFocusableElements = (root) => {
     'artist-alina-kugush': 'assets/artist-index/izobrazhenie-dsc05043-1-1500x.jpg',
     'artist-no-excuse-group': 'assets/artist-index/0015.jpg.webp'
   };
+  const captionKeys = {
+    ru: 'caption',
+    en: 'captionEn',
+    ja: 'captionJa'
+  };
 
   if (!dossier || !panel || !image || !galleryBlock || !gallery || !credit || !name || !role || !text || !links || !cards.length) return;
 
@@ -1032,6 +1037,12 @@ const getVisibleFocusableElements = (root) => {
   const getOpenDetailsPrefix = () => window.tarskiI18n?.t('ui.openDetails') || 'Открыть подробности: ';
   const getLinksGroupLabel = () => window.tarskiI18n?.t('ui.links.group') || 'Ссылки';
   const getCardName = (card) => card.querySelector('.artist-card__name')?.textContent.trim() || 'художника';
+  const getLocalizedCaption = (item) => {
+    const language = window.tarskiI18n?.getLanguage?.() || document.documentElement.dataset.language || 'ru';
+    const captionKey = captionKeys[language] || captionKeys.ru;
+
+    return item.dataset[captionKey] || item.dataset.caption || '';
+  };
 
   const syncDetailTriggerLabels = () => {
     cards.forEach((card) => {
@@ -1057,6 +1068,7 @@ const getVisibleFocusableElements = (root) => {
         alt: item.getAttribute('alt') || '',
         width: item.getAttribute('width') || '',
         height: item.getAttribute('height') || '',
+        caption: getLocalizedCaption(item),
         isWide: item.classList.contains('artist-card__gallery-image--wide')
       })).filter((item) => item.src)
       : [];
@@ -1070,6 +1082,7 @@ const getVisibleFocusableElements = (root) => {
       copy,
       links: cardLinks,
       galleryItems,
+      galleryLayout: galleryTemplate?.dataset.layout || '',
       galleryCredit: galleryTemplate?.dataset.credit || ''
     };
   };
@@ -1176,33 +1189,51 @@ const getVisibleFocusableElements = (root) => {
     closeTimerId = null;
     dossier.classList.remove('is-closing');
     setPanelOrigin(trigger);
-    const galleryImages = data.galleryItems.map((item) => {
+    const galleryItems = data.galleryItems.map((item) => {
+      const galleryItem = document.createElement('figure');
       const galleryImage = document.createElement('img');
+      const galleryCaption = item.caption ? document.createElement('figcaption') : null;
+
+      galleryItem.className = 'artist-dossier__gallery-item';
       galleryImage.className = 'artist-dossier__gallery-image';
 
       if (item.isWide) {
+        galleryItem.classList.add('artist-dossier__gallery-item--wide');
         galleryImage.classList.add('artist-dossier__gallery-image--wide');
       }
 
       galleryImage.src = item.src;
-      galleryImage.alt = item.alt;
+      galleryImage.alt = item.alt || item.caption;
       if (item.width) galleryImage.width = Number(item.width);
       if (item.height) galleryImage.height = Number(item.height);
       galleryImage.loading = 'lazy';
       galleryImage.decoding = 'async';
 
-      return galleryImage;
+      galleryItem.append(galleryImage);
+
+      if (galleryCaption) {
+        galleryCaption.className = 'artist-dossier__gallery-caption';
+        galleryCaption.textContent = item.caption;
+        galleryItem.append(galleryCaption);
+      }
+
+      return galleryItem;
     });
 
     panel.dataset.artistId = card.id;
-    panel.classList.toggle('has-gallery', galleryImages.length > 0);
+    panel.classList.toggle('has-gallery', galleryItems.length > 0);
+    if (data.galleryLayout) {
+      panel.dataset.galleryLayout = data.galleryLayout;
+    } else {
+      delete panel.dataset.galleryLayout;
+    }
     image.src = data.imageSrc;
     image.alt = data.imageAlt;
-    gallery.replaceChildren(...galleryImages);
-    gallery.hidden = galleryImages.length === 0;
+    gallery.replaceChildren(...galleryItems);
+    gallery.hidden = galleryItems.length === 0;
     credit.textContent = data.galleryCredit;
     credit.hidden = !data.galleryCredit;
-    galleryBlock.hidden = galleryImages.length === 0 && !data.galleryCredit;
+    galleryBlock.hidden = galleryItems.length === 0 && !data.galleryCredit;
     name.textContent = data.name;
     role.textContent = data.role;
     text.replaceChildren(...data.copy.map((item) => item.cloneNode(true)));
