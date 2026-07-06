@@ -1205,11 +1205,16 @@ const getVisibleFocusableElements = (root) => {
     }
 
     const data = getCardData(card);
-    const isSwitching = dossier.classList.contains('is-open') && activeCard && activeCard !== card;
+    const previousCard = activeCard;
+    const isSwitching = dossier.classList.contains('is-open') && previousCard && previousCard !== card;
     activeCard = card;
-    activeTrigger = trigger instanceof HTMLElement
-      ? trigger
-      : (activeTrigger instanceof HTMLElement ? activeTrigger : null);
+    if (trigger instanceof HTMLElement) {
+      activeTrigger = trigger;
+    } else if (previousCard !== card) {
+      activeTrigger = null;
+    } else if (!(activeTrigger instanceof HTMLElement)) {
+      activeTrigger = null;
+    }
     window.clearTimeout(closeTimerId);
     closeTimerId = null;
     dossier.classList.remove('is-closing');
