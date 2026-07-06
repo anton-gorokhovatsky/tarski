@@ -1,17 +1,35 @@
 /*
   Tarski static site — tuned to the current Figma desktop layout.
+
+  CSS map
+  1. Tokens, theme modes and language typography
+  2. Base elements and page shell
+  3. Desktop navigation and service controls
+  4. Editorial content
+  5. Artists cloud, list view and cards
+  6. Artist dossier modal and gallery
+  7. Footer and privacy page
+  8. Responsive layout
+  9. Mobile floating island and drawer
+  10. Reduced motion
 */
 
+/* 1. Tokens, theme modes and language typography */
 :root {
+  /* Palette and rules */
   color-scheme: light;
   --page-bg: #f2f2f2;
   --text: #000;
   --muted-text: #6b6b6b;
   --rule: rgba(0, 0, 0, 0.14);
   --artist-rule: rgba(0, 0, 0, 0.07);
+
+  /* Artist list rhythm */
   --artist-image-width: 180px;
   --artist-image-height: 244px;
   --artist-image-muted-opacity: 0.42;
+
+  /* Motion */
   --ease-smooth: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-spring: cubic-bezier(0.18, 1.32, 0.32, 1);
   --duration-fast: 180ms;
@@ -19,6 +37,8 @@
   --duration-slow: 420ms;
   --duration-focus: 680ms;
   --duration-indicator: 460ms;
+
+  /* Matte surfaces */
   --matte-pill-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.38));
   --matte-panel-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.74), rgba(242, 242, 242, 0.56));
   --matte-pill-fallback-bg: rgba(242, 242, 242, 0.96);
@@ -47,6 +67,8 @@
   --mobile-pill-shadow: var(--shadow-mobile-pill);
   --mobile-bottom-pill-shadow: var(--shadow-mobile-bottom-pill);
   --mobile-pill-fallback-bg: var(--matte-pill-fallback-bg);
+
+  /* Focus, trail and active-scene behavior */
   --focus-text-muted: #b8b8b8;
   --focus-transition-duration: var(--duration-fast);
   --cursor-trail-rgb: 0 0 0;
@@ -62,6 +84,8 @@
   --scene-label-active-shift: -4px;
   --scene-nav-label-opacity: 0.82;
   --scene-nav-label-shift: 0px;
+
+  /* Layout and typography */
   --page-padding-x: 45px;
   --content-width: 890px;
   --menu-width: 199px;
@@ -214,6 +238,7 @@
   font-display: swap;
 }
 
+/* 2. Base elements and page shell */
 * {
   box-sizing: border-box;
 }
@@ -328,6 +353,7 @@ a:hover {
   filter: var(--brand-filter);
 }
 
+/* 3. Desktop navigation and service controls */
 .main-nav {
   --nav-indicator-y: 10px;
   --nav-indicator-opacity: 0;
@@ -622,6 +648,7 @@ a:hover {
   transform: translateY(-50%);
 }
 
+/* 4. Editorial content */
 .content {
   width: min(100%, var(--content-width));
 }
@@ -936,6 +963,7 @@ li::before {
   margin-bottom: 56px;
 }
 
+/* 5. Artists cloud, list view and cards */
 .artists-view-switch {
   display: inline-flex;
   gap: 2px;
@@ -1469,6 +1497,7 @@ li::before {
   opacity: 1;
 }
 
+/* 6. Artist dossier modal and gallery */
 .artist-dossier {
   position: fixed;
   inset: 0;
@@ -1827,6 +1856,7 @@ html.has-open-dossier {
   overflow: hidden;
 }
 
+/* 7. Footer and privacy page */
 .site-footer {
   --footer-meta-column: 132px;
   --footer-column-gap: 34px;
@@ -1962,6 +1992,7 @@ html.has-open-dossier {
   margin-bottom: 0;
 }
 
+/* 8. Responsive layout */
 @media (min-width: 961px) {
   .brand,
   .privacy-page__brand {
@@ -2508,7 +2539,7 @@ html.has-open-dossier {
   }
 }
 
-/* Mobile floating menu — compact service island. */
+/* 9. Mobile floating island and drawer */
 .mobile-menu-home,
 .mobile-floating-menu,
 .mobile-menu-drawer {
@@ -3351,6 +3382,7 @@ html.has-open-dossier {
   }
 }
 
+/* 10. Reduced motion */
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
