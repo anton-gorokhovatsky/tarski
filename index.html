@@ -55,13 +55,14 @@
     <meta property="og:image" content="https://tarski.ru/assets/og-image.png?v=20260704-footer-og" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content="Tarski" />
+    <meta property="og:image:alt" content="Tarski — среда связей и вовлекающего искусства" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Tarski" />
     <meta name="twitter:description" content="Среда изучения и поддержки социально ориентированного и вовлекающего искусства." />
     <meta name="twitter:image" content="https://tarski.ru/assets/og-image.png?v=20260704-footer-og" />
+    <meta name="twitter:image:alt" content="Tarski — среда связей и вовлекающего искусства" />
     <link rel="icon" href="assets/favicon.svg?v=20260701-caps-favicon" type="image/svg+xml" sizes="any" />
-    <link rel="stylesheet" href="styles.css?v=20260706-dossier-essay" />
+    <link rel="stylesheet" href="styles.css?v=20260707-system-polish" />
   </head>
   <body>
     <noscript><div><img src="https://mc.yandex.ru/watch/110320853" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
@@ -263,11 +264,11 @@
           </div>
 
           <div class="artists-view-switch" data-artists-view-switch role="group" aria-label="Представление художников" hidden>
-            <button class="artists-view-switch__button is-active" type="button" data-artists-view-option="cloud" aria-pressed="true">Облако</button>
-            <button class="artists-view-switch__button" type="button" data-artists-view-option="list" aria-pressed="false">Список</button>
+            <button class="artists-view-switch__button is-active" type="button" data-artists-view-option="cloud" aria-controls="artists-cloud artists-list" aria-pressed="true">Облако</button>
+            <button class="artists-view-switch__button" type="button" data-artists-view-option="list" aria-controls="artists-cloud artists-list" aria-pressed="false">Список</button>
           </div>
 
-          <nav class="artist-index" aria-label="Навигация по художникам">
+          <nav id="artists-cloud" class="artist-index" aria-label="Навигация по художникам">
             <a class="artist-index__link" href="#artist-anastasia-dahl">Анастасия Даль</a>
             <a class="artist-index__link" href="#artist-irhs" aria-label="Институт развития художественных ситуаций">ИРХС</a>
             <a class="artist-index__link" href="#artist-nadezhda-ishkinyaeva">Надежда Ишкиняева</a>
@@ -277,7 +278,7 @@
             <a class="artist-index__link" href="#artist-daria-orlova">Дарья Орлова</a>
           </nav>
 
-          <div class="artists-list">
+          <div id="artists-list" class="artists-list">
             <article id="artist-anastasia-dahl" class="artist-card">
               <img class="artist-card__image" src="assets/artist-cover.png" alt="Анастасия Даль" width="628" height="850" loading="lazy" decoding="async" />
               <template class="artist-card__gallery" data-artist-gallery data-layout="editorial">
