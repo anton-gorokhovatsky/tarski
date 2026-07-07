@@ -1439,6 +1439,9 @@ const getVisibleFocusableElements = (root) => {
 
   window.addEventListener('keydown', (event) => {
     if (event.key === 'Escape') {
+      if (!dossier.classList.contains('is-open')) return;
+
+      event.preventDefault();
       closeDossier();
       return;
     }
@@ -1456,14 +1459,18 @@ const getVisibleFocusableElements = (root) => {
 
     const firstElement = focusableElements[0];
     const lastElement = focusableElements[focusableElements.length - 1];
+    const activeElement = document.activeElement;
 
-    if (!panel.contains(document.activeElement)) {
+    if (activeElement === panel) {
       event.preventDefault();
       focusWithoutScroll(event.shiftKey ? lastElement : firstElement);
-    } else if (event.shiftKey && document.activeElement === firstElement) {
+    } else if (!panel.contains(activeElement)) {
+      event.preventDefault();
+      focusWithoutScroll(event.shiftKey ? lastElement : firstElement);
+    } else if (event.shiftKey && activeElement === firstElement) {
       event.preventDefault();
       focusWithoutScroll(lastElement);
-    } else if (!event.shiftKey && document.activeElement === lastElement) {
+    } else if (!event.shiftKey && activeElement === lastElement) {
       event.preventDefault();
       focusWithoutScroll(firstElement);
     }
