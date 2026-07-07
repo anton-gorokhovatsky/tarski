@@ -402,37 +402,67 @@ a:hover {
 /* 3. Desktop navigation and service controls */
 .main-nav {
   --nav-indicator-y: 9px;
-  --nav-shell-padding-x: 11px;
-  --nav-shell-padding-y: 11px;
+  --nav-shell-padding-x: 7px;
+  --nav-shell-padding-y: 7px;
   --nav-indicator-x: var(--nav-shell-padding-x);
   --nav-indicator-opacity: 0;
   --nav-marker-width: 14px;
   --nav-marker-height: 22px;
   --nav-marker-line-mix: 34%;
   --nav-marker-dot-mix: 78%;
+  --nav-control-bg:
+    linear-gradient(145deg,
+      color-mix(in srgb, var(--page-bg) 58%, transparent),
+      color-mix(in srgb, var(--page-bg) 70%, var(--text) 3%));
+  --nav-control-active-bg:
+    linear-gradient(145deg,
+      color-mix(in srgb, var(--text) 6%, transparent),
+      color-mix(in srgb, var(--page-bg) 58%, transparent));
+  --nav-control-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--text) 5%, transparent),
+    inset 0 1px 0 color-mix(in srgb, #fff 18%, transparent),
+    0 8px 18px rgba(0, 0, 0, 0.028);
   position: relative;
+  z-index: 3;
+  isolation: isolate;
   box-sizing: border-box;
   width: max-content;
-  min-width: 174px;
+  min-width: 178px;
   max-width: calc(100vw - (var(--page-padding-x) * 2));
   padding: var(--nav-shell-padding-y) var(--nav-shell-padding-x);
-  border-radius: 18px;
+  border-radius: 0;
   corner-shape: squircle;
-  background:
-    linear-gradient(135deg,
-      color-mix(in srgb, var(--page-bg) 76%, transparent),
-      color-mix(in srgb, var(--page-bg) 52%, transparent));
-  box-shadow:
-    0 14px 34px rgba(0, 0, 0, 0.055),
-    inset 0 0 0 1px color-mix(in srgb, var(--text) 6%, transparent),
-    inset 0 1px 0 color-mix(in srgb, #fff 32%, transparent);
+  background: transparent;
+  box-shadow: none;
   color: var(--text);
-  -webkit-backdrop-filter: blur(16px) saturate(122%);
-  backdrop-filter: blur(16px) saturate(122%);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  text-shadow: 0 1px 18px color-mix(in srgb, var(--page-bg) 72%, transparent);
   font-size: 15px;
   line-height: 19px;
   font-weight: 400;
   font-feature-settings: "case" 1, "zero" 1, "ordn" 1, "ss01" 1, "ss02" 1, "ss04" 1, "ss05" 1, "ss06" 1, "ss07" 1, "ss08" 1, "numr" 1, "dlig" 1, "frac" 1;
+}
+
+.main-nav::after {
+  content: "";
+  position: absolute;
+  inset: -9px -12px -9px -18px;
+  z-index: 0;
+  border-radius: 36px;
+  corner-shape: squircle;
+  background:
+    linear-gradient(
+      90deg,
+      transparent 0,
+      color-mix(in srgb, var(--page-bg) 92%, transparent) 18%,
+      color-mix(in srgb, var(--page-bg) 68%, transparent) 74%,
+      transparent 100%
+    );
+  opacity: 1;
+  -webkit-backdrop-filter: blur(11px) saturate(112%);
+  backdrop-filter: blur(11px) saturate(112%);
+  pointer-events: none;
 }
 
 .main-nav::before,
@@ -471,7 +501,7 @@ a:hover {
 .main-nav::before {
   left: var(--nav-indicator-x);
   top: var(--nav-indicator-y);
-  z-index: 1;
+  z-index: 2;
   transform:
     translate3d(0, -50%, 0)
     rotateZ(var(--nav-indicator-rotation))
@@ -492,8 +522,12 @@ a:hover {
   align-items: center;
   gap: 10px;
   width: max-content;
-  min-height: 22px;
-  padding-left: 26px;
+  min-height: 24px;
+  margin: 0;
+  padding: 3px 10px 3px 26px;
+  border-radius: 999px;
+  background: transparent;
+  box-shadow: none;
   color: var(--text);
   font-size: 13px;
   line-height: 18px;
@@ -529,7 +563,7 @@ a:hover {
 }
 
 .main-nav .nav-label + a {
-  margin-top: 7px;
+  margin-top: 8px;
 }
 
 .main-nav .nav-actions {
@@ -538,30 +572,60 @@ a:hover {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 8px;
+  gap: 9px;
   width: max-content;
-  margin-top: 17px;
-  padding-left: 26px;
+  margin-top: 18px;
+  padding-left: 0;
 }
 
 .nav-service-panel {
   display: inline-flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   width: max-content;
+  margin-left: -2px;
+  padding: 6px 7px 6px 11px;
+  border-radius: 999px;
+  background: var(--nav-control-bg);
+  box-shadow: var(--nav-control-shadow);
 }
 
 .main-nav a {
   position: relative;
   z-index: 3;
-  display: block;
+  isolation: isolate;
+  display: flex;
+  align-items: center;
   width: max-content;
-  padding-left: 26px;
+  min-height: 28px;
+  margin-left: -4px;
+  padding: 4px 11px 5px 30px;
+  border-radius: 999px;
   text-decoration: none;
   transform-origin: left center;
   transition:
     color var(--duration-fast) var(--ease-smooth),
     transform var(--duration-fast) var(--ease-smooth);
+}
+
+.main-nav a::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: var(--nav-control-active-bg);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--text) 5%, transparent),
+    inset 0 1px 0 color-mix(in srgb, #fff 16%, transparent),
+    0 8px 14px rgba(0, 0, 0, 0.026);
+  opacity: 0;
+  transform: scaleX(0.94);
+  transform-origin: left center;
+  transition:
+    opacity var(--duration-fast) var(--ease-smooth),
+    transform var(--duration-fast) var(--ease-spring);
+  pointer-events: none;
 }
 
 .main-nav a:focus-visible,
@@ -573,12 +637,12 @@ a:hover {
 }
 
 .main-nav a + a {
-  margin-top: 5px;
+  margin-top: 4px;
 }
 
 .main-nav a.nav-mail {
   margin-top: 0;
-  padding-left: 0;
+  padding: 6px 13px 7px;
 }
 
 .main-nav a.nav-mail::before {
@@ -644,11 +708,28 @@ a:hover {
 }
 
 .main-nav a:hover {
-  text-decoration: underline;
+  text-decoration: none;
+  transform: translateX(1px);
+}
+
+.main-nav a:hover::after,
+.main-nav a.is-active::after,
+.main-nav a[aria-current="true"]::after,
+.main-nav a.nav-mail::after {
+  opacity: 0.46;
+  transform: scaleX(1);
+}
+
+.main-nav a.nav-mail::after {
+  opacity: 0.18;
+}
+
+.main-nav a.nav-mail:hover::after {
+  opacity: 0.38;
 }
 
 .main-nav a:active {
-  transform: scale(0.98);
+  transform: translateX(1px) scale(0.98);
 }
 
 .theme-toggle {
@@ -667,8 +748,14 @@ a:hover {
   padding: 0;
   border: 0;
   border-radius: 999px;
-  background: transparent;
-  box-shadow: none;
+  background:
+    linear-gradient(145deg,
+      color-mix(in srgb, var(--page-bg) 54%, transparent),
+      color-mix(in srgb, var(--page-bg) 76%, var(--text) 4%));
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--text) 6%, transparent),
+    inset 0 1px 0 color-mix(in srgb, #fff 16%, transparent),
+    0 5px 10px rgba(0, 0, 0, 0.032);
   color: var(--text);
   cursor: pointer;
   font: inherit;
