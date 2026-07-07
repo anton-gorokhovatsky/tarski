@@ -401,33 +401,63 @@ a:hover {
 
 /* 3. Desktop navigation and service controls */
 .main-nav {
-  --nav-indicator-y: 10px;
-  --nav-shell-padding-x: 14px;
-  --nav-shell-padding-y: 14px;
+  --nav-indicator-y: 9px;
+  --nav-shell-padding-x: 11px;
+  --nav-shell-padding-y: 11px;
   --nav-indicator-x: var(--nav-shell-padding-x);
   --nav-indicator-opacity: 0;
+  --nav-marker-width: 14px;
+  --nav-marker-height: 22px;
+  --nav-marker-line-mix: 34%;
+  --nav-marker-dot-mix: 78%;
   position: relative;
   box-sizing: border-box;
-  width: calc(var(--menu-width) + (var(--nav-shell-padding-x) * 2));
-  padding: var(--nav-shell-padding-y) var(--nav-shell-padding-x) calc(var(--nav-shell-padding-y) + 1px);
-  border-radius: var(--corner-panel-compact);
+  width: calc(var(--menu-width) - 10px + (var(--nav-shell-padding-x) * 2));
+  padding: var(--nav-shell-padding-y) var(--nav-shell-padding-x);
+  border-radius: 20px;
   corner-shape: squircle;
-  background: var(--matte-panel-bg);
+  background:
+    linear-gradient(135deg,
+      color-mix(in srgb, var(--page-bg) 76%, transparent),
+      color-mix(in srgb, var(--page-bg) 52%, transparent));
   box-shadow:
-    0 18px 52px rgba(0, 0, 0, 0.08),
-    var(--matte-panel-border);
-  -webkit-backdrop-filter: blur(18px) saturate(128%);
-  backdrop-filter: blur(18px) saturate(128%);
-  font-size: 16px;
-  line-height: 20px;
+    0 14px 34px rgba(0, 0, 0, 0.055),
+    inset 0 0 0 1px color-mix(in srgb, var(--text) 6%, transparent),
+    inset 0 1px 0 color-mix(in srgb, #fff 32%, transparent);
+  color: var(--text);
+  -webkit-backdrop-filter: blur(16px) saturate(122%);
+  backdrop-filter: blur(16px) saturate(122%);
+  font-size: 15px;
+  line-height: 19px;
   font-weight: 400;
   font-feature-settings: "case" 1, "zero" 1, "ordn" 1, "ss01" 1, "ss02" 1, "ss04" 1, "ss05" 1, "ss06" 1, "ss07" 1, "ss08" 1, "numr" 1, "dlig" 1, "frac" 1;
 }
 
-.main-nav::before {
+.main-nav::before,
+.main-nav .nav-label::before {
   content: "";
   position: absolute;
+  display: block;
+  width: var(--nav-marker-width);
+  height: var(--nav-marker-height);
+  background:
+    linear-gradient(
+      to bottom,
+      transparent 0 7%,
+      color-mix(in srgb, currentColor var(--nav-marker-line-mix), transparent) 7% 93%,
+      transparent 93% 100%
+    ) center / 1px 100% no-repeat,
+    radial-gradient(
+      circle at center,
+      color-mix(in srgb, currentColor var(--nav-marker-dot-mix), transparent) 0 3px,
+      transparent 3.4px
+    ) center / 100% 100% no-repeat;
+  filter: none;
+  transform-origin: 50% 50%;
   pointer-events: none;
+}
+
+.main-nav::before {
   opacity: var(--nav-indicator-opacity);
   transition:
     top var(--duration-indicator) var(--ease-spring),
@@ -440,15 +470,10 @@ a:hover {
   left: var(--nav-indicator-x);
   top: var(--nav-indicator-y);
   z-index: 1;
-  width: 18px;
-  height: 24px;
-  background: url("assets/menu-shape.svg") center / contain no-repeat;
-  filter: var(--indicator-filter);
   transform:
     translate3d(0, -50%, 0)
     rotateZ(var(--nav-indicator-rotation))
     scale(var(--nav-indicator-scale));
-  transform-origin: 50% 64%;
 }
 
 .main-nav.is-indicator-moving::before {
@@ -465,8 +490,8 @@ a:hover {
   align-items: center;
   gap: 10px;
   width: max-content;
-  min-height: 24px;
-  padding-left: 30px;
+  min-height: 22px;
+  padding-left: 26px;
   color: var(--text);
   font-size: 13px;
   line-height: 18px;
@@ -479,21 +504,13 @@ a:hover {
 }
 
 .main-nav .nav-label::before {
-  content: "";
-  position: absolute;
   left: 0;
   top: 50%;
-  display: block;
-  width: 18px;
-  height: 24px;
-  background: url("assets/menu-shape.svg") center / contain no-repeat;
-  filter: var(--indicator-filter);
   opacity: 0;
   transform:
     translateY(-50%)
     rotateZ(var(--nav-indicator-rotation))
     scale(var(--nav-indicator-scale));
-  transform-origin: 50% 64%;
   transition:
     opacity var(--duration-fast) var(--ease-smooth),
     transform var(--duration-fast) var(--ease-smooth);
@@ -506,11 +523,11 @@ a:hover {
 }
 
 .main-nav.is-cover-state .nav-label::before {
-  opacity: 0.72;
+  opacity: 0.68;
 }
 
 .main-nav .nav-label + a {
-  margin-top: 8px;
+  margin-top: 7px;
 }
 
 .main-nav .nav-actions {
@@ -519,10 +536,10 @@ a:hover {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 9px;
+  gap: 8px;
   width: max-content;
-  margin-top: 20px;
-  padding-left: 30px;
+  margin-top: 17px;
+  padding-left: 26px;
 }
 
 .nav-service-panel {
@@ -537,7 +554,7 @@ a:hover {
   z-index: 3;
   display: block;
   width: max-content;
-  padding-left: 30px;
+  padding-left: 26px;
   text-decoration: none;
   transform-origin: left center;
   transition:
@@ -1051,7 +1068,7 @@ li::before {
   align-items: center;
   margin: -24px 0 44px;
   padding: 3px;
-  border-radius: 999px;
+  border-radius: 17px;
   corner-shape: squircle;
   background: var(--matte-panel-bg);
   box-shadow:
@@ -1073,7 +1090,8 @@ li::before {
   min-height: 32px;
   padding: 5px 15px 6px;
   border: 0;
-  border-radius: 999px;
+  border-radius: 14px;
+  corner-shape: squircle;
   background: transparent;
   color: inherit;
   font: inherit;
@@ -1221,6 +1239,11 @@ li::before {
 }
 
 @media (min-width: 721px) {
+  :root[data-language="en"] .artist-index__link:nth-child(6) {
+    margin-left: 7%;
+    --artist-link-x: 0.22em;
+  }
+
   :root[data-language="en"] .artist-index__link:nth-child(7) {
     justify-self: center;
     margin-top: 0.04em;
@@ -2082,54 +2105,6 @@ html.has-open-dossier {
   filter: var(--brand-filter);
 }
 
-.site-footer__nav {
-  display: inline-flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px 18px;
-  width: min(var(--footer-signature-width), max-content);
-  max-width: var(--footer-signature-width);
-  margin: clamp(12px, 1.1vw, 16px) 0 0;
-  padding: 7px 10px 8px;
-  border-radius: 999px;
-  corner-shape: squircle;
-  background: var(--matte-pill-bg);
-  box-shadow:
-    inset 0 0 0 1px color-mix(in srgb, var(--text) 7%, transparent),
-    0 16px 44px rgba(0, 0, 0, 0.06);
-  -webkit-backdrop-filter: blur(16px) saturate(120%);
-  backdrop-filter: blur(16px) saturate(120%);
-  color: var(--muted-text);
-  font-size: 14px;
-  line-height: 1.1;
-}
-
-.site-footer__nav a {
-  color: var(--text);
-  text-decoration: none;
-  opacity: 0.64;
-  transition:
-    opacity var(--duration-fast) var(--ease-smooth),
-    transform var(--duration-fast) var(--ease-smooth);
-}
-
-.site-footer__nav a:hover,
-.site-footer__nav a:focus-visible {
-  opacity: 1;
-  text-decoration: underline;
-  text-underline-offset: 0.18em;
-}
-
-.site-footer__nav a:focus-visible {
-  outline: 0;
-  border-radius: 999px;
-  box-shadow: var(--focus-ring-soft);
-}
-
-.site-footer__nav a:active {
-  transform: scale(0.98);
-}
-
 .site-footer__texts {
   display: grid;
   grid-template-columns:
@@ -2137,7 +2112,7 @@ html.has-open-dossier {
     minmax(0, var(--footer-legal-column));
   column-gap: var(--footer-column-gap);
   width: var(--footer-signature-width);
-  margin: clamp(12px, 1.1vw, 16px) 0 0;
+  margin: clamp(18px, 1.6vw, 26px) 0 0;
   padding: 0;
   align-items: start;
 }
@@ -2670,15 +2645,6 @@ html.has-open-dossier {
     padding-top: clamp(52px, 15vw, 76px);
     min-height: auto;
     padding-bottom: calc(48px + env(safe-area-inset-bottom));
-  }
-
-  .site-footer__nav {
-    gap: 7px 14px;
-    width: auto;
-    max-width: 100%;
-    margin-top: 10px;
-    padding: 7px 9px 8px;
-    font-size: 13px;
   }
 
   .site-footer__disclaimer {
