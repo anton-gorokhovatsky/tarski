@@ -1200,6 +1200,28 @@ li::before {
     transform var(--duration-normal) var(--ease-smooth);
 }
 
+.artist-index__link::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: calc(100% + 0.05em);
+  width: clamp(4px, 0.075em, 7px);
+  height: clamp(4px, 0.075em, 7px);
+  border-radius: 999px;
+  background: currentColor;
+  opacity: 0;
+  transform: translate3d(-50%, 0.08em, 0) scale(0.74);
+  transition:
+    opacity var(--duration-fast) var(--ease-smooth),
+    transform var(--duration-fast) var(--ease-smooth);
+  pointer-events: none;
+}
+
+.artist-index__link:is(:hover, :focus-visible, [aria-current="true"])::after {
+  opacity: 0.32;
+  transform: translate3d(-50%, 0, 0) scale(1);
+}
+
 .artist-index__link:nth-child(1) {
   justify-self: start;
   margin-left: 16%;
@@ -1771,6 +1793,39 @@ li::before {
     transform var(--duration-focus) var(--ease-smooth);
 }
 
+.artist-dossier__panel::before {
+  content: "";
+  position: absolute;
+  left: clamp(16px, 1.25vw, 22px);
+  top: 50%;
+  z-index: 2;
+  width: 14px;
+  height: 48px;
+  background:
+    linear-gradient(
+      to bottom,
+      transparent 0 6%,
+      color-mix(in srgb, var(--text) 24%, transparent) 6% 94%,
+      transparent 94% 100%
+    ) center / 1px 100% no-repeat,
+    radial-gradient(
+      circle at center,
+      color-mix(in srgb, var(--text) 62%, transparent) 0 3px,
+      transparent 3.4px
+    ) center / 100% 100% no-repeat;
+  opacity: 0;
+  transform: translate3d(-4px, -50%, 0) scaleY(0.88);
+  transition:
+    opacity var(--duration-normal) var(--ease-smooth),
+    transform var(--duration-normal) var(--ease-smooth);
+  pointer-events: none;
+}
+
+.artist-dossier.is-open .artist-dossier__panel::before {
+  opacity: 0.3;
+  transform: translate3d(0, -50%, 0) scaleY(1);
+}
+
 .artist-dossier__panel::-webkit-scrollbar {
   width: 0;
   height: 0;
@@ -2091,11 +2146,44 @@ html.has-open-dossier {
   --footer-column-gap: 34px;
   --footer-signature-width: min(100%, calc(100vw - (var(--page-padding-x) * 2) - var(--menu-width) - 84px));
   --footer-legal-column: min(680px, calc(var(--footer-signature-width) - var(--footer-meta-column) - var(--footer-column-gap)));
+  position: relative;
   min-height: 100svh;
   margin-top: clamp(88px, 14vh, 168px);
   padding-top: clamp(156px, 22vh, 220px);
   padding-bottom: 34px;
   text-align: left;
+}
+
+.site-footer::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: clamp(104px, 18vh, 166px);
+  width: 14px;
+  height: clamp(48px, 6vh, 68px);
+  background:
+    linear-gradient(
+      to bottom,
+      transparent 0 6%,
+      color-mix(in srgb, var(--text) 24%, transparent) 6% 94%,
+      transparent 94% 100%
+    ) center / 1px 100% no-repeat,
+    radial-gradient(
+      circle at center,
+      color-mix(in srgb, var(--text) 58%, transparent) 0 3px,
+      transparent 3.4px
+    ) center / 100% 100% no-repeat;
+  opacity: 0.18;
+  transform: translate3d(-1px, 8px, 0) scaleY(0.9);
+  transition:
+    opacity var(--duration-normal) var(--ease-smooth),
+    transform var(--duration-normal) var(--ease-smooth);
+  pointer-events: none;
+}
+
+:root[data-footer-proximity="true"] .site-footer::before {
+  opacity: 0.42;
+  transform: translate3d(-1px, 0, 0) scaleY(1);
 }
 
 .site-footer__logo {

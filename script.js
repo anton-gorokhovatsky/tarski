@@ -1186,6 +1186,29 @@ const getVisibleFocusableElements = (root) => {
     panel.style.setProperty('--dossier-enter-y', `${enterY.toFixed(1)}px`);
   };
 
+  const emitThreadLink = (trigger) => {
+    if (!(trigger instanceof HTMLElement) || reducedMotion()) return;
+
+    window.requestAnimationFrame(() => {
+      const sourceRect = trigger.getBoundingClientRect();
+      const panelRect = panel.getBoundingClientRect();
+      if (!sourceRect.width || !sourceRect.height || !panelRect.width || !panelRect.height) return;
+
+      const source = {
+        x: sourceRect.left + sourceRect.width / 2 + window.scrollX,
+        y: sourceRect.top + sourceRect.height / 2 + window.scrollY
+      };
+      const target = {
+        x: panelRect.left + Math.min(panelRect.width * 0.18, 180) + window.scrollX,
+        y: panelRect.top + panelRect.height * 0.5 + window.scrollY
+      };
+
+      window.dispatchEvent(new CustomEvent('tarski:threadlink', {
+        detail: { source, target }
+      }));
+    });
+  };
+
   const animateDossierContent = () => {
     if (reducedMotion()) return;
 
@@ -1342,6 +1365,7 @@ const getVisibleFocusableElements = (root) => {
     setCurrentIndexLink(card.id);
     setDossierTriggerState(card.id);
     syncDossierHash(card.id, history);
+    emitThreadLink(trigger);
 
     if (isSwitching) {
       animateDossierContent();
@@ -1597,7 +1621,12 @@ const getVisibleFocusableElements = (root) => {
       const segmentAge = now - point.time;
       const life = Math.max(0, 1 - segmentAge / trailDuration);
       if (life <= 0) continue;
+      const isThreadLink = Boolean(point.isThreadLink || previousPoint.isThreadLink);
+      const segmentBaseWidth = isThreadLink ? Math.max(trailBaseWidth, 0.94) : trailBaseWidth;
+      const segmentExtraWidth = isThreadLink ? Math.max(trailExtraWidth, 0.36) : trailExtraWidth;
+      const segmentOpacity = isThreadLink ? Math.max(trailOpacity, 0.54) : trailOpacity;
 
+      context.lineCap = isThreadLink ? 'round' : 'butt';
       context.beginPath();
       context.moveTo(startX, startY);
       context.bezierCurveTo(
@@ -1608,8 +1637,8 @@ const getVisibleFocusableElements = (root) => {
         endX,
         endY
       );
-      context.lineWidth = trailBaseWidth + life * trailExtraWidth;
-      context.strokeStyle = `rgba(${trailRgb}, ${life * trailOpacity})`;
+      context.lineWidth = segmentBaseWidth + life * segmentExtraWidth;
+      context.strokeStyle = `rgba(${trailRgb}, ${life * segmentOpacity})`;
       context.stroke();
     }
 
@@ -1648,6 +1677,65 @@ const getVisibleFocusableElements = (root) => {
       points.splice(0, points.length - maxPoints);
     }
 
+    scheduleRender();
+  };
+
+  const addThreadLink = ({ source, target } = {}) => {
+    if (
+      !source ||
+      !target ||
+      !Number.isFinite(source.x) ||
+      !Number.isFinite(source.y) ||
+      !Number.isFinite(target.x) ||
+      !Number.isFinite(target.y) ||
+      !shouldRun()
+    ) {
+      return;
+    }
+
+    if (!canvas) enableTrail();
+    if (!context) return;
+
+    readTrailSettings();
+    startNewStroke();
+
+    const now = window.performance.now();
+    const steps = 24;
+    const dx = target.x - source.x;
+    const dy = target.y - source.y;
+    const curveLift = Math.min(140, Math.max(42, Math.hypot(dx, dy) * 0.12));
+    const controlA = {
+      x: source.x + dx * 0.28,
+      y: source.y + dy * 0.16 - curveLift
+    };
+    const controlB = {
+      x: source.x + dx * 0.72,
+      y: target.y - dy * 0.16 + curveLift * 0.32
+    };
+
+    for (let step = 0; step <= steps; step += 1) {
+      const t = step / steps;
+      const inverse = 1 - t;
+      points.push({
+        x: inverse ** 3 * source.x
+          + 3 * inverse ** 2 * t * controlA.x
+          + 3 * inverse * t ** 2 * controlB.x
+          + t ** 3 * target.x,
+        y: inverse ** 3 * source.y
+          + 3 * inverse ** 2 * t * controlA.y
+          + 3 * inverse * t ** 2 * controlB.y
+          + t ** 3 * target.y,
+        time: now - (steps - step) * 18,
+        startsStroke: step === 0,
+        isThreadLink: true
+      });
+    }
+
+    if (points.length > maxPoints) {
+      points.splice(0, points.length - maxPoints);
+    }
+
+    hasPointerPosition = false;
     scheduleRender();
   };
 
@@ -1750,6 +1838,7 @@ const getVisibleFocusableElements = (root) => {
   window.addEventListener('tarski:themechange', readTrailSettings);
   window.addEventListener('tarski:scenechange', readTrailSettings);
   window.addEventListener('tarski:artistsviewchange', readTrailSettings);
+  window.addEventListener('tarski:threadlink', (event) => addThreadLink(event.detail));
 
   const footer = document.querySelector('.site-footer');
   if (footer && 'IntersectionObserver' in window) {
