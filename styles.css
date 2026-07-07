@@ -53,6 +53,10 @@
   --matte-panel-border:
     inset 0 0 0 1px color-mix(in srgb, var(--text) 8%, transparent),
     inset 0 1px 0 rgba(255, 255, 255, 0.38);
+  --corner-panel: clamp(26px, 2vw, 34px);
+  --corner-panel-compact: 26px;
+  --corner-panel-mobile: 30px;
+  --corner-dossier: clamp(22px, 1.8vw, 30px);
   --shadow-indicator:
     drop-shadow(0 2px 1px rgba(0, 0, 0, 0.24))
     drop-shadow(0 9px 12px rgba(0, 0, 0, 0.14));
@@ -77,6 +81,8 @@
   --cursor-trail-base-width: 1.15;
   --cursor-trail-extra-width: 0.65;
   --cursor-trail-opacity: 0.95;
+  --cursor-trail-duration: 10000;
+  --cursor-trail-min-distance: 2;
   --nav-indicator-rotation: -3deg;
   --nav-indicator-scale: 1;
   --nav-indicator-moving-rotation: 7deg;
@@ -187,6 +193,7 @@
 :root[data-scene="about"] {
   --focus-text-muted: #ababab;
   --cursor-trail-opacity: 1;
+  --cursor-trail-duration: 11000;
   --focus-transition-duration: 220ms;
   --nav-indicator-rotation: -5deg;
   --nav-indicator-moving-rotation: 5deg;
@@ -195,13 +202,47 @@
 
 :root[data-scene="artists"] {
   --focus-text-muted: #bfbfbf;
-  --cursor-trail-opacity: 1;
+  --cursor-trail-base-width: 1;
+  --cursor-trail-extra-width: 0.42;
+  --cursor-trail-opacity: 0.74;
   --focus-transition-duration: 360ms;
   --nav-indicator-rotation: -7deg;
   --nav-indicator-scale: 1.12;
   --nav-indicator-moving-rotation: 2deg;
   --nav-indicator-moving-scale: 1.18;
   --scene-label-active-shift: -5px;
+}
+
+:root[data-scene="artists"][data-artists-view="cloud"] {
+  --cursor-trail-base-width: 1.08;
+  --cursor-trail-extra-width: 0.58;
+  --cursor-trail-opacity: 0.9;
+  --cursor-trail-duration: 12500;
+  --cursor-trail-min-distance: 1.8;
+}
+
+:root[data-scene="artists"][data-artists-view="list"] {
+  --cursor-trail-base-width: 0.82;
+  --cursor-trail-extra-width: 0.34;
+  --cursor-trail-opacity: 0.56;
+  --cursor-trail-duration: 6800;
+  --cursor-trail-min-distance: 3;
+}
+
+:root[data-footer-proximity="true"] {
+  --cursor-trail-base-width: 0.92;
+  --cursor-trail-extra-width: 0.4;
+  --cursor-trail-opacity: 0.68;
+  --cursor-trail-duration: 13500;
+  --cursor-trail-min-distance: 2.4;
+}
+
+html.has-open-dossier {
+  --cursor-trail-base-width: 0.76;
+  --cursor-trail-extra-width: 0.28;
+  --cursor-trail-opacity: 0.42;
+  --cursor-trail-duration: 5200;
+  --cursor-trail-min-distance: 3.2;
 }
 
 :root[data-language="ja"] {
@@ -361,9 +402,22 @@ a:hover {
 /* 3. Desktop navigation and service controls */
 .main-nav {
   --nav-indicator-y: 10px;
+  --nav-shell-padding-x: 14px;
+  --nav-shell-padding-y: 14px;
+  --nav-indicator-x: var(--nav-shell-padding-x);
   --nav-indicator-opacity: 0;
   position: relative;
-  width: var(--menu-width);
+  box-sizing: border-box;
+  width: calc(var(--menu-width) + (var(--nav-shell-padding-x) * 2));
+  padding: var(--nav-shell-padding-y) var(--nav-shell-padding-x) calc(var(--nav-shell-padding-y) + 1px);
+  border-radius: var(--corner-panel-compact);
+  corner-shape: squircle;
+  background: var(--matte-panel-bg);
+  box-shadow:
+    0 18px 52px rgba(0, 0, 0, 0.08),
+    var(--matte-panel-border);
+  -webkit-backdrop-filter: blur(18px) saturate(128%);
+  backdrop-filter: blur(18px) saturate(128%);
   font-size: 16px;
   line-height: 20px;
   font-weight: 400;
@@ -383,7 +437,7 @@ a:hover {
 }
 
 .main-nav::before {
-  left: 0;
+  left: var(--nav-indicator-x);
   top: var(--nav-indicator-y);
   z-index: 1;
   width: 18px;
@@ -998,9 +1052,10 @@ li::before {
   margin: -24px 0 44px;
   padding: 3px;
   border-radius: 999px;
+  corner-shape: squircle;
   background: var(--matte-panel-bg);
   box-shadow:
-    0 18px 40px color-mix(in srgb, var(--shadow-color) 10%, transparent),
+    0 18px 40px rgba(0, 0, 0, 0.08),
     inset 0 0 0 1px color-mix(in srgb, currentColor 8%, transparent);
   color: var(--muted-text);
   backdrop-filter: blur(14px) saturate(112%);
@@ -1168,16 +1223,16 @@ li::before {
 @media (min-width: 721px) {
   :root[data-language="en"] .artist-index__link:nth-child(7) {
     justify-self: center;
-    margin-top: -0.42em;
+    margin-top: 0.04em;
     margin-right: 0;
-    --artist-link-x: 0.45em;
+    --artist-link-x: 0.42em;
   }
 
   :root[data-language="ja"] .artist-index__link:nth-child(7) {
     justify-self: center;
-    margin-top: -0.34em;
+    margin-top: 0.04em;
     margin-right: 0;
-    --artist-link-x: 0.22em;
+    --artist-link-x: 0.28em;
   }
 }
 
@@ -1676,7 +1731,8 @@ li::before {
   -ms-overflow-style: none;
   scrollbar-width: none;
   border: 0;
-  border-radius: 8px;
+  border-radius: var(--corner-dossier);
+  corner-shape: squircle;
   outline: 0;
   background: var(--matte-panel-bg);
   box-shadow:
@@ -2026,6 +2082,54 @@ html.has-open-dossier {
   filter: var(--brand-filter);
 }
 
+.site-footer__nav {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 18px;
+  width: min(var(--footer-signature-width), max-content);
+  max-width: var(--footer-signature-width);
+  margin: clamp(12px, 1.1vw, 16px) 0 0;
+  padding: 7px 10px 8px;
+  border-radius: 999px;
+  corner-shape: squircle;
+  background: var(--matte-pill-bg);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--text) 7%, transparent),
+    0 16px 44px rgba(0, 0, 0, 0.06);
+  -webkit-backdrop-filter: blur(16px) saturate(120%);
+  backdrop-filter: blur(16px) saturate(120%);
+  color: var(--muted-text);
+  font-size: 14px;
+  line-height: 1.1;
+}
+
+.site-footer__nav a {
+  color: var(--text);
+  text-decoration: none;
+  opacity: 0.64;
+  transition:
+    opacity var(--duration-fast) var(--ease-smooth),
+    transform var(--duration-fast) var(--ease-smooth);
+}
+
+.site-footer__nav a:hover,
+.site-footer__nav a:focus-visible {
+  opacity: 1;
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+}
+
+.site-footer__nav a:focus-visible {
+  outline: 0;
+  border-radius: 999px;
+  box-shadow: var(--focus-ring-soft);
+}
+
+.site-footer__nav a:active {
+  transform: scale(0.98);
+}
+
 .site-footer__texts {
   display: grid;
   grid-template-columns:
@@ -2291,6 +2395,12 @@ html.has-open-dossier {
     flex-flow: row wrap;
     align-items: baseline;
     gap: 7px 14px;
+    padding: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
     font-size: 16px;
     line-height: 20px;
   }
@@ -2562,6 +2672,15 @@ html.has-open-dossier {
     padding-bottom: calc(48px + env(safe-area-inset-bottom));
   }
 
+  .site-footer__nav {
+    gap: 7px 14px;
+    width: auto;
+    max-width: 100%;
+    margin-top: 10px;
+    padding: 7px 9px 8px;
+    font-size: 13px;
+  }
+
   .site-footer__disclaimer {
     font-size: 14px;
   }
@@ -2636,7 +2755,7 @@ html.has-open-dossier {
     border-right: 0;
     border-bottom: 0;
     border-left: 0;
-    border-radius: 8px 8px 0 0;
+    border-radius: var(--corner-panel-mobile) var(--corner-panel-mobile) 0 0;
     transform: translate3d(0, 26px, 0);
     transform-origin: 50% 100%;
   }
@@ -2915,7 +3034,8 @@ html.has-open-dossier {
     max-height: calc(100dvh - 24px - env(safe-area-inset-bottom));
     padding: 0;
     overflow: auto;
-    border-radius: 30px;
+    border-radius: var(--corner-panel-mobile);
+    corner-shape: squircle;
     box-shadow:
       0 28px 74px rgba(0, 0, 0, 0.18),
       inset 0 1px 0 rgba(255, 255, 255, 0.28);
@@ -2963,6 +3083,7 @@ html.has-open-dossier {
     height: var(--mobile-control-size);
     padding: 0 11px;
     border-radius: 999px;
+    corner-shape: squircle;
     background: transparent;
     box-shadow: none;
     cursor: pointer;
@@ -3049,6 +3170,7 @@ html.has-open-dossier {
     height: var(--mobile-control-size);
     padding: 0;
     border-radius: 999px;
+    corner-shape: squircle;
     background: transparent;
     box-shadow: none;
     font-size: 0;
@@ -3146,6 +3268,7 @@ html.has-open-dossier {
     height: var(--mobile-control-size);
     padding: 0;
     border-radius: 999px;
+    corner-shape: squircle;
     background: transparent;
     box-shadow: none;
     cursor: pointer;
@@ -3398,6 +3521,7 @@ html.has-open-dossier {
     padding: 0;
     border: 0;
     border-radius: 999px;
+    corner-shape: squircle;
     background: transparent;
     color: inherit;
     cursor: pointer;
@@ -3581,7 +3705,7 @@ html.has-open-dossier {
   }
 
   .mobile-floating-menu.is-menu-open {
-    border-radius: 28px;
+    border-radius: var(--corner-panel-mobile);
   }
 
   .mobile-menu-drawer__header {

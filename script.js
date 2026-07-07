@@ -801,6 +801,7 @@ const getVisibleFocusableElements = (root) => {
 
   const setView = (view) => {
     const nextView = viewModes.has(view) ? view : 'cloud';
+    document.documentElement.dataset.artistsView = nextView;
     section.dataset.artistsView = nextView;
     artistIndex.setAttribute('aria-hidden', String(nextView === 'list'));
     artistsList.setAttribute('aria-hidden', String(nextView === 'cloud'));
@@ -1505,8 +1506,6 @@ const getVisibleFocusableElements = (root) => {
   const finePointerQuery = window.matchMedia('(hover: hover) and (pointer: fine)');
   const colorSchemeQuery = window.matchMedia('(prefers-color-scheme: dark)');
 
-  const trailDuration = 10000;
-  const minPointDistance = 2;
   const smoothingFactor = 0.68;
   const curveSmoothing = 0.18;
   const maxPoints = 1400;
@@ -1520,6 +1519,8 @@ const getVisibleFocusableElements = (root) => {
   let trailBaseWidth = 1.15;
   let trailExtraWidth = 0.65;
   let trailOpacity = 0.95;
+  let trailDuration = 10000;
+  let minPointDistance = 2;
   let hasPointerPosition = false;
 
   const shouldRun = () => finePointerQuery.matches && !reducedMotionQuery.matches;
@@ -1530,11 +1531,15 @@ const getVisibleFocusableElements = (root) => {
     const baseWidth = parseFloat(rootStyles.getPropertyValue('--cursor-trail-base-width'));
     const extraWidth = parseFloat(rootStyles.getPropertyValue('--cursor-trail-extra-width'));
     const opacity = parseFloat(rootStyles.getPropertyValue('--cursor-trail-opacity'));
+    const duration = parseFloat(rootStyles.getPropertyValue('--cursor-trail-duration'));
+    const pointDistance = parseFloat(rootStyles.getPropertyValue('--cursor-trail-min-distance'));
 
     trailRgb = rawColor ? rawColor.split(/\s+/).join(', ') : '0, 0, 0';
     trailBaseWidth = Number.isFinite(baseWidth) ? baseWidth : 1.15;
     trailExtraWidth = Number.isFinite(extraWidth) ? extraWidth : 0.65;
     trailOpacity = Number.isFinite(opacity) ? opacity : 0.95;
+    trailDuration = Number.isFinite(duration) ? duration : 10000;
+    minPointDistance = Number.isFinite(pointDistance) ? pointDistance : 2;
   };
 
   const resizeCanvas = () => {
@@ -1744,6 +1749,25 @@ const getVisibleFocusableElements = (root) => {
   colorSchemeQuery.addEventListener('change', readTrailSettings);
   window.addEventListener('tarski:themechange', readTrailSettings);
   window.addEventListener('tarski:scenechange', readTrailSettings);
+  window.addEventListener('tarski:artistsviewchange', readTrailSettings);
+
+  const footer = document.querySelector('.site-footer');
+  if (footer && 'IntersectionObserver' in window) {
+    const footerObserver = new IntersectionObserver((entries) => {
+      const isNearFooter = entries.some((entry) => entry.isIntersecting);
+      if (isNearFooter) {
+        document.documentElement.dataset.footerProximity = 'true';
+      } else {
+        delete document.documentElement.dataset.footerProximity;
+      }
+      readTrailSettings();
+    }, {
+      rootMargin: '0px 0px -18% 0px',
+      threshold: 0.08
+    });
+
+    footerObserver.observe(footer);
+  }
 
   syncTrail();
 })();

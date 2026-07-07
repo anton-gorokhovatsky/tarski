@@ -33,7 +33,7 @@
         artistNavigation: 'Навигация по художникам',
         artistView: {
           label: 'Представление художников',
-          cloud: 'Облако',
+          cloud: 'Имена',
           list: 'Список'
         },
         language: 'Выбор языка',
@@ -47,6 +47,7 @@
           artists: 'Художники',
           mail: 'Написать нам'
         },
+        footerNav: 'Навигация в подвале',
         scenes: {
           cover: 'Меню',
           about: 'Среда',
@@ -98,7 +99,7 @@
         artistNavigation: 'Artist navigation',
         artistView: {
           label: 'Artist view',
-          cloud: 'Cloud',
+          cloud: 'Names',
           list: 'List'
         },
         language: 'Language',
@@ -112,6 +113,7 @@
           artists: 'Artists',
           mail: 'Contact us'
         },
+        footerNav: 'Footer navigation',
         scenes: {
           cover: 'Menu',
           about: 'Environment',
@@ -261,7 +263,7 @@
         artistNavigation: 'アーティストナビゲーション',
         artistView: {
           label: 'アーティスト表示',
-          cloud: 'クラウド',
+          cloud: '名前',
           list: 'リスト'
         },
         language: '言語',
@@ -275,6 +277,7 @@
           artists: 'アーティスト',
           mail: 'お問い合わせ'
         },
+        footerNav: 'フッターナビゲーション',
         scenes: {
           cover: 'メニュー',
           about: '環境',
@@ -600,6 +603,7 @@
     setAttr(document.querySelector('.site-header'), 'aria-label', data.ui.header);
     setAttr(document.querySelector('.main-nav'), 'aria-label', data.ui.mainNav);
     setAttr(document.querySelector('[data-mobile-menu]'), 'aria-label', data.ui.mobileNav);
+    setAttr(document.querySelector('.site-footer__nav'), 'aria-label', data.ui.footerNav);
     setAttr(document.querySelector('[data-mobile-menu-drawer]'), 'aria-label', data.ui.scenes.cover);
     document.querySelectorAll('[data-mobile-menu-toggle]').forEach((toggle) => {
       const isOpen = toggle.getAttribute('aria-expanded') === 'true';
@@ -631,9 +635,10 @@
     setAttr(document.querySelector('[data-artists-view-switch]'), 'aria-label', data.ui.artistView?.label);
     setText(document.querySelector('[data-artists-view-option="cloud"]'), data.ui.artistView?.cloud);
     setText(document.querySelector('[data-artists-view-option="list"]'), data.ui.artistView?.list);
-    setTexts(document.querySelectorAll('.main-nav a[href="#about"], .mobile-menu-expanded a[href="#about"]'), [data.ui.nav.about, data.ui.nav.about]);
-    setTexts(document.querySelectorAll('.main-nav a[href="#artists"], .mobile-menu-expanded a[href="#artists"]'), [data.ui.nav.artists, data.ui.nav.artists]);
+    setTexts(document.querySelectorAll('.main-nav a[href="#about"], .mobile-menu-expanded a[href="#about"], .site-footer__nav a[href="#about"]'), [data.ui.nav.about, data.ui.nav.about, data.ui.nav.about]);
+    setTexts(document.querySelectorAll('.main-nav a[href="#artists"], .mobile-menu-expanded a[href="#artists"], .site-footer__nav a[href="#artists"]'), [data.ui.nav.artists, data.ui.nav.artists, data.ui.nav.artists]);
     setText(document.querySelector('.nav-mail'), data.ui.nav.mail);
+    setText(document.querySelector('.site-footer__nav a[href^="mailto:"]'), data.ui.nav.mail);
     setText(document.querySelector('[data-mobile-menu-mail-action]'), data.ui.nav.mail);
     setAttr(document.querySelector('.mobile-mail-pill'), 'aria-label', data.ui.nav.mail);
     setAttr(document.querySelector('.mobile-mail-pill'), 'title', data.ui.nav.mail);
