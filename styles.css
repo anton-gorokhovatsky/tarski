@@ -412,9 +412,11 @@ a:hover {
   --nav-marker-dot-mix: 78%;
   position: relative;
   box-sizing: border-box;
-  width: calc(var(--menu-width) - 10px + (var(--nav-shell-padding-x) * 2));
+  width: max-content;
+  min-width: 174px;
+  max-width: calc(100vw - (var(--page-padding-x) * 2));
   padding: var(--nav-shell-padding-y) var(--nav-shell-padding-x);
-  border-radius: 20px;
+  border-radius: 18px;
   corner-shape: squircle;
   background:
     linear-gradient(135deg,
