@@ -1759,6 +1759,14 @@ li::before {
   line-height: 1.15;
 }
 
+.artist-dossier__gallery-label {
+  display: block;
+  margin: 0 0 8px;
+  color: var(--muted-text);
+  font-size: 12px;
+  line-height: 1.1;
+}
+
 .artist-dossier__panel[data-gallery-layout="essay"] {
   --dossier-media-width: clamp(360px, 31vw, 520px);
   --dossier-column-gap: clamp(46px, 4.2vw, 64px);
@@ -1775,6 +1783,39 @@ li::before {
 
 .artist-dossier__panel[data-gallery-layout="essay"] .artist-dossier__gallery-item--wide {
   grid-column: 1 / -1;
+}
+
+.artist-dossier__panel[data-gallery-layout="editorial"] {
+  --dossier-media-width: clamp(380px, 32vw, 540px);
+  --dossier-column-gap: clamp(54px, 5vw, 76px);
+}
+
+.artist-dossier__panel[data-gallery-layout="editorial"] .artist-dossier__gallery {
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 8px;
+  align-items: start;
+}
+
+.artist-dossier__panel[data-gallery-layout="editorial"] .artist-dossier__gallery-item {
+  grid-column: 1 / -1;
+}
+
+.artist-dossier__panel[data-gallery-layout="editorial"] .artist-dossier__gallery-item--opener {
+  margin-bottom: clamp(10px, 1.2vw, 18px);
+}
+
+.artist-dossier__panel[data-gallery-layout="editorial"] .artist-dossier__gallery-item--portrait {
+  grid-column: 2 / span 4;
+  margin: clamp(4px, 1vw, 14px) 0 clamp(12px, 1.5vw, 22px);
+}
+
+.artist-dossier__panel[data-gallery-layout="editorial"] .artist-dossier__gallery-item--pair {
+  grid-column: span 3;
+}
+
+.artist-dossier__panel[data-gallery-layout="editorial"] .artist-dossier__gallery-item--wide {
+  grid-column: 1 / -1;
+  margin-top: clamp(10px, 1.4vw, 20px);
 }
 
 .artist-dossier__credit {
@@ -2461,6 +2502,13 @@ html.has-open-dossier {
 
   .artist-dossier__close {
     grid-column: 1;
+    margin-right: 0;
+    transform: translate3d(calc(-1 * var(--dossier-close-inset)), var(--dossier-close-y), 0);
+  }
+
+  .artist-dossier__close:hover,
+  .artist-dossier__close:focus-visible {
+    transform: translate3d(calc(-1 * var(--dossier-close-inset)), var(--dossier-close-y), 0) rotate(6deg);
   }
 
   .artist-dossier__media > img {
@@ -2483,6 +2531,25 @@ html.has-open-dossier {
 
   .artist-dossier__panel[data-gallery-layout="essay"] .artist-dossier__gallery-item--wide {
     grid-column: 1 / -1;
+  }
+
+  .artist-dossier__panel[data-gallery-layout="editorial"] .artist-dossier__gallery {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .artist-dossier__panel[data-gallery-layout="editorial"] {
+    --dossier-media-width: 100%;
+  }
+
+  .artist-dossier__panel[data-gallery-layout="editorial"] .artist-dossier__gallery-item,
+  .artist-dossier__panel[data-gallery-layout="editorial"] .artist-dossier__gallery-item--opener,
+  .artist-dossier__panel[data-gallery-layout="editorial"] .artist-dossier__gallery-item--portrait,
+  .artist-dossier__panel[data-gallery-layout="editorial"] .artist-dossier__gallery-item--wide {
+    grid-column: 1 / -1;
+  }
+
+  .artist-dossier__panel[data-gallery-layout="editorial"] .artist-dossier__gallery-item--pair {
+    grid-column: span 1;
   }
 
   .artist-dossier__content {

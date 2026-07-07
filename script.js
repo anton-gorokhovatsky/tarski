@@ -1057,6 +1057,11 @@ const getVisibleFocusableElements = (root) => {
     en: 'captionEn',
     ja: 'captionJa'
   };
+  const labelKeys = {
+    ru: 'label',
+    en: 'labelEn',
+    ja: 'labelJa'
+  };
 
   if (!dossier || !panel || !image || !galleryBlock || !gallery || !credit || !name || !role || !text || !links || !cards.length) return;
 
@@ -1075,6 +1080,12 @@ const getVisibleFocusableElements = (root) => {
     const captionKey = captionKeys[language] || captionKeys.ru;
 
     return item.dataset[captionKey] || item.dataset.caption || '';
+  };
+  const getLocalizedLabel = (item) => {
+    const language = window.tarskiI18n?.getLanguage?.() || document.documentElement.dataset.language || 'ru';
+    const labelKey = labelKeys[language] || labelKeys.ru;
+
+    return item.dataset[labelKey] || item.dataset.label || '';
   };
 
   const syncDetailTriggerLabels = () => {
@@ -1102,6 +1113,8 @@ const getVisibleFocusableElements = (root) => {
         width: item.getAttribute('width') || '',
         height: item.getAttribute('height') || '',
         caption: getLocalizedCaption(item),
+        label: getLocalizedLabel(item),
+        variant: item.dataset.variant || '',
         isWide: item.classList.contains('artist-card__gallery-image--wide')
       })).filter((item) => item.src)
       : [];
@@ -1255,10 +1268,15 @@ const getVisibleFocusableElements = (root) => {
     const galleryItems = data.galleryItems.map((item) => {
       const galleryItem = document.createElement('figure');
       const galleryImage = document.createElement('img');
+      const galleryLabel = item.label ? document.createElement('span') : null;
       const galleryCaption = item.caption ? document.createElement('figcaption') : null;
 
       galleryItem.className = 'artist-dossier__gallery-item';
       galleryImage.className = 'artist-dossier__gallery-image';
+
+      if (item.variant && /^[a-z0-9-]+$/i.test(item.variant)) {
+        galleryItem.classList.add(`artist-dossier__gallery-item--${item.variant}`);
+      }
 
       if (item.isWide) {
         galleryItem.classList.add('artist-dossier__gallery-item--wide');
@@ -1271,6 +1289,12 @@ const getVisibleFocusableElements = (root) => {
       if (item.height) galleryImage.height = Number(item.height);
       galleryImage.loading = 'lazy';
       galleryImage.decoding = 'async';
+
+      if (galleryLabel) {
+        galleryLabel.className = 'artist-dossier__gallery-label';
+        galleryLabel.textContent = item.label;
+        galleryItem.append(galleryLabel);
+      }
 
       galleryItem.append(galleryImage);
 
