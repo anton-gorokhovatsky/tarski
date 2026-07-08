@@ -92,6 +92,7 @@
   --scene-label-active-shift: -4px;
   --scene-nav-label-opacity: 0.82;
   --scene-nav-label-shift: 0px;
+  --brand-dot-mask: url("assets/brand-dot-mask.svg");
   --focus-ring-soft:
     0 0 0 1px currentColor,
     0 0 0 6px color-mix(in srgb, currentColor 8%, transparent);
@@ -99,7 +100,8 @@
   /* Layout and typography */
   --page-padding-x: 45px;
   --content-width: 890px;
-  --menu-width: 199px;
+  --menu-right-offset: 18px;
+  --menu-width: calc(199px + var(--menu-right-offset));
   --font-ui-latin: "CoFo Robert Sans", "CoFo Sans", Arial, Helvetica, sans-serif;
   --font-sans: var(--font-ui-latin);
   --font-serif-display: "Noto Serif Tarski", Georgia, "Times New Roman", serif;
@@ -435,6 +437,12 @@ a:hover {
   --nav-field-color: var(--page-bg);
   --nav-field-tint: 0%;
   --nav-field-tone: color-mix(in srgb, var(--nav-field-color) var(--nav-field-tint), var(--page-bg));
+  --nav-lens-shape: var(--brand-dot-mask);
+  --nav-lens-width: calc(var(--nav-shell-width) + 78px);
+  --nav-lens-height: calc(var(--nav-lens-width) * 1.3535);
+  --nav-lens-x: -64px;
+  --nav-lens-y: -15px;
+  --nav-lens-rotation: -26deg;
   position: relative;
   z-index: 3;
   isolation: isolate;
@@ -460,30 +468,45 @@ a:hover {
 .main-nav::after {
   content: "";
   position: absolute;
-  inset: -7px -8px -7px -24px;
+  left: var(--nav-lens-x);
+  top: var(--nav-lens-y);
+  width: var(--nav-lens-width);
+  height: var(--nav-lens-height);
   z-index: 0;
-  border-radius: 26px;
-  corner-shape: squircle;
+  border-radius: 0;
   background:
     radial-gradient(
-      92% 68% at 78% 56%,
-      color-mix(in srgb, var(--nav-field-tone) 22%, transparent) 0,
-      transparent 72%
+      ellipse 88% 142% at 36% 50%,
+      color-mix(in srgb, var(--nav-field-tone) 50%, transparent) 0,
+      color-mix(in srgb, var(--nav-field-tone) 24%, transparent) 54%,
+      transparent 100%
     ),
     linear-gradient(
-      90deg,
-      transparent 0,
-      transparent 12%,
-      color-mix(in srgb, var(--nav-field-tone) 38%, transparent) 34%,
-      color-mix(in srgb, var(--nav-field-tone) 64%, transparent) 74%,
-      transparent 100%
+      135deg,
+      color-mix(in srgb, var(--page-bg) 74%, transparent),
+      color-mix(in srgb, var(--nav-field-tone) 36%, transparent)
     );
-  opacity: 0.58;
-  -webkit-backdrop-filter: blur(4.2px) saturate(102%);
-  backdrop-filter: blur(4.2px) saturate(102%);
+  opacity: 0.56;
+  -webkit-backdrop-filter: blur(3.2px) saturate(106%);
+  backdrop-filter: blur(3.2px) saturate(106%);
+  box-shadow:
+    0 24px 72px color-mix(in srgb, var(--nav-field-color) 10%, rgba(0, 0, 0, 0.026)),
+    inset 0 1px 0 color-mix(in srgb, #fff 8%, transparent);
+  filter:
+    drop-shadow(0 0 0.7px color-mix(in srgb, var(--text) 8%, transparent))
+    drop-shadow(0 18px 42px color-mix(in srgb, var(--nav-field-color) 8%, transparent))
+    drop-shadow(0 2px 18px color-mix(in srgb, var(--page-bg) 34%, transparent));
+  -webkit-mask: var(--nav-lens-shape) center / 100% 100% no-repeat;
+  mask: var(--nav-lens-shape) center / 100% 100% no-repeat;
+  mask-mode: alpha;
+  transform: rotate(var(--nav-lens-rotation)) scaleX(-1);
+  transform-origin: 52% 54%;
   transition:
     background var(--duration-fast) var(--ease-smooth),
+    box-shadow var(--duration-fast) var(--ease-smooth),
+    filter var(--duration-fast) var(--ease-smooth),
     opacity var(--duration-fast) var(--ease-smooth),
+    transform var(--duration-fast) var(--ease-smooth),
     -webkit-backdrop-filter var(--duration-fast) var(--ease-smooth),
     backdrop-filter var(--duration-fast) var(--ease-smooth);
   pointer-events: none;
@@ -1248,6 +1271,9 @@ li::before {
 
 /* 5. Artists cloud, list view and cards */
 .artists-view-switch {
+  --artists-switch-color: var(--page-bg);
+  --artists-switch-tint: 0%;
+  --artists-switch-tone: color-mix(in srgb, var(--artists-switch-color) var(--artists-switch-tint), var(--page-bg));
   position: relative;
   z-index: 3;
   display: inline-flex;
@@ -1257,13 +1283,30 @@ li::before {
   padding: 3px;
   border-radius: 17px;
   corner-shape: squircle;
-  background: var(--matte-panel-bg);
+  background:
+    radial-gradient(
+      ellipse 84% 150% at 34% 50%,
+      color-mix(in srgb, var(--artists-switch-tone) 56%, transparent) 0,
+      color-mix(in srgb, var(--artists-switch-tone) 28%, transparent) 54%,
+      transparent 100%
+    ),
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--page-bg) 74%, transparent),
+      color-mix(in srgb, var(--artists-switch-tone) 36%, transparent)
+    );
   box-shadow:
-    0 18px 40px rgba(0, 0, 0, 0.08),
-    inset 0 0 0 1px color-mix(in srgb, currentColor 8%, transparent);
+    0 18px 40px color-mix(in srgb, var(--artists-switch-color) 15%, rgba(0, 0, 0, 0.07)),
+    inset 0 0 0 1px color-mix(in srgb, currentColor 7%, transparent),
+    inset 0 1px 0 color-mix(in srgb, #fff 20%, transparent);
   color: var(--muted-text);
-  backdrop-filter: blur(14px) saturate(112%);
-  -webkit-backdrop-filter: blur(14px) saturate(112%);
+  backdrop-filter: blur(13px) saturate(114%);
+  -webkit-backdrop-filter: blur(13px) saturate(114%);
+  transition:
+    background var(--duration-fast) var(--ease-smooth),
+    box-shadow var(--duration-fast) var(--ease-smooth),
+    -webkit-backdrop-filter var(--duration-fast) var(--ease-smooth),
+    backdrop-filter var(--duration-fast) var(--ease-smooth);
 }
 
 .artists-view-switch[hidden] {
@@ -1305,10 +1348,13 @@ li::before {
 .artists-view-switch__button.is-active {
   background:
     linear-gradient(135deg,
-      color-mix(in srgb, var(--text) 10%, transparent),
-      color-mix(in srgb, var(--text) 4%, transparent));
+      color-mix(in srgb, var(--artists-switch-tone) 68%, var(--text) 8%),
+      color-mix(in srgb, var(--page-bg) 48%, var(--artists-switch-tone) 38%));
   color: var(--text);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, currentColor 6%, transparent);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, currentColor 6%, transparent),
+    inset 0 1px 0 color-mix(in srgb, #fff 24%, transparent),
+    0 5px 12px color-mix(in srgb, var(--artists-switch-color) 12%, rgba(0, 0, 0, 0.035));
 }
 
 .artists-view-switch__button:active {
@@ -1479,36 +1525,56 @@ li::before {
 html[data-scene="artists"] .main-nav::after {
   background:
     radial-gradient(
-      120% 78% at 42% 42%,
-      color-mix(in srgb, var(--nav-field-color) 26%, transparent) 0,
-      transparent 70%
+      ellipse 88% 142% at 36% 50%,
+      color-mix(in srgb, var(--nav-field-tone) 58%, transparent) 0,
+      color-mix(in srgb, var(--nav-field-tone) 32%, transparent) 54%,
+      transparent 100%
     ),
     linear-gradient(
-      90deg,
-      transparent 0,
-      color-mix(in srgb, var(--nav-field-tone) 86%, transparent) 18%,
-      color-mix(in srgb, var(--nav-field-tone) 72%, transparent) 78%,
-      transparent 100%
+      135deg,
+      color-mix(in srgb, var(--page-bg) 68%, transparent),
+      color-mix(in srgb, var(--nav-field-tone) 44%, transparent)
     );
-  opacity: 0.76;
-  -webkit-backdrop-filter: blur(1.15px) saturate(102%);
-  backdrop-filter: blur(1.15px) saturate(102%);
+  opacity: 0.78;
+  -webkit-backdrop-filter: blur(1.45px) saturate(104%);
+  backdrop-filter: blur(1.45px) saturate(104%);
+  box-shadow:
+    0 24px 72px color-mix(in srgb, var(--nav-field-color) 12%, rgba(0, 0, 0, 0.032)),
+    inset 0 1px 0 color-mix(in srgb, #fff 9%, transparent);
+  filter:
+    drop-shadow(0 0 0.7px color-mix(in srgb, var(--text) 9%, transparent))
+    drop-shadow(0 22px 52px color-mix(in srgb, var(--nav-field-color) 13%, transparent))
+    drop-shadow(0 3px 20px color-mix(in srgb, var(--page-bg) 30%, transparent));
 }
 
 :root[data-effective-theme="dark"][data-scene="artists"] .main-nav::after {
   background:
     radial-gradient(
-      130% 80% at 42% 42%,
-      color-mix(in srgb, var(--nav-field-color) 18%, transparent) 0,
-      transparent 74%
+      ellipse 78% 122% at 42% 52%,
+      color-mix(in srgb, var(--nav-field-color) 11%, transparent) 0,
+      color-mix(in srgb, var(--nav-field-tone) 24%, transparent) 48%,
+      transparent 88%
+    ),
+    radial-gradient(
+      ellipse 42% 62% at 62% 23%,
+      color-mix(in srgb, #fff 5%, transparent) 0,
+      transparent 72%
     ),
     linear-gradient(
-      90deg,
-      transparent 0,
-      color-mix(in srgb, var(--nav-field-tone) 54%, transparent) 28%,
-      color-mix(in srgb, var(--nav-field-tone) 34%, transparent) 70%,
-      transparent 100%
+      135deg,
+      color-mix(in srgb, var(--text) 3%, transparent),
+      color-mix(in srgb, var(--page-bg) 42%, transparent)
     );
+  opacity: 0.62;
+  -webkit-backdrop-filter: blur(1.45px) saturate(108%) brightness(1.04);
+  backdrop-filter: blur(1.45px) saturate(108%) brightness(1.04);
+  box-shadow:
+    0 24px 72px color-mix(in srgb, var(--nav-field-color) 9%, rgba(0, 0, 0, 0.08)),
+    inset 0 1px 0 color-mix(in srgb, #fff 7%, transparent);
+  filter:
+    drop-shadow(0 0 0.85px color-mix(in srgb, #fff 12%, transparent))
+    drop-shadow(0 24px 58px color-mix(in srgb, var(--nav-field-color) 18%, transparent))
+    drop-shadow(0 0 34px color-mix(in srgb, #fff 5%, transparent));
 }
 
 html[data-scene="artists"]:has(.artist-index__link:nth-child(1):is(:hover, :focus-visible, [aria-current="true"])) .main-nav {
@@ -1516,9 +1582,19 @@ html[data-scene="artists"]:has(.artist-index__link:nth-child(1):is(:hover, :focu
   --nav-field-tint: 54%;
 }
 
+html[data-scene="artists"]:has(.artist-index__link:nth-child(1):is(:hover, :focus-visible, [aria-current="true"])) .artists-view-switch {
+  --artists-switch-color: rgb(176 170 154);
+  --artists-switch-tint: 50%;
+}
+
 html[data-scene="artists"]:has(.artist-index__link:nth-child(2):is(:hover, :focus-visible, [aria-current="true"])) .main-nav {
   --nav-field-color: rgb(232 232 224);
   --nav-field-tint: 46%;
+}
+
+html[data-scene="artists"]:has(.artist-index__link:nth-child(2):is(:hover, :focus-visible, [aria-current="true"])) .artists-view-switch {
+  --artists-switch-color: rgb(232 232 224);
+  --artists-switch-tint: 44%;
 }
 
 html[data-scene="artists"]:has(.artist-index__link:nth-child(3):is(:hover, :focus-visible, [aria-current="true"])) .main-nav {
@@ -1526,9 +1602,19 @@ html[data-scene="artists"]:has(.artist-index__link:nth-child(3):is(:hover, :focu
   --nav-field-tint: 54%;
 }
 
+html[data-scene="artists"]:has(.artist-index__link:nth-child(3):is(:hover, :focus-visible, [aria-current="true"])) .artists-view-switch {
+  --artists-switch-color: rgb(206 197 183);
+  --artists-switch-tint: 50%;
+}
+
 html[data-scene="artists"]:has(.artist-index__link:nth-child(4):is(:hover, :focus-visible, [aria-current="true"])) .main-nav {
   --nav-field-color: rgb(205 207 199);
   --nav-field-tint: 52%;
+}
+
+html[data-scene="artists"]:has(.artist-index__link:nth-child(4):is(:hover, :focus-visible, [aria-current="true"])) .artists-view-switch {
+  --artists-switch-color: rgb(205 207 199);
+  --artists-switch-tint: 48%;
 }
 
 html[data-scene="artists"]:has(.artist-index__link:nth-child(5):is(:hover, :focus-visible, [aria-current="true"])) .main-nav {
@@ -1536,9 +1622,19 @@ html[data-scene="artists"]:has(.artist-index__link:nth-child(5):is(:hover, :focu
   --nav-field-tint: 58%;
 }
 
+html[data-scene="artists"]:has(.artist-index__link:nth-child(5):is(:hover, :focus-visible, [aria-current="true"])) .artists-view-switch {
+  --artists-switch-color: rgb(205 184 158);
+  --artists-switch-tint: 54%;
+}
+
 html[data-scene="artists"]:has(.artist-index__link:nth-child(6):is(:hover, :focus-visible, [aria-current="true"])) .main-nav {
   --nav-field-color: rgb(118 126 118);
   --nav-field-tint: 44%;
+}
+
+html[data-scene="artists"]:has(.artist-index__link:nth-child(6):is(:hover, :focus-visible, [aria-current="true"])) .artists-view-switch {
+  --artists-switch-color: rgb(118 126 118);
+  --artists-switch-tint: 36%;
 }
 
 html[data-scene="artists"]:has(.artist-index__link:nth-child(7):is(:hover, :focus-visible, [aria-current="true"])) .main-nav {
@@ -1546,37 +1642,129 @@ html[data-scene="artists"]:has(.artist-index__link:nth-child(7):is(:hover, :focu
   --nav-field-tint: 52%;
 }
 
+html[data-scene="artists"]:has(.artist-index__link:nth-child(7):is(:hover, :focus-visible, [aria-current="true"])) .artists-view-switch {
+  --artists-switch-color: rgb(202 202 196);
+  --artists-switch-tint: 48%;
+}
+
 :root[data-effective-theme="dark"][data-scene="artists"]:has(.artist-index__link:is(:hover, :focus-visible, [aria-current="true"])) .main-nav {
   --nav-field-tint: 16%;
+}
+
+:root[data-effective-theme="dark"][data-scene="artists"]:has(.artist-index__link:is(:hover, :focus-visible, [aria-current="true"])) .artists-view-switch {
+  --artists-switch-tint: 14%;
 }
 
 @media (hover: hover) and (pointer: fine) {
   html[data-scene="artists"]:has(.artist-index__link:hover) .main-nav::after,
   html[data-scene="artists"]:has(.artist-index__link:focus-visible) .main-nav::after {
-    opacity: 0.9;
-    -webkit-backdrop-filter: blur(1.4px) saturate(104%);
-    backdrop-filter: blur(1.4px) saturate(104%);
+    opacity: 0.78;
+    -webkit-backdrop-filter: blur(1.65px) saturate(106%);
+    backdrop-filter: blur(1.65px) saturate(106%);
+    filter:
+      drop-shadow(0 0 0.8px color-mix(in srgb, var(--text) 11%, transparent))
+      drop-shadow(0 26px 60px color-mix(in srgb, var(--nav-field-color) 18%, transparent))
+      drop-shadow(0 4px 24px color-mix(in srgb, var(--page-bg) 28%, transparent));
   }
 
   :root[data-effective-theme="dark"][data-scene="artists"]:has(.artist-index__link:hover) .main-nav::after,
   :root[data-effective-theme="dark"][data-scene="artists"]:has(.artist-index__link:focus-visible) .main-nav::after {
-    opacity: 0.68;
-    -webkit-backdrop-filter: blur(1.2px) saturate(102%);
-    backdrop-filter: blur(1.2px) saturate(102%);
+    opacity: 0.64;
+    -webkit-backdrop-filter: blur(1.6px) saturate(112%) brightness(1.06);
+    backdrop-filter: blur(1.6px) saturate(112%) brightness(1.06);
+    filter:
+      drop-shadow(0 0 0.95px color-mix(in srgb, #fff 16%, transparent))
+      drop-shadow(0 30px 68px color-mix(in srgb, var(--nav-field-color) 22%, transparent))
+      drop-shadow(0 0 36px color-mix(in srgb, #fff 6%, transparent));
   }
 
   html[data-scene="artists"]:has(.artist-index__link:hover) .main-nav a::after,
   html[data-scene="artists"]:has(.artist-index__link:focus-visible) .main-nav a::after {
-    background: transparent;
-    box-shadow: none;
-    opacity: 0;
+    background:
+      linear-gradient(
+        135deg,
+        color-mix(in srgb, var(--nav-field-tone) 42%, var(--text) 4%),
+        color-mix(in srgb, var(--page-bg) 46%, var(--nav-field-tone) 28%)
+      );
+    box-shadow:
+      inset 0 0 0 1px color-mix(in srgb, currentColor 5%, transparent),
+      inset 0 1px 0 color-mix(in srgb, #fff 12%, transparent),
+      0 6px 14px color-mix(in srgb, var(--nav-field-color) 10%, rgba(0, 0, 0, 0.022));
+  }
+
+  html[data-scene="artists"]:has(.artist-index__link:hover) .main-nav a:hover::after,
+  html[data-scene="artists"]:has(.artist-index__link:focus-visible) .main-nav a:focus-visible::after {
+    opacity: 0.24;
+    transform: scaleX(1);
+  }
+
+  html[data-scene="artists"]:has(.artist-index__link:hover) .main-nav a.is-active::after,
+  html[data-scene="artists"]:has(.artist-index__link:hover) .main-nav a[aria-current="true"]::after,
+  html[data-scene="artists"]:has(.artist-index__link:focus-visible) .main-nav a.is-active::after,
+  html[data-scene="artists"]:has(.artist-index__link:focus-visible) .main-nav a[aria-current="true"]::after {
+    opacity: 0.34;
     transform: scaleX(1);
   }
 
   html[data-scene="artists"]:has(.artist-index__link:hover) .nav-service-panel,
   html[data-scene="artists"]:has(.artist-index__link:focus-visible) .nav-service-panel {
-    background: transparent;
-    box-shadow: none;
+    background:
+      radial-gradient(
+        ellipse 86% 150% at 34% 50%,
+        color-mix(in srgb, var(--nav-field-tone) 42%, transparent) 0,
+        color-mix(in srgb, var(--nav-field-tone) 22%, transparent) 54%,
+        transparent 100%
+      ),
+      linear-gradient(
+        135deg,
+        color-mix(in srgb, var(--page-bg) 66%, transparent),
+        color-mix(in srgb, var(--nav-field-tone) 30%, transparent)
+      );
+    box-shadow:
+      0 14px 30px color-mix(in srgb, var(--nav-field-color) 11%, rgba(0, 0, 0, 0.034)),
+      inset 0 0 0 1px color-mix(in srgb, currentColor 5%, transparent),
+      inset 0 1px 0 color-mix(in srgb, #fff 12%, transparent);
+  }
+
+  :root[data-effective-theme="dark"][data-scene="artists"]:has(.artist-index__link:hover) .main-nav a::after,
+  :root[data-effective-theme="dark"][data-scene="artists"]:has(.artist-index__link:focus-visible) .main-nav a::after {
+    background:
+      linear-gradient(
+        135deg,
+        color-mix(in srgb, var(--nav-field-color) 13%, var(--text) 3%),
+        color-mix(in srgb, var(--page-bg) 48%, var(--nav-field-tone) 24%)
+      );
+    box-shadow:
+      inset 0 0 0 1px color-mix(in srgb, currentColor 4.5%, transparent),
+      inset 0 1px 0 color-mix(in srgb, #fff 6%, transparent),
+      0 6px 14px color-mix(in srgb, var(--nav-field-color) 8%, rgba(0, 0, 0, 0.06));
+  }
+
+  :root[data-effective-theme="dark"][data-scene="artists"]:has(.artist-index__link:hover) .main-nav a.is-active::after,
+  :root[data-effective-theme="dark"][data-scene="artists"]:has(.artist-index__link:hover) .main-nav a[aria-current="true"]::after,
+  :root[data-effective-theme="dark"][data-scene="artists"]:has(.artist-index__link:focus-visible) .main-nav a.is-active::after,
+  :root[data-effective-theme="dark"][data-scene="artists"]:has(.artist-index__link:focus-visible) .main-nav a[aria-current="true"]::after {
+    opacity: 0.28;
+  }
+
+  :root[data-effective-theme="dark"][data-scene="artists"]:has(.artist-index__link:hover) .nav-service-panel,
+  :root[data-effective-theme="dark"][data-scene="artists"]:has(.artist-index__link:focus-visible) .nav-service-panel {
+    background:
+      radial-gradient(
+        ellipse 86% 150% at 34% 50%,
+        color-mix(in srgb, var(--nav-field-color) 12%, transparent) 0,
+        color-mix(in srgb, var(--nav-field-tone) 22%, transparent) 54%,
+        transparent 100%
+      ),
+      linear-gradient(
+        135deg,
+        color-mix(in srgb, var(--text) 3%, transparent),
+        color-mix(in srgb, var(--page-bg) 42%, transparent)
+      );
+    box-shadow:
+      0 14px 32px color-mix(in srgb, var(--nav-field-color) 10%, rgba(0, 0, 0, 0.08)),
+      inset 0 0 0 1px color-mix(in srgb, currentColor 4.5%, transparent),
+      inset 0 1px 0 color-mix(in srgb, #fff 6%, transparent);
   }
 
   .artist-index:has(.artist-index__link:hover)::before,
@@ -1716,9 +1904,12 @@ html[data-scene="artists"]:has(.artist-index__link:nth-child(7):is(:hover, :focu
 
 .artists-section[data-artists-view="list"] .artist-card__image {
   width: var(--artist-list-thumb-width);
-  height: calc(var(--artist-list-thumb-width) * 1.28);
+  height: calc(var(--artist-list-thumb-width) * 1.3535);
   object-fit: cover;
   border-radius: 999px;
+  -webkit-mask: var(--brand-dot-mask) center / 100% 100% no-repeat;
+  mask: var(--brand-dot-mask) center / 100% 100% no-repeat;
+  mask-mode: alpha;
   opacity: 0.74;
   transform: none;
 }
@@ -2588,7 +2779,7 @@ html.has-open-dossier {
   .main-nav {
     position: fixed;
     top: 27px;
-    right: var(--page-padding-x);
+    right: calc(var(--page-padding-x) + var(--menu-right-offset));
     z-index: 10;
   }
 }
@@ -2921,7 +3112,7 @@ html.has-open-dossier {
 
   .artists-section[data-artists-view="list"] .artist-card__image {
     width: 58px;
-    height: 72px;
+    height: calc(58px * 1.3535);
   }
 
   .artists-section[data-artists-view="list"] .artist-card__name {
