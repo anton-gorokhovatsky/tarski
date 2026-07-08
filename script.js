@@ -1206,7 +1206,7 @@ const getVisibleFocusableElements = (root) => {
       };
 
       window.dispatchEvent(new CustomEvent('tarski:threadlink', {
-        detail: { source, target }
+        detail: { source, target, kind: 'dossier' }
       }));
     });
   };
@@ -1367,7 +1367,7 @@ const getVisibleFocusableElements = (root) => {
     setCurrentIndexLink(card.id);
     setDossierTriggerState(card.id);
     syncDossierHash(card.id, history);
-    emitThreadLink(trigger);
+    emitThreadLink(trigger || indexLinks.find((link) => link.getAttribute('href') === `#${card.id}`));
 
     if (isSwitching) {
       animateDossierContent();
@@ -1548,6 +1548,8 @@ const getVisibleFocusableElements = (root) => {
   let trailDuration = 10000;
   let minPointDistance = 2;
   let hasPointerPosition = false;
+  const routeTimers = new Map();
+  const routeCooldowns = new Map();
 
   const shouldRun = () => finePointerQuery.matches && !reducedMotionQuery.matches;
 
@@ -1623,10 +1625,19 @@ const getVisibleFocusableElements = (root) => {
       const segmentAge = now - point.time;
       const life = Math.max(0, 1 - segmentAge / trailDuration);
       if (life <= 0) continue;
+      const threadKind = point.threadKind || previousPoint.threadKind || '';
       const isThreadLink = Boolean(point.isThreadLink || previousPoint.isThreadLink);
-      const segmentBaseWidth = isThreadLink ? Math.max(trailBaseWidth, 0.94) : trailBaseWidth;
-      const segmentExtraWidth = isThreadLink ? Math.max(trailExtraWidth, 0.36) : trailExtraWidth;
-      const segmentOpacity = isThreadLink ? Math.max(trailOpacity, 0.54) : trailOpacity;
+      const isRouteLink = isThreadLink && threadKind && threadKind !== 'dossier';
+      const routeStrength = point.routeStrength || previousPoint.routeStrength || 1;
+      const segmentBaseWidth = isRouteLink
+        ? Math.max(trailBaseWidth * 0.44 * routeStrength, 0.32)
+        : (isThreadLink ? Math.max(trailBaseWidth, 0.94) : trailBaseWidth);
+      const segmentExtraWidth = isRouteLink
+        ? Math.max(trailExtraWidth * 0.14 * routeStrength, 0.05)
+        : (isThreadLink ? Math.max(trailExtraWidth, 0.36) : trailExtraWidth);
+      const segmentOpacity = isRouteLink
+        ? Math.max(trailOpacity * 0.16 * routeStrength, 0.06)
+        : (isThreadLink ? Math.max(trailOpacity, 0.54) : trailOpacity);
 
       context.lineCap = isThreadLink ? 'round' : 'butt';
       context.beginPath();
@@ -1642,6 +1653,29 @@ const getVisibleFocusableElements = (root) => {
       context.lineWidth = segmentBaseWidth + life * segmentExtraWidth;
       context.strokeStyle = `rgba(${trailRgb}, ${life * segmentOpacity})`;
       context.stroke();
+    }
+
+    for (let index = 0; index < points.length; index += 1) {
+      const point = points[index];
+      if (!point.threadNode) continue;
+
+      const segmentAge = now - point.time;
+      const life = Math.max(0, 1 - segmentAge / trailDuration);
+      if (life <= 0) continue;
+
+      const isRouteNode = point.threadKind && point.threadKind !== 'dossier';
+      const nodeStrength = point.routeStrength || 1;
+      const radius = isRouteNode
+        ? 1.4 + life * 1.1 * nodeStrength
+        : 2.1 + life * 1.6;
+      const opacity = isRouteNode
+        ? life * 0.16 * nodeStrength
+        : life * 0.34;
+
+      context.beginPath();
+      context.arc(point.x - scrollX, point.y - scrollY, radius, 0, Math.PI * 2);
+      context.fillStyle = `rgba(${trailRgb}, ${opacity})`;
+      context.fill();
     }
 
     if (points.length) {
@@ -1682,7 +1716,7 @@ const getVisibleFocusableElements = (root) => {
     scheduleRender();
   };
 
-  const addThreadLink = ({ source, target } = {}) => {
+  const addThreadLink = ({ source, target, kind = 'dossier', strength = 1 } = {}) => {
     if (
       !source ||
       !target ||
@@ -1702,10 +1736,15 @@ const getVisibleFocusableElements = (root) => {
     startNewStroke();
 
     const now = window.performance.now();
-    const steps = 24;
+    const isRouteLink = kind !== 'dossier';
+    const routeStrength = Number.isFinite(strength) ? strength : 1;
+    const steps = isRouteLink ? 18 : 24;
     const dx = target.x - source.x;
     const dy = target.y - source.y;
-    const curveLift = Math.min(140, Math.max(42, Math.hypot(dx, dy) * 0.12));
+    const distance = Math.hypot(dx, dy);
+    const curveLift = isRouteLink
+      ? Math.min(96, Math.max(26, distance * 0.08))
+      : Math.min(140, Math.max(42, distance * 0.12));
     const controlA = {
       x: source.x + dx * 0.28,
       y: source.y + dy * 0.16 - curveLift
@@ -1727,9 +1766,12 @@ const getVisibleFocusableElements = (root) => {
           + 3 * inverse ** 2 * t * controlA.y
           + 3 * inverse * t ** 2 * controlB.y
           + t ** 3 * target.y,
-        time: now - (steps - step) * 18,
+        time: now - (isRouteLink ? 1500 : 0) - (steps - step) * (isRouteLink ? 24 : 18),
         startsStroke: step === 0,
-        isThreadLink: true
+        isThreadLink: true,
+        threadKind: kind,
+        threadNode: step === 0 ? 'source' : (step === steps ? 'target' : ''),
+        routeStrength
       });
     }
 
@@ -1739,6 +1781,150 @@ const getVisibleFocusableElements = (root) => {
 
     hasPointerPosition = false;
     scheduleRender();
+  };
+
+  const getRouteElement = (source) => (typeof source === 'function' ? source() : source);
+
+  const getElementPoint = (element, options = {}) => {
+    if (!(element instanceof HTMLElement)) return null;
+
+    const rect = element.getBoundingClientRect();
+    if (!rect.width || !rect.height) return null;
+
+    const anchorX = Number.isFinite(options.anchorX) ? options.anchorX : 0.5;
+    const anchorY = Number.isFinite(options.anchorY) ? options.anchorY : 0.5;
+    const offsetX = Number.isFinite(options.offsetX) ? options.offsetX : 0;
+    const offsetY = Number.isFinite(options.offsetY) ? options.offsetY : 0;
+
+    return {
+      x: rect.left + rect.width * anchorX + offsetX + window.scrollX,
+      y: rect.top + rect.height * anchorY + offsetY + window.scrollY
+    };
+  };
+
+  const addRouteBetween = (key, sourceElement, targetElement, options = {}) => {
+    const now = window.performance.now();
+    const cooldown = Number.isFinite(options.cooldown) ? options.cooldown : 1200;
+    const previousRouteAt = routeCooldowns.get(key) || 0;
+
+    if (previousRouteAt && now - previousRouteAt < cooldown) return;
+
+    window.clearTimeout(routeTimers.get(key));
+    routeCooldowns.set(key, now);
+
+    routeTimers.set(key, window.setTimeout(() => {
+      const resolvedSource = getRouteElement(sourceElement);
+      const resolvedTarget = getRouteElement(targetElement);
+      const source = getElementPoint(resolvedSource, options.source || {});
+      const target = getElementPoint(resolvedTarget, options.target || {});
+
+      if (!source || !target) return;
+      if (
+        Number.isFinite(options.maxDistance) &&
+        Math.hypot(target.x - source.x, target.y - source.y) > options.maxDistance
+      ) {
+        return;
+      }
+
+      addThreadLink({
+        source,
+        target,
+        kind: options.kind || 'route',
+        strength: options.strength
+      });
+    }, Number.isFinite(options.delay) ? options.delay : 180));
+  };
+
+  const getActiveNavRouteSource = (scene) => {
+    const nav = document.querySelector('.main-nav');
+    if (!nav) return null;
+
+    return nav.querySelector(`a[href="#${scene}"]`) ||
+      nav.querySelector('a.is-active[href^="#"]') ||
+      nav.querySelector('.nav-label');
+  };
+
+  const getSceneRouteTarget = (scene) => {
+    if (scene === 'about') {
+      return document.querySelector('#about .section-intro');
+    }
+
+    if (scene === 'artists') {
+      return document.querySelector('#artists .artists-view-switch') ||
+        document.querySelector('#artists .artist-index');
+    }
+
+    return null;
+  };
+
+  const addNavRoute = (scene, sourceElement) => {
+    if (scene !== 'about' && scene !== 'artists') return;
+
+    addRouteBetween(
+      `nav-${scene}`,
+      () => sourceElement || getActiveNavRouteSource(scene),
+      () => getSceneRouteTarget(scene),
+      {
+        kind: 'nav',
+        delay: 420,
+        source: { anchorX: 0.08, anchorY: 0.52 },
+        target: { anchorX: 0.08, anchorY: 0.5 },
+        cooldown: 1400,
+        strength: 1.06
+      }
+    );
+  };
+
+  const addArtistsViewRoute = (view) => {
+    if (document.documentElement.dataset.scene !== 'artists') return;
+
+    const targetSelector = view === 'list'
+      ? '#artists .artist-card.is-text-focus-active, #artists .artist-card'
+      : '#artists .artist-index';
+
+    addRouteBetween(
+      `artists-view-${view || 'cloud'}`,
+      () => document.querySelector(`#artists [data-artists-view-option="${view || 'cloud'}"]`),
+      () => document.querySelector(targetSelector),
+      {
+        kind: 'view',
+        delay: 140,
+        source: { anchorX: 0.5, anchorY: 0.55 },
+        target: { anchorX: view === 'list' ? 0.08 : 0.38, anchorY: view === 'list' ? 0.24 : 0.16 },
+        cooldown: 900,
+        strength: 0.82
+      }
+    );
+  };
+
+  const addFooterRoute = () => {
+    const footer = document.querySelector('.site-footer');
+    if (!footer) return;
+
+    addRouteBetween(
+      'footer',
+      () => footer.querySelector('.site-footer__logo') || footer,
+      () => footer.querySelector('.site-footer__meta') || footer,
+      {
+        kind: 'footer',
+        delay: 90,
+        source: { anchorX: 0.08, anchorY: 0.78 },
+        target: { anchorX: 0.12, anchorY: 0.18 },
+        cooldown: 2600,
+        maxDistance: 640,
+        strength: 0.72
+      }
+    );
+  };
+
+  const bindRouteIntents = () => {
+    document.querySelectorAll('.main-nav a[href="#about"], .main-nav a[href="#artists"]').forEach((link) => {
+      link.addEventListener('click', (event) => {
+        if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+
+        addNavRoute(link.hash.slice(1), link);
+      });
+    });
   };
 
   const rememberPoint = (event) => {
@@ -1838,9 +2024,15 @@ const getVisibleFocusableElements = (root) => {
   finePointerQuery.addEventListener('change', syncTrail);
   colorSchemeQuery.addEventListener('change', readTrailSettings);
   window.addEventListener('tarski:themechange', readTrailSettings);
-  window.addEventListener('tarski:scenechange', readTrailSettings);
-  window.addEventListener('tarski:artistsviewchange', readTrailSettings);
+  window.addEventListener('tarski:scenechange', () => {
+    readTrailSettings();
+  });
+  window.addEventListener('tarski:artistsviewchange', (event) => {
+    readTrailSettings();
+    addArtistsViewRoute(event.detail?.view);
+  });
   window.addEventListener('tarski:threadlink', (event) => addThreadLink(event.detail));
+  bindRouteIntents();
 
   const footer = document.querySelector('.site-footer');
   if (footer && 'IntersectionObserver' in window) {
@@ -1848,6 +2040,7 @@ const getVisibleFocusableElements = (root) => {
       const isNearFooter = entries.some((entry) => entry.isIntersecting);
       if (isNearFooter) {
         document.documentElement.dataset.footerProximity = 'true';
+        addFooterRoute();
       } else {
         delete document.documentElement.dataset.footerProximity;
       }
