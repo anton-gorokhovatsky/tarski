@@ -647,12 +647,7 @@ const getVisibleFocusableElements = (root) => {
     mainNav.style.setProperty('--nav-indicator-y', `${indicatorY.toFixed(2)}px`);
     mainNav.style.setProperty('--nav-indicator-opacity', '1');
 
-    if (!activeLink) {
-      mainNav.style.setProperty('--nav-indicator-opacity', '1');
-      return;
-    }
-
-    if (animate) {
+    if (activeLink && animate) {
       pulseIndicator(mainNav);
     }
   };

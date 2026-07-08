@@ -210,6 +210,7 @@
   --nav-indicator-scale: 1.12;
   --nav-indicator-moving-rotation: 2deg;
   --nav-indicator-moving-scale: 1.18;
+  --nav-indicator-hover-scale: 1.16;
   --scene-label-active-shift: -5px;
 }
 
@@ -406,10 +407,15 @@ a:hover {
   --nav-indicator-y: 69px;
   --nav-shell-padding-x: 7px;
   --nav-shell-padding-y: 7px;
+  --nav-label-gap: 8px;
+  --nav-link-gap: 5px;
+  --nav-group-gap: 20px;
+  --nav-service-gap: 10px;
   --nav-indicator-x: -18px;
   --nav-indicator-opacity: 0;
   --nav-indicator-moving-rotation: var(--nav-indicator-rotation);
   --nav-indicator-moving-scale: var(--nav-indicator-scale);
+  --nav-indicator-hover-scale: 1.06;
   --nav-marker-width: 14px;
   --nav-marker-height: 22px;
   --nav-marker-line-mix: 34%;
@@ -459,16 +465,22 @@ a:hover {
   border-radius: 26px;
   corner-shape: squircle;
   background:
+    radial-gradient(
+      92% 68% at 78% 56%,
+      color-mix(in srgb, var(--nav-field-tone) 22%, transparent) 0,
+      transparent 72%
+    ),
     linear-gradient(
       90deg,
       transparent 0,
-      color-mix(in srgb, var(--nav-field-tone) 80%, transparent) 24%,
-      color-mix(in srgb, var(--nav-field-tone) 42%, transparent) 72%,
+      transparent 12%,
+      color-mix(in srgb, var(--nav-field-tone) 38%, transparent) 34%,
+      color-mix(in srgb, var(--nav-field-tone) 64%, transparent) 74%,
       transparent 100%
     );
-  opacity: 0.64;
-  -webkit-backdrop-filter: blur(5px) saturate(102%);
-  backdrop-filter: blur(5px) saturate(102%);
+  opacity: 0.58;
+  -webkit-backdrop-filter: blur(4.2px) saturate(102%);
+  backdrop-filter: blur(4.2px) saturate(102%);
   transition:
     background var(--duration-fast) var(--ease-smooth),
     opacity var(--duration-fast) var(--ease-smooth),
@@ -527,6 +539,15 @@ a:hover {
     scale(var(--nav-indicator-moving-scale));
 }
 
+.main-nav.is-cover-state:has(.nav-label:hover)::before,
+.main-nav:has(a.is-active:hover)::before,
+.main-nav:has(a[aria-current="true"]:hover)::before {
+  transform:
+    translate3d(0, -50%, 0)
+    rotateZ(var(--nav-indicator-moving-rotation))
+    scale(var(--nav-indicator-hover-scale));
+}
+
 .main-nav .nav-label {
   position: relative;
   z-index: 3;
@@ -581,7 +602,7 @@ a:hover {
 }
 
 .main-nav .nav-label + a {
-  margin-top: 8px;
+  margin-top: var(--nav-label-gap);
 }
 
 .main-nav .nav-actions {
@@ -590,16 +611,16 @@ a:hover {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 9px;
+  gap: var(--nav-service-gap);
   width: var(--nav-content-width);
-  margin-top: 18px;
+  margin-top: var(--nav-group-gap);
   padding-left: 0;
 }
 
 .nav-service-panel {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   box-sizing: border-box;
   width: var(--nav-content-width);
   margin-left: 0;
@@ -658,17 +679,17 @@ a:hover {
 }
 
 .main-nav a + a {
-  margin-top: 4px;
+  margin-top: var(--nav-link-gap);
 }
 
 .main-nav a.nav-mail {
-  margin-top: 1px;
+  margin-top: 0;
   box-sizing: border-box;
   width: max-content;
   max-width: none;
   min-width: 0;
   min-height: 32px;
-  padding: 5px 13px 6px;
+  padding: 5px 13px 7px;
   font-size: 16px;
   line-height: 20px;
   white-space: nowrap;
@@ -688,6 +709,10 @@ a:hover {
   font-feature-settings: normal;
   font-variant-numeric: lining-nums tabular-nums;
   line-height: 1;
+}
+
+.nav-service-panel .language-switcher {
+  gap: 8px;
 }
 
 .language-switcher button {
@@ -711,9 +736,19 @@ a:hover {
     transform var(--duration-fast) var(--ease-smooth);
 }
 
+:root[data-effective-theme="dark"] .nav-service-panel .language-switcher button {
+  opacity: 0.4;
+}
+
 .language-switcher button:hover,
 .language-switcher button:focus-visible,
 .language-switcher button[aria-pressed="true"] {
+  opacity: 1;
+}
+
+:root[data-effective-theme="dark"] .nav-service-panel .language-switcher button:hover,
+:root[data-effective-theme="dark"] .nav-service-panel .language-switcher button:focus-visible,
+:root[data-effective-theme="dark"] .nav-service-panel .language-switcher button[aria-pressed="true"] {
   opacity: 1;
 }
 
@@ -741,19 +776,27 @@ a:hover {
   transform: translateX(1px);
 }
 
-.main-nav a:hover::after,
+.main-nav a:hover::after {
+  opacity: 0.24;
+  transform: scaleX(1);
+}
+
 .main-nav a.is-active::after,
 .main-nav a[aria-current="true"]::after {
-  opacity: 0.46;
+  opacity: 0.44;
   transform: scaleX(1);
 }
 
 .main-nav a.nav-mail::after {
   display: none;
+  opacity: 0;
+  transform: none;
 }
 
-.main-nav a.nav-mail:hover::after {
-  opacity: 0;
+.main-nav a.nav-mail:hover {
+  color: color-mix(in srgb, var(--text) 88%, var(--muted-text));
+  text-shadow: 0 0 14px color-mix(in srgb, currentColor 12%, transparent);
+  transform: translateX(2px);
 }
 
 .main-nav a:active {
@@ -816,6 +859,29 @@ a:hover {
 
 .nav-service-panel .theme-toggle:focus-visible {
   box-shadow: none;
+}
+
+.nav-service-panel .theme-toggle {
+  width: 24px;
+  height: 24px;
+  margin-left: auto;
+}
+
+.nav-service-panel .theme-toggle__icon {
+  width: 18px;
+  height: 18px;
+  border-width: 1.55px;
+}
+
+.nav-service-panel .theme-toggle__icon::before {
+  width: 4.5px;
+  height: 4.5px;
+  right: 0.5px;
+  top: 0.5px;
+}
+
+:root[data-effective-theme="dark"] .nav-service-panel .theme-toggle__icon::before {
+  left: 2.5px;
 }
 
 .nav-service-panel .theme-toggle:focus-visible .theme-toggle__icon {
@@ -1412,63 +1478,91 @@ li::before {
 
 html[data-scene="artists"] .main-nav::after {
   background:
+    radial-gradient(
+      120% 78% at 42% 42%,
+      color-mix(in srgb, var(--nav-field-color) 26%, transparent) 0,
+      transparent 70%
+    ),
     linear-gradient(
       90deg,
       transparent 0,
-      color-mix(in srgb, var(--nav-field-tone) 92%, transparent) 18%,
-      color-mix(in srgb, var(--nav-field-tone) 86%, transparent) 78%,
+      color-mix(in srgb, var(--nav-field-tone) 86%, transparent) 18%,
+      color-mix(in srgb, var(--nav-field-tone) 72%, transparent) 78%,
       transparent 100%
     );
-  opacity: 0.82;
-  -webkit-backdrop-filter: blur(1.25px) saturate(101%);
-  backdrop-filter: blur(1.25px) saturate(101%);
+  opacity: 0.76;
+  -webkit-backdrop-filter: blur(1.15px) saturate(102%);
+  backdrop-filter: blur(1.15px) saturate(102%);
+}
+
+:root[data-effective-theme="dark"][data-scene="artists"] .main-nav::after {
+  background:
+    radial-gradient(
+      130% 80% at 42% 42%,
+      color-mix(in srgb, var(--nav-field-color) 18%, transparent) 0,
+      transparent 74%
+    ),
+    linear-gradient(
+      90deg,
+      transparent 0,
+      color-mix(in srgb, var(--nav-field-tone) 54%, transparent) 28%,
+      color-mix(in srgb, var(--nav-field-tone) 34%, transparent) 70%,
+      transparent 100%
+    );
 }
 
 html[data-scene="artists"]:has(.artist-index__link:nth-child(1):is(:hover, :focus-visible, [aria-current="true"])) .main-nav {
   --nav-field-color: rgb(176 170 154);
-  --nav-field-tint: 38%;
+  --nav-field-tint: 54%;
 }
 
 html[data-scene="artists"]:has(.artist-index__link:nth-child(2):is(:hover, :focus-visible, [aria-current="true"])) .main-nav {
   --nav-field-color: rgb(232 232 224);
-  --nav-field-tint: 34%;
+  --nav-field-tint: 46%;
 }
 
 html[data-scene="artists"]:has(.artist-index__link:nth-child(3):is(:hover, :focus-visible, [aria-current="true"])) .main-nav {
   --nav-field-color: rgb(206 197 183);
-  --nav-field-tint: 38%;
+  --nav-field-tint: 54%;
 }
 
 html[data-scene="artists"]:has(.artist-index__link:nth-child(4):is(:hover, :focus-visible, [aria-current="true"])) .main-nav {
   --nav-field-color: rgb(205 207 199);
-  --nav-field-tint: 38%;
+  --nav-field-tint: 52%;
 }
 
 html[data-scene="artists"]:has(.artist-index__link:nth-child(5):is(:hover, :focus-visible, [aria-current="true"])) .main-nav {
   --nav-field-color: rgb(205 184 158);
-  --nav-field-tint: 42%;
+  --nav-field-tint: 58%;
 }
 
 html[data-scene="artists"]:has(.artist-index__link:nth-child(6):is(:hover, :focus-visible, [aria-current="true"])) .main-nav {
   --nav-field-color: rgb(118 126 118);
-  --nav-field-tint: 30%;
+  --nav-field-tint: 44%;
 }
 
 html[data-scene="artists"]:has(.artist-index__link:nth-child(7):is(:hover, :focus-visible, [aria-current="true"])) .main-nav {
   --nav-field-color: rgb(202 202 196);
-  --nav-field-tint: 38%;
+  --nav-field-tint: 52%;
 }
 
 :root[data-effective-theme="dark"][data-scene="artists"]:has(.artist-index__link:is(:hover, :focus-visible, [aria-current="true"])) .main-nav {
-  --nav-field-tint: 18%;
+  --nav-field-tint: 16%;
 }
 
 @media (hover: hover) and (pointer: fine) {
   html[data-scene="artists"]:has(.artist-index__link:hover) .main-nav::after,
   html[data-scene="artists"]:has(.artist-index__link:focus-visible) .main-nav::after {
-    opacity: 0.88;
-    -webkit-backdrop-filter: blur(1.5px) saturate(100%);
-    backdrop-filter: blur(1.5px) saturate(100%);
+    opacity: 0.9;
+    -webkit-backdrop-filter: blur(1.4px) saturate(104%);
+    backdrop-filter: blur(1.4px) saturate(104%);
+  }
+
+  :root[data-effective-theme="dark"][data-scene="artists"]:has(.artist-index__link:hover) .main-nav::after,
+  :root[data-effective-theme="dark"][data-scene="artists"]:has(.artist-index__link:focus-visible) .main-nav::after {
+    opacity: 0.68;
+    -webkit-backdrop-filter: blur(1.2px) saturate(102%);
+    backdrop-filter: blur(1.2px) saturate(102%);
   }
 
   html[data-scene="artists"]:has(.artist-index__link:hover) .main-nav a::after,
