@@ -413,6 +413,7 @@ a:hover {
   --nav-link-gap: 5px;
   --nav-group-gap: 20px;
   --nav-service-gap: 10px;
+  --nav-content-shift: -18px;
   --nav-indicator-x: -18px;
   --nav-indicator-opacity: 0;
   --nav-indicator-moving-rotation: var(--nav-indicator-rotation);
@@ -546,7 +547,7 @@ a:hover {
 }
 
 .main-nav::before {
-  left: var(--nav-indicator-x);
+  left: calc(var(--nav-indicator-x) + var(--nav-content-shift));
   top: var(--nav-indicator-y);
   z-index: 2;
   transform:
@@ -583,6 +584,7 @@ a:hover {
   height: 24px;
   min-height: 24px;
   margin: 0;
+  margin-left: var(--nav-content-shift);
   padding: 3px 13px;
   border-radius: 999px;
   background: transparent;
@@ -637,6 +639,7 @@ a:hover {
   gap: var(--nav-service-gap);
   width: var(--nav-content-width);
   margin-top: var(--nav-group-gap);
+  margin-left: var(--nav-content-shift);
   padding-left: 0;
 }
 
@@ -671,6 +674,10 @@ a:hover {
   transition:
     color var(--duration-fast) var(--ease-smooth),
     transform var(--duration-fast) var(--ease-smooth);
+}
+
+.main-nav > a {
+  margin-left: var(--nav-content-shift);
 }
 
 .main-nav a::after {
