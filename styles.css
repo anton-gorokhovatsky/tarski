@@ -401,11 +401,15 @@ a:hover {
 
 /* 3. Desktop navigation and service controls */
 .main-nav {
-  --nav-indicator-y: 9px;
+  --nav-shell-width: 138px;
+  --nav-content-width: 124px;
+  --nav-indicator-y: 69px;
   --nav-shell-padding-x: 7px;
   --nav-shell-padding-y: 7px;
-  --nav-indicator-x: var(--nav-shell-padding-x);
+  --nav-indicator-x: -18px;
   --nav-indicator-opacity: 0;
+  --nav-indicator-moving-rotation: var(--nav-indicator-rotation);
+  --nav-indicator-moving-scale: var(--nav-indicator-scale);
   --nav-marker-width: 14px;
   --nav-marker-height: 22px;
   --nav-marker-line-mix: 34%;
@@ -422,12 +426,15 @@ a:hover {
     inset 0 0 0 1px color-mix(in srgb, var(--text) 4.5%, transparent),
     inset 0 1px 0 color-mix(in srgb, #fff 12%, transparent),
     0 4px 10px rgba(0, 0, 0, 0.018);
+  --nav-field-color: var(--page-bg);
+  --nav-field-tint: 0%;
+  --nav-field-tone: color-mix(in srgb, var(--nav-field-color) var(--nav-field-tint), var(--page-bg));
   position: relative;
   z-index: 3;
   isolation: isolate;
   box-sizing: border-box;
-  width: max-content;
-  min-width: 166px;
+  width: var(--nav-shell-width);
+  min-width: 0;
   max-width: calc(100vw - (var(--page-padding-x) * 2));
   padding: var(--nav-shell-padding-y) var(--nav-shell-padding-x);
   border-radius: 0;
@@ -447,21 +454,26 @@ a:hover {
 .main-nav::after {
   content: "";
   position: absolute;
-  inset: -7px -2px -7px -12px;
+  inset: -7px -8px -7px -24px;
   z-index: 0;
-  border-radius: 28px;
+  border-radius: 26px;
   corner-shape: squircle;
   background:
     linear-gradient(
       90deg,
       transparent 0,
-      color-mix(in srgb, var(--page-bg) 86%, transparent) 24%,
-      color-mix(in srgb, var(--page-bg) 48%, transparent) 72%,
+      color-mix(in srgb, var(--nav-field-tone) 80%, transparent) 24%,
+      color-mix(in srgb, var(--nav-field-tone) 42%, transparent) 72%,
       transparent 100%
     );
-  opacity: 0.82;
-  -webkit-backdrop-filter: blur(8px) saturate(106%);
-  backdrop-filter: blur(8px) saturate(106%);
+  opacity: 0.64;
+  -webkit-backdrop-filter: blur(5px) saturate(102%);
+  backdrop-filter: blur(5px) saturate(102%);
+  transition:
+    background var(--duration-fast) var(--ease-smooth),
+    opacity var(--duration-fast) var(--ease-smooth),
+    -webkit-backdrop-filter var(--duration-fast) var(--ease-smooth),
+    backdrop-filter var(--duration-fast) var(--ease-smooth);
   pointer-events: none;
 }
 
@@ -521,16 +533,20 @@ a:hover {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  width: max-content;
+  justify-content: flex-start;
+  box-sizing: border-box;
+  width: var(--nav-content-width);
+  height: 24px;
   min-height: 24px;
   margin: 0;
-  padding: 3px 10px 3px 26px;
+  padding: 3px 13px;
   border-radius: 999px;
   background: transparent;
   box-shadow: none;
   color: var(--text);
   font-size: 13px;
   line-height: 18px;
+  white-space: nowrap;
   opacity: var(--scene-nav-label-opacity);
   transform: translateX(var(--scene-nav-label-shift));
   transition:
@@ -553,13 +569,15 @@ a:hover {
 }
 
 .main-nav.is-cover-state .nav-label {
+  width: var(--nav-content-width);
+  padding: 3px 13px;
   color: var(--text);
   opacity: 1;
   transform: translateX(0);
 }
 
 .main-nav.is-cover-state .nav-label::before {
-  opacity: 0.68;
+  opacity: 0;
 }
 
 .main-nav .nav-label + a {
@@ -573,7 +591,7 @@ a:hover {
   flex-direction: column;
   align-items: flex-start;
   gap: 9px;
-  width: max-content;
+  width: var(--nav-content-width);
   margin-top: 18px;
   padding-left: 0;
 }
@@ -582,9 +600,10 @@ a:hover {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  width: max-content;
-  margin-left: -2px;
-  padding: 5px 6px 5px 10px;
+  box-sizing: border-box;
+  width: var(--nav-content-width);
+  margin-left: 0;
+  padding: 5px 6px 5px 13px;
   border-radius: 999px;
   background: var(--nav-control-bg);
   box-shadow: var(--nav-control-shadow);
@@ -596,10 +615,12 @@ a:hover {
   isolation: isolate;
   display: flex;
   align-items: center;
+  justify-content: flex-start;
   width: max-content;
+  min-width: 0;
   min-height: 28px;
-  margin-left: -4px;
-  padding: 4px 11px 5px 30px;
+  margin-left: 0;
+  padding: 4px 13px 5px;
   border-radius: 999px;
   text-decoration: none;
   transform-origin: left center;
@@ -641,8 +662,16 @@ a:hover {
 }
 
 .main-nav a.nav-mail {
-  margin-top: 0;
-  padding: 6px 13px 7px;
+  margin-top: 1px;
+  box-sizing: border-box;
+  width: max-content;
+  max-width: none;
+  min-width: 0;
+  min-height: 32px;
+  padding: 5px 13px 6px;
+  font-size: 16px;
+  line-height: 20px;
+  white-space: nowrap;
 }
 
 .main-nav a.nav-mail::before {
@@ -714,18 +743,17 @@ a:hover {
 
 .main-nav a:hover::after,
 .main-nav a.is-active::after,
-.main-nav a[aria-current="true"]::after,
-.main-nav a.nav-mail::after {
+.main-nav a[aria-current="true"]::after {
   opacity: 0.46;
   transform: scaleX(1);
 }
 
 .main-nav a.nav-mail::after {
-  opacity: 0.18;
+  display: none;
 }
 
 .main-nav a.nav-mail:hover::after {
-  opacity: 0.38;
+  opacity: 0;
 }
 
 .main-nav a:active {
@@ -1382,13 +1410,79 @@ li::before {
   transform: translate3d(var(--artist-link-x), -0.04em, 0) scale(1.025);
 }
 
+html[data-scene="artists"] .main-nav::after {
+  background:
+    linear-gradient(
+      90deg,
+      transparent 0,
+      color-mix(in srgb, var(--nav-field-tone) 92%, transparent) 18%,
+      color-mix(in srgb, var(--nav-field-tone) 86%, transparent) 78%,
+      transparent 100%
+    );
+  opacity: 0.82;
+  -webkit-backdrop-filter: blur(1.25px) saturate(101%);
+  backdrop-filter: blur(1.25px) saturate(101%);
+}
+
+html[data-scene="artists"]:has(.artist-index__link:nth-child(1):is(:hover, :focus-visible, [aria-current="true"])) .main-nav {
+  --nav-field-color: rgb(176 170 154);
+  --nav-field-tint: 38%;
+}
+
+html[data-scene="artists"]:has(.artist-index__link:nth-child(2):is(:hover, :focus-visible, [aria-current="true"])) .main-nav {
+  --nav-field-color: rgb(232 232 224);
+  --nav-field-tint: 34%;
+}
+
+html[data-scene="artists"]:has(.artist-index__link:nth-child(3):is(:hover, :focus-visible, [aria-current="true"])) .main-nav {
+  --nav-field-color: rgb(206 197 183);
+  --nav-field-tint: 38%;
+}
+
+html[data-scene="artists"]:has(.artist-index__link:nth-child(4):is(:hover, :focus-visible, [aria-current="true"])) .main-nav {
+  --nav-field-color: rgb(205 207 199);
+  --nav-field-tint: 38%;
+}
+
+html[data-scene="artists"]:has(.artist-index__link:nth-child(5):is(:hover, :focus-visible, [aria-current="true"])) .main-nav {
+  --nav-field-color: rgb(205 184 158);
+  --nav-field-tint: 42%;
+}
+
+html[data-scene="artists"]:has(.artist-index__link:nth-child(6):is(:hover, :focus-visible, [aria-current="true"])) .main-nav {
+  --nav-field-color: rgb(118 126 118);
+  --nav-field-tint: 30%;
+}
+
+html[data-scene="artists"]:has(.artist-index__link:nth-child(7):is(:hover, :focus-visible, [aria-current="true"])) .main-nav {
+  --nav-field-color: rgb(202 202 196);
+  --nav-field-tint: 38%;
+}
+
+:root[data-effective-theme="dark"][data-scene="artists"]:has(.artist-index__link:is(:hover, :focus-visible, [aria-current="true"])) .main-nav {
+  --nav-field-tint: 18%;
+}
+
 @media (hover: hover) and (pointer: fine) {
   html[data-scene="artists"]:has(.artist-index__link:hover) .main-nav::after,
   html[data-scene="artists"]:has(.artist-index__link:focus-visible) .main-nav::after {
-    inset: -6px 1px -6px -10px;
-    opacity: 0.66;
-    -webkit-backdrop-filter: blur(6px) saturate(102%);
-    backdrop-filter: blur(6px) saturate(102%);
+    opacity: 0.88;
+    -webkit-backdrop-filter: blur(1.5px) saturate(100%);
+    backdrop-filter: blur(1.5px) saturate(100%);
+  }
+
+  html[data-scene="artists"]:has(.artist-index__link:hover) .main-nav a::after,
+  html[data-scene="artists"]:has(.artist-index__link:focus-visible) .main-nav a::after {
+    background: transparent;
+    box-shadow: none;
+    opacity: 0;
+    transform: scaleX(1);
+  }
+
+  html[data-scene="artists"]:has(.artist-index__link:hover) .nav-service-panel,
+  html[data-scene="artists"]:has(.artist-index__link:focus-visible) .nav-service-panel {
+    background: transparent;
+    box-shadow: none;
   }
 
   .artist-index:has(.artist-index__link:hover)::before,

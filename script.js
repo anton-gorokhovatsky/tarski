@@ -633,17 +633,24 @@ const getVisibleFocusableElements = (root) => {
     const activeLink = mainNav.querySelector('a.is-active[href^="#"]');
     mainNav.classList.toggle('is-cover-state', !activeLink);
 
-    if (!activeLink) {
+    const indicatorTarget = activeLink || navLabel;
+
+    if (!indicatorTarget) {
       mainNav.style.setProperty('--nav-indicator-opacity', '0');
       return;
     }
 
     const navRect = mainNav.getBoundingClientRect();
-    const linkRect = activeLink.getBoundingClientRect();
-    const indicatorY = linkRect.top - navRect.top + linkRect.height / 2;
+    const targetRect = indicatorTarget.getBoundingClientRect();
+    const indicatorY = targetRect.top - navRect.top + targetRect.height / 2;
 
     mainNav.style.setProperty('--nav-indicator-y', `${indicatorY.toFixed(2)}px`);
     mainNav.style.setProperty('--nav-indicator-opacity', '1');
+
+    if (!activeLink) {
+      mainNav.style.setProperty('--nav-indicator-opacity', '1');
+      return;
+    }
 
     if (animate) {
       pulseIndicator(mainNav);
