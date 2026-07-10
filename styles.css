@@ -96,6 +96,41 @@
   --focus-ring-soft:
     0 0 0 1px currentColor,
     0 0 0 6px color-mix(in srgb, currentColor 8%, transparent);
+  --gutter-color: var(--page-bg);
+  --gutter-tint: 0%;
+  --gutter-tone: color-mix(in srgb, var(--gutter-color) var(--gutter-tint), var(--page-bg));
+  --gutter-bg:
+    radial-gradient(
+      ellipse 84% 150% at 34% 50%,
+      color-mix(in srgb, var(--gutter-tone) 56%, transparent) 0,
+      color-mix(in srgb, var(--gutter-tone) 28%, transparent) 54%,
+      transparent 100%
+    ),
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--page-bg) 74%, transparent),
+      color-mix(in srgb, var(--gutter-tone) 36%, transparent)
+    );
+  --gutter-active-bg:
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--gutter-tone) 68%, var(--text) 8%),
+      color-mix(in srgb, var(--page-bg) 48%, var(--gutter-tone) 38%)
+    );
+  --gutter-shadow:
+    0 18px 40px color-mix(in srgb, var(--gutter-color) 15%, rgba(0, 0, 0, 0.07)),
+    inset 0 0 0 1px color-mix(in srgb, currentColor 7%, transparent),
+    inset 0 1px 0 color-mix(in srgb, #fff 20%, transparent);
+  --gutter-edge-shadow:
+    drop-shadow(0 0 0.95px color-mix(in srgb, currentColor 20%, transparent))
+    drop-shadow(0 1px 0.55px color-mix(in srgb, #fff 13%, transparent))
+    drop-shadow(0 -1px 0.55px color-mix(in srgb, #000 10%, transparent))
+    drop-shadow(0 18px 40px color-mix(in srgb, var(--gutter-color) 15%, rgba(0, 0, 0, 0.07)));
+  --gutter-active-shadow:
+    inset 0 0 0 1px color-mix(in srgb, currentColor 6%, transparent),
+    inset 0 1px 0 color-mix(in srgb, #fff 24%, transparent),
+    0 5px 12px color-mix(in srgb, var(--gutter-color) 12%, rgba(0, 0, 0, 0.035));
+  --gutter-backdrop-filter: blur(13px) saturate(114%);
 
   /* Layout and typography */
   --page-padding-x: 45px;
@@ -414,6 +449,7 @@ a:hover {
   --nav-group-gap: 20px;
   --nav-service-gap: 10px;
   --nav-content-shift: -18px;
+  --nav-content-y-shift: 16px;
   --nav-indicator-x: -18px;
   --nav-indicator-opacity: 0;
   --nav-indicator-moving-rotation: var(--nav-indicator-rotation);
@@ -423,21 +459,15 @@ a:hover {
   --nav-marker-height: 22px;
   --nav-marker-line-mix: 34%;
   --nav-marker-dot-mix: 78%;
-  --nav-control-bg:
-    linear-gradient(145deg,
-      color-mix(in srgb, var(--page-bg) 58%, transparent),
-      color-mix(in srgb, var(--page-bg) 70%, var(--text) 3%));
-  --nav-control-active-bg:
-    linear-gradient(145deg,
-      color-mix(in srgb, var(--text) 6%, transparent),
-      color-mix(in srgb, var(--page-bg) 58%, transparent));
-  --nav-control-shadow:
-    inset 0 0 0 1px color-mix(in srgb, var(--text) 4.5%, transparent),
-    inset 0 1px 0 color-mix(in srgb, #fff 12%, transparent),
-    0 4px 10px rgba(0, 0, 0, 0.018);
   --nav-field-color: var(--page-bg);
   --nav-field-tint: 0%;
-  --nav-field-tone: color-mix(in srgb, var(--nav-field-color) var(--nav-field-tint), var(--page-bg));
+  --gutter-color: var(--nav-field-color);
+  --gutter-tint: var(--nav-field-tint);
+  --nav-field-tone: var(--gutter-tone);
+  --nav-control-bg: var(--gutter-bg);
+  --nav-control-active-bg: var(--gutter-active-bg);
+  --nav-control-shadow: var(--gutter-shadow);
+  --nav-control-active-shadow: var(--gutter-active-shadow);
   --nav-lens-shape: var(--brand-dot-mask);
   --nav-lens-width: calc(var(--nav-shell-width) + 78px);
   --nav-lens-height: calc(var(--nav-lens-width) * 1.3535);
@@ -475,28 +505,12 @@ a:hover {
   height: var(--nav-lens-height);
   z-index: 0;
   border-radius: 0;
-  background:
-    radial-gradient(
-      ellipse 88% 142% at 36% 50%,
-      color-mix(in srgb, var(--nav-field-tone) 50%, transparent) 0,
-      color-mix(in srgb, var(--nav-field-tone) 24%, transparent) 54%,
-      transparent 100%
-    ),
-    linear-gradient(
-      135deg,
-      color-mix(in srgb, var(--page-bg) 74%, transparent),
-      color-mix(in srgb, var(--nav-field-tone) 36%, transparent)
-    );
-  opacity: 0.56;
-  -webkit-backdrop-filter: blur(3.2px) saturate(106%);
-  backdrop-filter: blur(3.2px) saturate(106%);
-  box-shadow:
-    0 24px 72px color-mix(in srgb, var(--nav-field-color) 10%, rgba(0, 0, 0, 0.026)),
-    inset 0 1px 0 color-mix(in srgb, #fff 8%, transparent);
-  filter:
-    drop-shadow(0 0 0.7px color-mix(in srgb, var(--text) 8%, transparent))
-    drop-shadow(0 18px 42px color-mix(in srgb, var(--nav-field-color) 8%, transparent))
-    drop-shadow(0 2px 18px color-mix(in srgb, var(--page-bg) 34%, transparent));
+  background: var(--nav-control-bg);
+  opacity: 0.64;
+  -webkit-backdrop-filter: var(--gutter-backdrop-filter);
+  backdrop-filter: var(--gutter-backdrop-filter);
+  box-shadow: var(--nav-control-shadow);
+  filter: var(--gutter-edge-shadow);
   -webkit-mask: var(--nav-lens-shape) center / 100% 100% no-repeat;
   mask: var(--nav-lens-shape) center / 100% 100% no-repeat;
   mask-mode: alpha;
@@ -548,7 +562,7 @@ a:hover {
 
 .main-nav::before {
   left: calc(var(--nav-indicator-x) + var(--nav-content-shift));
-  top: var(--nav-indicator-y);
+  top: calc(var(--nav-indicator-y) + var(--nav-content-y-shift));
   z-index: 2;
   transform:
     translate3d(0, -50%, 0)
@@ -585,6 +599,7 @@ a:hover {
   min-height: 24px;
   margin: 0;
   margin-left: var(--nav-content-shift);
+  top: var(--nav-content-y-shift);
   padding: 3px 13px;
   border-radius: 999px;
   background: transparent;
@@ -640,6 +655,7 @@ a:hover {
   width: var(--nav-content-width);
   margin-top: var(--nav-group-gap);
   margin-left: var(--nav-content-shift);
+  top: var(--nav-content-y-shift);
   padding-left: 0;
 }
 
@@ -678,6 +694,7 @@ a:hover {
 
 .main-nav > a {
   margin-left: var(--nav-content-shift);
+  top: var(--nav-content-y-shift);
 }
 
 .main-nav a::after {
@@ -687,10 +704,7 @@ a:hover {
   z-index: -1;
   border-radius: inherit;
   background: var(--nav-control-active-bg);
-  box-shadow:
-    inset 0 0 0 1px color-mix(in srgb, var(--text) 5%, transparent),
-    inset 0 1px 0 color-mix(in srgb, #fff 16%, transparent),
-    0 8px 14px rgba(0, 0, 0, 0.026);
+  box-shadow: var(--nav-control-active-shadow);
   opacity: 0;
   transform: scaleX(0.94);
   transform-origin: left center;
@@ -1280,7 +1294,9 @@ li::before {
 .artists-view-switch {
   --artists-switch-color: var(--page-bg);
   --artists-switch-tint: 0%;
-  --artists-switch-tone: color-mix(in srgb, var(--artists-switch-color) var(--artists-switch-tint), var(--page-bg));
+  --gutter-color: var(--artists-switch-color);
+  --gutter-tint: var(--artists-switch-tint);
+  --artists-switch-tone: var(--gutter-tone);
   position: relative;
   z-index: 3;
   display: inline-flex;
@@ -1290,25 +1306,11 @@ li::before {
   padding: 3px;
   border-radius: 17px;
   corner-shape: squircle;
-  background:
-    radial-gradient(
-      ellipse 84% 150% at 34% 50%,
-      color-mix(in srgb, var(--artists-switch-tone) 56%, transparent) 0,
-      color-mix(in srgb, var(--artists-switch-tone) 28%, transparent) 54%,
-      transparent 100%
-    ),
-    linear-gradient(
-      135deg,
-      color-mix(in srgb, var(--page-bg) 74%, transparent),
-      color-mix(in srgb, var(--artists-switch-tone) 36%, transparent)
-    );
-  box-shadow:
-    0 18px 40px color-mix(in srgb, var(--artists-switch-color) 15%, rgba(0, 0, 0, 0.07)),
-    inset 0 0 0 1px color-mix(in srgb, currentColor 7%, transparent),
-    inset 0 1px 0 color-mix(in srgb, #fff 20%, transparent);
+  background: var(--gutter-bg);
+  box-shadow: var(--gutter-shadow);
   color: var(--muted-text);
-  backdrop-filter: blur(13px) saturate(114%);
-  -webkit-backdrop-filter: blur(13px) saturate(114%);
+  backdrop-filter: var(--gutter-backdrop-filter);
+  -webkit-backdrop-filter: var(--gutter-backdrop-filter);
   transition:
     background var(--duration-fast) var(--ease-smooth),
     box-shadow var(--duration-fast) var(--ease-smooth),
@@ -1353,15 +1355,9 @@ li::before {
 }
 
 .artists-view-switch__button.is-active {
-  background:
-    linear-gradient(135deg,
-      color-mix(in srgb, var(--artists-switch-tone) 68%, var(--text) 8%),
-      color-mix(in srgb, var(--page-bg) 48%, var(--artists-switch-tone) 38%));
+  background: var(--gutter-active-bg);
   color: var(--text);
-  box-shadow:
-    inset 0 0 0 1px color-mix(in srgb, currentColor 6%, transparent),
-    inset 0 1px 0 color-mix(in srgb, #fff 24%, transparent),
-    0 5px 12px color-mix(in srgb, var(--artists-switch-color) 12%, rgba(0, 0, 0, 0.035));
+  box-shadow: var(--gutter-active-shadow);
 }
 
 .artists-view-switch__button:active {
@@ -1530,58 +1526,21 @@ li::before {
 }
 
 html[data-scene="artists"] .main-nav::after {
-  background:
-    radial-gradient(
-      ellipse 88% 142% at 36% 50%,
-      color-mix(in srgb, var(--nav-field-tone) 58%, transparent) 0,
-      color-mix(in srgb, var(--nav-field-tone) 32%, transparent) 54%,
-      transparent 100%
-    ),
-    linear-gradient(
-      135deg,
-      color-mix(in srgb, var(--page-bg) 68%, transparent),
-      color-mix(in srgb, var(--nav-field-tone) 44%, transparent)
-    );
-  opacity: 0.78;
-  -webkit-backdrop-filter: blur(1.45px) saturate(104%);
-  backdrop-filter: blur(1.45px) saturate(104%);
-  box-shadow:
-    0 24px 72px color-mix(in srgb, var(--nav-field-color) 12%, rgba(0, 0, 0, 0.032)),
-    inset 0 1px 0 color-mix(in srgb, #fff 9%, transparent);
-  filter:
-    drop-shadow(0 0 0.7px color-mix(in srgb, var(--text) 9%, transparent))
-    drop-shadow(0 22px 52px color-mix(in srgb, var(--nav-field-color) 13%, transparent))
-    drop-shadow(0 3px 20px color-mix(in srgb, var(--page-bg) 30%, transparent));
+  background: var(--nav-control-bg);
+  opacity: 0.68;
+  -webkit-backdrop-filter: var(--gutter-backdrop-filter);
+  backdrop-filter: var(--gutter-backdrop-filter);
+  box-shadow: var(--nav-control-shadow);
+  filter: var(--gutter-edge-shadow);
 }
 
 :root[data-effective-theme="dark"][data-scene="artists"] .main-nav::after {
-  background:
-    radial-gradient(
-      ellipse 78% 122% at 42% 52%,
-      color-mix(in srgb, var(--nav-field-color) 11%, transparent) 0,
-      color-mix(in srgb, var(--nav-field-tone) 24%, transparent) 48%,
-      transparent 88%
-    ),
-    radial-gradient(
-      ellipse 42% 62% at 62% 23%,
-      color-mix(in srgb, #fff 5%, transparent) 0,
-      transparent 72%
-    ),
-    linear-gradient(
-      135deg,
-      color-mix(in srgb, var(--text) 3%, transparent),
-      color-mix(in srgb, var(--page-bg) 42%, transparent)
-    );
+  background: var(--nav-control-bg);
   opacity: 0.62;
-  -webkit-backdrop-filter: blur(1.45px) saturate(108%) brightness(1.04);
-  backdrop-filter: blur(1.45px) saturate(108%) brightness(1.04);
-  box-shadow:
-    0 24px 72px color-mix(in srgb, var(--nav-field-color) 9%, rgba(0, 0, 0, 0.08)),
-    inset 0 1px 0 color-mix(in srgb, #fff 7%, transparent);
-  filter:
-    drop-shadow(0 0 0.85px color-mix(in srgb, #fff 12%, transparent))
-    drop-shadow(0 24px 58px color-mix(in srgb, var(--nav-field-color) 18%, transparent))
-    drop-shadow(0 0 34px color-mix(in srgb, #fff 5%, transparent));
+  -webkit-backdrop-filter: var(--gutter-backdrop-filter);
+  backdrop-filter: var(--gutter-backdrop-filter);
+  box-shadow: var(--nav-control-shadow);
+  filter: var(--gutter-edge-shadow);
 }
 
 html[data-scene="artists"]:has(.artist-index__link:nth-child(1):is(:hover, :focus-visible, [aria-current="true"])) .main-nav {
@@ -1665,38 +1624,28 @@ html[data-scene="artists"]:has(.artist-index__link:nth-child(7):is(:hover, :focu
 @media (hover: hover) and (pointer: fine) {
   html[data-scene="artists"]:has(.artist-index__link:hover) .main-nav::after,
   html[data-scene="artists"]:has(.artist-index__link:focus-visible) .main-nav::after {
-    opacity: 0.78;
-    -webkit-backdrop-filter: blur(1.65px) saturate(106%);
-    backdrop-filter: blur(1.65px) saturate(106%);
-    filter:
-      drop-shadow(0 0 0.8px color-mix(in srgb, var(--text) 11%, transparent))
-      drop-shadow(0 26px 60px color-mix(in srgb, var(--nav-field-color) 18%, transparent))
-      drop-shadow(0 4px 24px color-mix(in srgb, var(--page-bg) 28%, transparent));
+    background: var(--nav-control-bg);
+    opacity: 0.68;
+    -webkit-backdrop-filter: var(--gutter-backdrop-filter);
+    backdrop-filter: var(--gutter-backdrop-filter);
+    box-shadow: var(--nav-control-shadow);
+    filter: var(--gutter-edge-shadow);
   }
 
   :root[data-effective-theme="dark"][data-scene="artists"]:has(.artist-index__link:hover) .main-nav::after,
   :root[data-effective-theme="dark"][data-scene="artists"]:has(.artist-index__link:focus-visible) .main-nav::after {
-    opacity: 0.64;
-    -webkit-backdrop-filter: blur(1.6px) saturate(112%) brightness(1.06);
-    backdrop-filter: blur(1.6px) saturate(112%) brightness(1.06);
-    filter:
-      drop-shadow(0 0 0.95px color-mix(in srgb, #fff 16%, transparent))
-      drop-shadow(0 30px 68px color-mix(in srgb, var(--nav-field-color) 22%, transparent))
-      drop-shadow(0 0 36px color-mix(in srgb, #fff 6%, transparent));
+    background: var(--nav-control-bg);
+    opacity: 0.62;
+    -webkit-backdrop-filter: var(--gutter-backdrop-filter);
+    backdrop-filter: var(--gutter-backdrop-filter);
+    box-shadow: var(--nav-control-shadow);
+    filter: var(--gutter-edge-shadow);
   }
 
   html[data-scene="artists"]:has(.artist-index__link:hover) .main-nav a::after,
   html[data-scene="artists"]:has(.artist-index__link:focus-visible) .main-nav a::after {
-    background:
-      linear-gradient(
-        135deg,
-        color-mix(in srgb, var(--nav-field-tone) 42%, var(--text) 4%),
-        color-mix(in srgb, var(--page-bg) 46%, var(--nav-field-tone) 28%)
-      );
-    box-shadow:
-      inset 0 0 0 1px color-mix(in srgb, currentColor 5%, transparent),
-      inset 0 1px 0 color-mix(in srgb, #fff 12%, transparent),
-      0 6px 14px color-mix(in srgb, var(--nav-field-color) 10%, rgba(0, 0, 0, 0.022));
+    background: var(--nav-control-active-bg);
+    box-shadow: var(--nav-control-active-shadow);
   }
 
   html[data-scene="artists"]:has(.artist-index__link:hover) .main-nav a:hover::after,
@@ -1715,36 +1664,14 @@ html[data-scene="artists"]:has(.artist-index__link:nth-child(7):is(:hover, :focu
 
   html[data-scene="artists"]:has(.artist-index__link:hover) .nav-service-panel,
   html[data-scene="artists"]:has(.artist-index__link:focus-visible) .nav-service-panel {
-    background:
-      radial-gradient(
-        ellipse 86% 150% at 34% 50%,
-        color-mix(in srgb, var(--nav-field-tone) 42%, transparent) 0,
-        color-mix(in srgb, var(--nav-field-tone) 22%, transparent) 54%,
-        transparent 100%
-      ),
-      linear-gradient(
-        135deg,
-        color-mix(in srgb, var(--page-bg) 66%, transparent),
-        color-mix(in srgb, var(--nav-field-tone) 30%, transparent)
-      );
-    box-shadow:
-      0 14px 30px color-mix(in srgb, var(--nav-field-color) 11%, rgba(0, 0, 0, 0.034)),
-      inset 0 0 0 1px color-mix(in srgb, currentColor 5%, transparent),
-      inset 0 1px 0 color-mix(in srgb, #fff 12%, transparent);
+    background: var(--nav-control-bg);
+    box-shadow: var(--nav-control-shadow);
   }
 
   :root[data-effective-theme="dark"][data-scene="artists"]:has(.artist-index__link:hover) .main-nav a::after,
   :root[data-effective-theme="dark"][data-scene="artists"]:has(.artist-index__link:focus-visible) .main-nav a::after {
-    background:
-      linear-gradient(
-        135deg,
-        color-mix(in srgb, var(--nav-field-color) 13%, var(--text) 3%),
-        color-mix(in srgb, var(--page-bg) 48%, var(--nav-field-tone) 24%)
-      );
-    box-shadow:
-      inset 0 0 0 1px color-mix(in srgb, currentColor 4.5%, transparent),
-      inset 0 1px 0 color-mix(in srgb, #fff 6%, transparent),
-      0 6px 14px color-mix(in srgb, var(--nav-field-color) 8%, rgba(0, 0, 0, 0.06));
+    background: var(--nav-control-active-bg);
+    box-shadow: var(--nav-control-active-shadow);
   }
 
   :root[data-effective-theme="dark"][data-scene="artists"]:has(.artist-index__link:hover) .main-nav a.is-active::after,
@@ -1756,22 +1683,8 @@ html[data-scene="artists"]:has(.artist-index__link:nth-child(7):is(:hover, :focu
 
   :root[data-effective-theme="dark"][data-scene="artists"]:has(.artist-index__link:hover) .nav-service-panel,
   :root[data-effective-theme="dark"][data-scene="artists"]:has(.artist-index__link:focus-visible) .nav-service-panel {
-    background:
-      radial-gradient(
-        ellipse 86% 150% at 34% 50%,
-        color-mix(in srgb, var(--nav-field-color) 12%, transparent) 0,
-        color-mix(in srgb, var(--nav-field-tone) 22%, transparent) 54%,
-        transparent 100%
-      ),
-      linear-gradient(
-        135deg,
-        color-mix(in srgb, var(--text) 3%, transparent),
-        color-mix(in srgb, var(--page-bg) 42%, transparent)
-      );
-    box-shadow:
-      0 14px 32px color-mix(in srgb, var(--nav-field-color) 10%, rgba(0, 0, 0, 0.08)),
-      inset 0 0 0 1px color-mix(in srgb, currentColor 4.5%, transparent),
-      inset 0 1px 0 color-mix(in srgb, #fff 6%, transparent);
+    background: var(--nav-control-bg);
+    box-shadow: var(--nav-control-shadow);
   }
 
   .artist-index:has(.artist-index__link:hover)::before,
@@ -2767,7 +2680,10 @@ html.has-open-dossier {
 
 /* 8. Responsive layout */
 @media (min-width: 961px) {
-  .brand,
+  .brand {
+    transform: translateY(18px);
+  }
+
   .privacy-page__brand {
     transform: translateY(7px);
   }
@@ -2785,7 +2701,7 @@ html.has-open-dossier {
 
   .main-nav {
     position: fixed;
-    top: 27px;
+    top: 31px;
     right: calc(var(--page-padding-x) + var(--menu-right-offset));
     z-index: 10;
   }
