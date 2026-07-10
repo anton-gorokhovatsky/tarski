@@ -450,7 +450,7 @@ a:hover {
   --nav-service-gap: 10px;
   --nav-content-shift: -18px;
   --nav-content-y-shift: 16px;
-  --nav-indicator-x: -4px;
+  --nav-indicator-x: -8px;
   --nav-indicator-opacity: 0;
   --nav-indicator-moving-rotation: var(--nav-indicator-rotation);
   --nav-indicator-moving-scale: var(--nav-indicator-scale);
@@ -742,9 +742,9 @@ a:hover {
   justify-content: flex-start;
   width: max-content;
   min-width: 0;
-  min-height: 28px;
+  min-height: 26px;
   margin-left: 0;
-  padding: 4px 13px 5px;
+  padding: 3px 10px 4px;
   border-radius: 999px;
   text-decoration: none;
   transform-origin: left center;
@@ -793,8 +793,8 @@ a:hover {
   width: max-content;
   max-width: none;
   min-width: 0;
-  min-height: 32px;
-  padding: 5px 13px 7px;
+  min-height: 30px;
+  padding: 4px 10px 6px;
   font-size: 16px;
   line-height: 20px;
   white-space: nowrap;
@@ -3234,15 +3234,15 @@ html.has-open-dossier {
   }
 
   .artist-dossier__panel {
-    --dossier-panel-padding-block: 18px;
+    --dossier-panel-padding-block: var(--page-padding-x);
     --dossier-panel-padding-inline: var(--page-padding-x);
     --dossier-panel-padding: var(--dossier-panel-padding-block) var(--dossier-panel-padding-inline) calc(24px + env(safe-area-inset-bottom));
+    --dossier-close-image-inset: clamp(12px, 3.5vw, 16px);
     --dossier-media-width: 100%;
     --dossier-column-gap: 18px;
     --dossier-close-inset: 18px;
     grid-template-columns: 1fr;
     grid-template-areas:
-      "close"
       "media"
       "content"
       "gallery";
@@ -3264,14 +3264,14 @@ html.has-open-dossier {
 
   .artist-dossier__close {
     --dossier-close-y: 0px;
-    grid-area: close;
-    grid-column: auto;
-    grid-row: auto;
-    top: var(--dossier-panel-padding-block);
+    grid-area: media;
+    position: sticky;
+    top: var(--dossier-close-image-inset);
+    align-self: start;
     justify-self: end;
     width: 38px;
     height: 38px;
-    margin-right: 0;
+    margin: var(--dossier-close-image-inset) var(--dossier-close-image-inset) 0 0;
     transform: translate3d(0, var(--dossier-close-y), 0);
   }
 
