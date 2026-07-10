@@ -434,7 +434,8 @@ const getVisibleFocusableElements = (root) => {
     window.dispatchEvent(new CustomEvent('tarski:mobileislandresize'));
 
     if (shouldRestoreFocus && activeTrigger instanceof HTMLElement) {
-      window.setTimeout(() => focusWithoutScroll(activeTrigger), 0);
+      const triggerToRestore = activeTrigger;
+      window.setTimeout(() => focusWithoutScroll(triggerToRestore), 0);
     }
 
     activeTrigger = null;
