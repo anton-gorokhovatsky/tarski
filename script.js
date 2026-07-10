@@ -286,7 +286,7 @@ const getVisibleFocusableElements = (root) => {
 
     window.requestAnimationFrame(() => {
       const handoffDelay = prefersReducedMotion() ? 0 : 160;
-      const returningDelay = prefersReducedMotion() ? 0 : 400;
+      const returningDelay = prefersReducedMotion() ? 0 : 420;
 
       setToggleState(isOpen);
 
@@ -442,14 +442,14 @@ const getVisibleFocusableElements = (root) => {
 
     returnTimer = window.setTimeout(() => {
       menu.classList.remove('is-menu-returning');
-    }, prefersReducedMotion() ? 0 : 520);
+    }, prefersReducedMotion() ? 0 : 420);
 
     hideTimer = window.setTimeout(() => {
       if (!drawer.classList.contains('is-open')) {
         drawer.hidden = true;
         panel.hidden = true;
       }
-    }, prefersReducedMotion() ? 0 : 520);
+    }, prefersReducedMotion() ? 0 : 420);
   };
 
   toggle.addEventListener('click', (event) => {

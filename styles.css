@@ -3397,45 +3397,45 @@ html.has-open-dossier {
     align-items: flex-start;
     justify-content: center;
     width: 100%;
-    height: 212px;
-    min-height: 212px;
+    height: 193.384px;
+    min-height: 193.384px;
     margin: var(--mobile-cover-island-overlap) 0 0;
     position: relative;
     z-index: 20;
   }
 
   .mobile-floating-menu {
-    /* Island geometry tokens. */
+    /* Compact geometry mirrors Figma frame 77:153; material stays on this single shell. */
     --island-control-size: 42px;
     --island-compact-width: 212px;
-    --island-cluster-width: 155px;
-    --island-cluster-height: 212px;
-    --island-lens-menu-width: 134px;
-    --island-lens-menu-height: 100px;
-    --island-lens-menu-x: 2px;
+    --island-cluster-width: 149px;
+    --island-cluster-height: 193.384px;
+    --island-lens-menu-width: 122.324px;
+    --island-lens-menu-height: 95.961px;
+    --island-lens-menu-x: 14px;
     --island-lens-menu-y: 0px;
-    --island-lens-menu-shape-width: 98.74376px;
-    --island-lens-menu-shape-height: 133.65px;
-    --island-lens-mail-width: 95px;
-    --island-lens-mail-height: 100px;
+    --island-lens-menu-shape-width: 84.0588px;
+    --island-lens-menu-shape-height: 113.843px;
+    --island-lens-mail-width: 112.195px;
+    --island-lens-mail-height: 114.384px;
     --island-lens-mail-x: 0px;
-    --island-lens-mail-y: 111px;
-    --island-lens-mail-shape-width: 59.51962px;
-    --island-lens-mail-shape-height: 80.56px;
-    --island-lens-service-width: 64px;
-    --island-lens-service-height: 50px;
-    --island-lens-service-x: 91px;
-    --island-lens-service-y: 101px;
-    --island-lens-service-shape-width: 45.63713px;
-    --island-lens-service-shape-height: 61.77px;
-    --island-lens-menu-rotation: -90deg;
-    --island-lens-mail-rotation: -34deg;
-    --island-lens-service-rotation: -87deg;
-    --island-menu-origin-x: calc(50% - 3.5px);
-    --island-menu-origin-y: 50px;
-    --island-service-origin-x: 40px;
-    --island-service-home-shift-y: 98px;
-    --island-service-fixed-shift-y: -58px;
+    --island-lens-mail-y: 79px;
+    --island-lens-mail-shape-width: 68.36px;
+    --island-lens-mail-shape-height: 92.2px;
+    --island-lens-service-width: 63px;
+    --island-lens-service-height: 52.104px;
+    --island-lens-service-x: 86px;
+    --island-lens-service-y: 88px;
+    --island-lens-service-shape-width: 40.8405px;
+    --island-lens-service-shape-height: 55.3116px;
+    --island-lens-menu-rotation: -96.25deg;
+    --island-lens-mail-rotation: -41.32deg;
+    --island-lens-service-rotation: -77.17deg;
+    --island-menu-origin-x: 75.162px;
+    --island-menu-origin-y: 47.9805px;
+    --island-service-origin-x: 43px;
+    --island-service-home-shift-y: 88px;
+    --island-service-fixed-shift-y: -53.33px;
     --island-compact-pad-y: 7px;
     --island-compact-pad-left: 13.65px;
     --island-compact-pad-right: 16.13px;
@@ -3454,7 +3454,7 @@ html.has-open-dossier {
     --island-glass-shadow:
       0 28px 74px rgba(0, 0, 0, 0.18),
       inset 0 1px 0 rgba(255, 255, 255, 0.28);
-    --mobile-island-clip: path("M 6.0200 50.6553 C 6.0200 34.9266 12.5737 23.1299 25.6810 15.2656 C 37.9146 7.4012 53.2064 3.4689 71.5568 3.4689 C 88.1595 4.3426 102.1405 9.1486 113.5004 17.8871 C 124.8602 25.7514 130.9767 36.6743 131.8505 50.6553 C 131.8505 65.5103 126.1707 76.8701 114.8109 84.7345 C 103.4514 92.5989 89.4701 96.5311 72.8674 96.5311 C 54.5172 96.5311 38.7883 92.5989 25.6810 84.7345 C 12.5737 76.8701 6.0200 65.5103 6.0200 50.6553 Z M 20.5303 121.8995 C 30.3643 115.2664 40.5038 114.3891 50.9484 119.2675 C 61.0246 123.5997 69.9320 131.5022 77.6708 142.9755 C 84.1263 153.7244 87.0175 164.4924 86.3447 175.2801 C 86.2183 185.6992 81.9685 194.1299 73.5957 200.5722 C 64.3079 206.8369 54.8102 208.0765 45.1025 204.2905 C 35.3949 200.5049 27.0402 193.4217 20.0385 183.0412 C 12.2998 171.5682 8.1251 160.0757 7.5145 148.5641 C 6.9039 137.0524 11.2425 128.1641 20.5303 121.8995 Z M 92.1761 124.7060 C 92.5793 117.0122 96.0875 111.4098 102.7006 107.8989 C 108.8864 104.3656 116.4673 102.8341 125.4436 103.3045 C 133.5425 104.1575 140.2582 106.8668 145.5909 111.4325 C 150.9460 115.5706 153.6580 121.0705 153.7270 127.9318 C 153.3462 135.1982 150.2767 140.6093 144.5183 144.1650 C 138.7601 147.7208 131.8203 149.2858 123.6989 148.8602 C 114.7228 148.3898 107.1297 146.0631 100.9198 141.8801 C 94.7098 137.6972 91.7952 130.9724 92.1761 124.7060 Z");
+    --mobile-island-clip: path("M 18.6433 54.7658 C 17.0966 40.6432 21.8307 29.4056 32.8455 21.0533 C 43.0745 12.7870 56.4407 7.7501 72.9442 5.9427 C 87.9618 5.0920 101.0086 8.0302 112.0842 14.7572 C 123.0743 20.6997 129.6495 29.9046 131.8096 42.3721 C 133.2704 55.7102 129.2800 66.4692 119.8365 74.6495 C 110.3933 82.8297 98.2060 87.7375 83.2743 89.3728 C 66.7708 91.1802 52.2383 89.1987 39.6767 83.4285 C 27.1152 77.6581 20.1040 68.1039 18.6433 54.7658 Z M 25.2443 101.8318 C 33.8994 94.2212 43.5671 92.1255 54.2473 95.5447 C 64.5039 98.4822 74.0791 105.0081 82.9727 115.1224 C 90.5384 124.6962 94.6699 134.7278 95.3670 145.2171 C 96.5450 155.2836 93.4990 163.9402 86.2290 171.1868 C 78.0547 178.3746 69.0509 180.7410 59.2178 178.2846 C 49.3846 175.8287 40.4447 170.0253 32.3981 160.8743 C 23.5045 150.7600 18.0452 140.1880 16.0202 129.1582 C 13.9953 118.1284 17.0699 109.0196 25.2443 101.8318 Z M 90.4708 108.1912 C 92.0036 101.4609 95.9621 97.0529 102.3462 94.9672 C 108.3559 92.7961 115.2931 92.6063 123.1580 94.3975 C 130.1888 96.3920 135.7127 99.8131 139.7299 104.6610 C 143.8322 109.1350 145.3894 114.4059 144.4015 120.4736 C 142.9538 126.8300 139.4124 131.1364 133.7772 133.3927 C 128.1421 135.6490 121.7666 135.9668 114.6508 134.3463 C 106.7859 132.5551 100.4278 129.3372 95.5764 124.6926 C 90.7250 120.0481 89.0232 114.5476 90.4708 108.1912 Z");
 
     /* Island motion tokens. */
     --island-motion-morph: 480ms;
@@ -3547,7 +3547,7 @@ html.has-open-dossier {
   .mobile-floating-menu.is-visible {
     position: fixed;
     left: 50%;
-    bottom: calc(14px + env(safe-area-inset-bottom));
+    bottom: calc(4px + env(safe-area-inset-bottom));
     z-index: 80;
     opacity: 1;
     pointer-events: auto;
@@ -3703,7 +3703,7 @@ html.has-open-dossier {
     font-feature-settings: normal;
     font-variant-numeric: lining-nums tabular-nums;
     font-size: 26px;
-    line-height: 1;
+    line-height: normal;
     letter-spacing: 0;
     text-align: center;
     text-decoration: none;
@@ -3741,11 +3741,11 @@ html.has-open-dossier {
   }
 
   .mobile-menu-toggle {
-    --mobile-lens-clip: path("M 4.0200 50.6553 C 4.0200 34.9266 10.5737 23.1299 23.6810 15.2656 C 35.9146 7.4012 51.2064 3.4689 69.5568 3.4689 C 86.1595 4.3426 100.1405 9.1486 111.5004 17.8871 C 122.8602 25.7514 128.9767 36.6743 129.8505 50.6553 C 129.8505 65.5103 124.1707 76.8701 112.8109 84.7345 C 101.4514 92.5989 87.4701 96.5311 70.8674 96.5311 C 52.5172 96.5311 36.7883 92.5989 23.6810 84.7345 C 10.5737 76.8701 4.0200 65.5103 4.0200 50.6553 Z");
+    --mobile-lens-clip: path("M 4.6433 54.7658 C 3.0966 40.6432 7.8307 29.4056 18.8455 21.0533 C 29.0745 12.7870 42.4407 7.7501 58.9442 5.9427 C 73.9618 5.0920 87.0086 8.0302 98.0842 14.7572 C 109.0743 20.6997 115.6495 29.9046 117.8096 42.3721 C 119.2704 55.7102 115.2800 66.4692 105.8365 74.6495 C 96.3933 82.8297 84.2060 87.7375 69.2743 89.3728 C 52.7708 91.1802 38.2383 89.1987 25.6767 83.4285 C 13.1152 77.6581 6.1040 68.1039 4.6433 54.7658 Z");
   }
 
   :root[lang="ja"] .mobile-menu-toggle {
-    font-size: 22px;
+    font-size: 23.057px;
   }
 
   .mobile-menu-toggle:focus {
@@ -3768,40 +3768,42 @@ html.has-open-dossier {
     transform: var(--mobile-island-handoff-shift);
   }
 
-  .mobile-floating-menu.is-service-returning .mobile-menu-toggle,
-  .mobile-floating-menu.is-service-returning .mobile-mail-pill {
-    opacity: 0;
+  .mobile-floating-menu.is-service-returning,
+  .mobile-floating-menu.is-menu-returning {
     pointer-events: none;
-    transform: var(--mobile-island-return-shift);
+    transition: none;
+    animation: mobile-island-return-home 420ms var(--ease-smooth) both;
   }
 
+  .mobile-floating-menu.is-visible.is-service-returning,
+  .mobile-floating-menu.is-visible.is-menu-returning {
+    animation-name: mobile-island-return-fixed;
+  }
+
+  .mobile-floating-menu.is-service-returning .mobile-menu-toggle,
+  .mobile-floating-menu.is-service-returning .mobile-mail-pill,
+  .mobile-floating-menu.is-service-returning .mobile-service,
+  .mobile-floating-menu.is-service-returning .mobile-service-toggle,
   .mobile-floating-menu.is-menu-returning .mobile-menu-toggle,
   .mobile-floating-menu.is-menu-returning .mobile-mail-pill,
-  .mobile-floating-menu.is-menu-returning .mobile-service {
-    opacity: 0;
-    pointer-events: none;
-    transition:
-      opacity 120ms var(--ease-smooth),
-      transform 220ms var(--ease-smooth),
-      width var(--mobile-island-content-collapse) var(--ease-smooth),
-      max-width var(--mobile-island-content-collapse) var(--ease-smooth),
-      min-width var(--mobile-island-content-collapse) var(--ease-smooth),
-      padding var(--mobile-island-content-collapse) var(--ease-smooth);
+  .mobile-floating-menu.is-menu-returning .mobile-service,
+  .mobile-floating-menu.is-menu-returning .mobile-service-toggle {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+    transition: none;
   }
 
-  .mobile-floating-menu.is-service-returning .mobile-service-toggle span {
-    width: 0;
-    opacity: 0;
+  .mobile-floating-menu.is-service-returning .mobile-service-toggle span,
+  .mobile-floating-menu.is-menu-returning .mobile-service-toggle span {
+    width: 17px;
+    opacity: 1;
+    transition: none;
   }
 
-  .mobile-floating-menu.is-service-returning .mobile-service-toggle {
-    opacity: 0;
-    pointer-events: none;
-    transform: var(--mobile-island-return-shift);
-    transition:
-      opacity 1ms linear,
-      transform var(--mobile-island-content-shift) var(--ease-smooth),
-      width var(--mobile-island-morph) var(--ease-smooth);
+  .mobile-floating-menu.is-service-returning .mobile-service-toggle::after,
+  .mobile-floating-menu.is-menu-returning .mobile-service-toggle::after {
+    transform: scale(1);
+    transition: none;
   }
 
   .mobile-mail-pill {
@@ -3822,7 +3824,7 @@ html.has-open-dossier {
     text-align: center;
     text-decoration: none;
     white-space: nowrap;
-    --mobile-lens-clip: path("M 20.5303 10.8995 C 30.3643 4.2664 40.5038 3.3891 50.9484 8.2675 C 61.0246 12.5997 69.9320 20.5022 77.6708 31.9755 C 84.1263 42.7244 87.0175 53.4924 86.3447 64.2801 C 86.2183 74.6992 81.9685 83.1299 73.5957 89.5722 C 64.3079 95.8369 54.8102 97.0765 45.1025 93.2905 C 35.3949 89.5049 27.0402 82.4217 20.0385 72.0412 C 12.2998 60.5682 8.1251 49.0757 7.5145 37.5641 C 6.9039 26.0524 11.2425 17.1641 20.5303 10.8995 Z");
+    --mobile-lens-clip: path("M 25.2443 22.8318 C 33.8994 15.2212 43.5671 13.1255 54.2473 16.5447 C 64.5039 19.4822 74.0791 26.0081 82.9727 36.1224 C 90.5384 45.6962 94.6699 55.7278 95.3670 66.2171 C 96.5450 76.2836 93.4990 84.9402 86.2290 92.1868 C 78.0547 99.3746 69.0509 101.7410 59.2178 99.2846 C 49.3846 96.8287 40.4447 91.0253 32.3981 81.8743 C 23.5045 71.7600 18.0452 61.1880 16.0202 50.1582 C 13.9953 39.1284 17.0699 30.0196 25.2443 22.8318 Z");
     transform: translate3d(0, 0, 0);
     transform-origin: 50% 50%;
     transition:
@@ -3882,10 +3884,10 @@ html.has-open-dossier {
 
   .mobile-mail-pill__icon {
     display: block;
-    width: 42px;
+    width: 41.5px;
     height: auto;
     filter: var(--brand-filter);
-    transform: translate3d(-1px, 1px, 0);
+    transform: translate3d(0, 0, 0);
     transform-origin: 50% 50%;
   }
 
@@ -3937,7 +3939,7 @@ html.has-open-dossier {
     flex: 0 0 auto;
     align-items: center;
     justify-content: center;
-    gap: 6px;
+    gap: 7px;
     width: 100%;
     height: 100%;
     padding: 0;
@@ -3947,13 +3949,13 @@ html.has-open-dossier {
     font-family: var(--font-ui-latin);
     font-feature-settings: normal;
     font-variant-numeric: lining-nums tabular-nums;
-    font-size: 14px;
+    font-size: 12.625px;
     line-height: 1;
     letter-spacing: 0;
     text-transform: uppercase;
     -webkit-tap-highlight-color: transparent;
     touch-action: manipulation;
-    --mobile-lens-clip: path("M 1.1761 23.7060 C 1.5793 16.0122 5.0875 10.4098 11.7006 6.8989 C 17.8864 3.3656 25.4673 1.8341 34.4436 2.3045 C 42.5425 3.1575 49.2582 5.8668 54.5909 10.4325 C 59.9460 14.5706 62.6580 20.0705 62.7270 26.9318 C 62.3462 34.1982 59.2767 39.6093 53.5183 43.1650 C 47.7601 46.7208 40.8203 48.2858 32.6989 47.8602 C 23.7228 47.3898 16.1297 45.0631 9.9198 40.8801 C 3.7098 36.6972 0.7952 30.9724 1.1761 23.7060 Z");
+    --mobile-lens-clip: path("M 4.4708 20.1912 C 6.0036 13.4609 9.9621 9.0529 16.3462 6.9672 C 22.3559 4.7961 29.2931 4.6063 37.1580 6.3975 C 44.1888 8.3920 49.7127 11.8131 53.7299 16.6610 C 57.8322 21.1350 59.3894 26.4059 58.4015 32.4736 C 56.9538 38.8300 53.4124 43.1364 47.7772 45.3927 C 42.1421 47.6490 35.7666 47.9668 28.6508 46.3463 C 20.7859 44.5551 14.4278 41.3372 9.5764 36.6926 C 4.7250 32.0481 3.0232 26.5476 4.4708 20.1912 Z");
     transition:
       opacity var(--duration-fast) var(--ease-smooth),
       transform var(--duration-fast) var(--ease-smooth),
@@ -3976,11 +3978,11 @@ html.has-open-dossier {
   .mobile-service-toggle::after {
     content: "";
     flex: 0 0 auto;
-    width: 5.5px;
-    height: 5.5px;
-    border: 1.35px solid currentColor;
+    width: 5.4942px;
+    height: 5.4942px;
+    border: 0.935187px solid currentColor;
     border-radius: 999px;
-    opacity: 0.62;
+    opacity: 1;
     transform: scale(1);
     transition:
       opacity var(--duration-fast) var(--ease-smooth),
@@ -3989,7 +3991,7 @@ html.has-open-dossier {
 
   .mobile-service-toggle span {
     display: inline-block;
-    width: 18px;
+    width: 17px;
     overflow: hidden;
     transition:
       width var(--duration-normal) var(--ease-smooth),
@@ -3998,6 +4000,7 @@ html.has-open-dossier {
 
   .mobile-service.is-open .mobile-service-toggle {
     order: 2;
+    gap: 6px;
     width: var(--mobile-service-toggle-open-size);
   }
 
@@ -4119,6 +4122,30 @@ html.has-open-dossier {
 
     to {
       transform: translate3d(-50%, var(--island-service-fixed-shift-y), 0) scale(1);
+    }
+  }
+
+  @keyframes mobile-island-return-home {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 8px, 0) scale(0.96);
+    }
+
+    to {
+      opacity: 1;
+      transform: translate3d(0, 0, 0) scale(1);
+    }
+  }
+
+  @keyframes mobile-island-return-fixed {
+    from {
+      opacity: 0;
+      transform: translate3d(-50%, 8px, 0) scale(0.96);
+    }
+
+    to {
+      opacity: 1;
+      transform: translate3d(-50%, 0, 0) scale(1);
     }
   }
 
@@ -4385,7 +4412,7 @@ html.has-open-dossier {
 
   .mobile-floating-menu.is-visible {
     left: 50%;
-    bottom: calc(12px + env(safe-area-inset-bottom));
+    bottom: calc(4px + env(safe-area-inset-bottom));
   }
 
   .mobile-menu-toggle {
