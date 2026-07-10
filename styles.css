@@ -450,7 +450,7 @@ a:hover {
   --nav-service-gap: 10px;
   --nav-content-shift: -18px;
   --nav-content-y-shift: 16px;
-  --nav-indicator-x: -18px;
+  --nav-indicator-x: -4px;
   --nav-indicator-opacity: 0;
   --nav-indicator-moving-rotation: var(--nav-indicator-rotation);
   --nav-indicator-moving-scale: var(--nav-indicator-scale);
@@ -468,6 +468,36 @@ a:hover {
   --nav-control-active-bg: var(--gutter-active-bg);
   --nav-control-shadow: var(--gutter-shadow);
   --nav-control-active-shadow: var(--gutter-active-shadow);
+  --nav-lens-bg:
+    radial-gradient(
+      ellipse 76% 118% at 36% 20%,
+      color-mix(in srgb, #fff 34%, transparent) 0,
+      color-mix(in srgb, #fff 12%, transparent) 38%,
+      transparent 70%
+    ),
+    radial-gradient(
+      ellipse 92% 136% at 48% 62%,
+      color-mix(in srgb, var(--nav-field-tone) 58%, transparent) 0,
+      color-mix(in srgb, var(--nav-field-tone) 24%, transparent) 58%,
+      transparent 100%
+    ),
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--page-bg) 72%, transparent),
+      color-mix(in srgb, var(--nav-field-tone) 42%, transparent)
+    );
+  --nav-lens-shadow:
+    0 24px 58px color-mix(in srgb, var(--nav-field-color) 16%, rgba(0, 0, 0, 0.1)),
+    0 8px 22px color-mix(in srgb, #000 8%, transparent),
+    inset 0 0 0 1px color-mix(in srgb, currentColor 7%, transparent),
+    inset 0 1px 0 color-mix(in srgb, #fff 34%, transparent),
+    inset 0 -1px 0 color-mix(in srgb, #000 5%, transparent);
+  --nav-lens-edge-filter:
+    drop-shadow(0 0 1px color-mix(in srgb, currentColor 18%, transparent))
+    drop-shadow(0 1px 0.6px color-mix(in srgb, #fff 18%, transparent))
+    drop-shadow(0 -1px 0.55px color-mix(in srgb, #000 10%, transparent))
+    drop-shadow(0 22px 44px color-mix(in srgb, var(--nav-field-color) 13%, rgba(0, 0, 0, 0.08)));
+  --nav-lens-backdrop-filter: blur(24px) saturate(178%);
   --nav-lens-shape: var(--brand-dot-mask);
   --nav-lens-width: calc(var(--nav-shell-width) + 78px);
   --nav-lens-height: calc(var(--nav-lens-width) * 1.3535);
@@ -496,6 +526,39 @@ a:hover {
   font-feature-settings: "case" 1, "zero" 1, "ordn" 1, "ss01" 1, "ss02" 1, "ss04" 1, "ss05" 1, "ss06" 1, "ss07" 1, "ss08" 1, "numr" 1, "dlig" 1, "frac" 1;
 }
 
+:root[data-effective-theme="dark"] .main-nav {
+  --nav-lens-bg:
+    radial-gradient(
+      ellipse 74% 116% at 36% 20%,
+      color-mix(in srgb, #fff 9%, transparent) 0,
+      color-mix(in srgb, #fff 4%, transparent) 38%,
+      transparent 72%
+    ),
+    radial-gradient(
+      ellipse 92% 136% at 48% 62%,
+      color-mix(in srgb, var(--nav-field-color) 14%, transparent) 0,
+      color-mix(in srgb, var(--nav-field-tone) 22%, transparent) 58%,
+      transparent 100%
+    ),
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--text) 3%, transparent),
+      color-mix(in srgb, var(--page-bg) 54%, transparent)
+    );
+  --nav-lens-shadow:
+    0 26px 66px color-mix(in srgb, var(--nav-field-color) 13%, rgba(0, 0, 0, 0.34)),
+    0 10px 30px rgba(0, 0, 0, 0.28),
+    inset 0 0 0 1px color-mix(in srgb, #fff 7%, transparent),
+    inset 0 1px 0 color-mix(in srgb, #fff 9%, transparent),
+    inset 0 -1px 0 color-mix(in srgb, #000 22%, transparent);
+  --nav-lens-edge-filter:
+    drop-shadow(0 0 1px color-mix(in srgb, #fff 12%, transparent))
+    drop-shadow(0 1px 0.55px color-mix(in srgb, #fff 7%, transparent))
+    drop-shadow(0 -1px 0.6px color-mix(in srgb, #000 30%, transparent))
+    drop-shadow(0 24px 54px color-mix(in srgb, var(--nav-field-color) 15%, rgba(0, 0, 0, 0.28)));
+  --nav-lens-backdrop-filter: blur(24px) saturate(146%) brightness(1.06);
+}
+
 .main-nav::after {
   content: "";
   position: absolute;
@@ -505,12 +568,12 @@ a:hover {
   height: var(--nav-lens-height);
   z-index: 0;
   border-radius: 0;
-  background: var(--nav-control-bg);
-  opacity: 0.64;
-  -webkit-backdrop-filter: var(--gutter-backdrop-filter);
-  backdrop-filter: var(--gutter-backdrop-filter);
-  box-shadow: var(--nav-control-shadow);
-  filter: var(--gutter-edge-shadow);
+  background: var(--nav-lens-bg);
+  opacity: 0.74;
+  -webkit-backdrop-filter: var(--nav-lens-backdrop-filter);
+  backdrop-filter: var(--nav-lens-backdrop-filter);
+  box-shadow: var(--nav-lens-shadow);
+  filter: var(--nav-lens-edge-filter);
   -webkit-mask: var(--nav-lens-shape) center / 100% 100% no-repeat;
   mask: var(--nav-lens-shape) center / 100% 100% no-repeat;
   mask-mode: alpha;
@@ -562,7 +625,7 @@ a:hover {
 
 .main-nav::before {
   left: calc(var(--nav-indicator-x) + var(--nav-content-shift));
-  top: calc(var(--nav-indicator-y) + var(--nav-content-y-shift));
+  top: var(--nav-indicator-y);
   z-index: 2;
   transform:
     translate3d(0, -50%, 0)
@@ -1526,21 +1589,21 @@ li::before {
 }
 
 html[data-scene="artists"] .main-nav::after {
-  background: var(--nav-control-bg);
-  opacity: 0.68;
-  -webkit-backdrop-filter: var(--gutter-backdrop-filter);
-  backdrop-filter: var(--gutter-backdrop-filter);
-  box-shadow: var(--nav-control-shadow);
-  filter: var(--gutter-edge-shadow);
+  background: var(--nav-lens-bg);
+  opacity: 0.74;
+  -webkit-backdrop-filter: var(--nav-lens-backdrop-filter);
+  backdrop-filter: var(--nav-lens-backdrop-filter);
+  box-shadow: var(--nav-lens-shadow);
+  filter: var(--nav-lens-edge-filter);
 }
 
 :root[data-effective-theme="dark"][data-scene="artists"] .main-nav::after {
-  background: var(--nav-control-bg);
-  opacity: 0.62;
-  -webkit-backdrop-filter: var(--gutter-backdrop-filter);
-  backdrop-filter: var(--gutter-backdrop-filter);
-  box-shadow: var(--nav-control-shadow);
-  filter: var(--gutter-edge-shadow);
+  background: var(--nav-lens-bg);
+  opacity: 0.7;
+  -webkit-backdrop-filter: var(--nav-lens-backdrop-filter);
+  backdrop-filter: var(--nav-lens-backdrop-filter);
+  box-shadow: var(--nav-lens-shadow);
+  filter: var(--nav-lens-edge-filter);
 }
 
 html[data-scene="artists"]:has(.artist-index__link:nth-child(1):is(:hover, :focus-visible, [aria-current="true"])) .main-nav {
@@ -1624,22 +1687,22 @@ html[data-scene="artists"]:has(.artist-index__link:nth-child(7):is(:hover, :focu
 @media (hover: hover) and (pointer: fine) {
   html[data-scene="artists"]:has(.artist-index__link:hover) .main-nav::after,
   html[data-scene="artists"]:has(.artist-index__link:focus-visible) .main-nav::after {
-    background: var(--nav-control-bg);
-    opacity: 0.68;
-    -webkit-backdrop-filter: var(--gutter-backdrop-filter);
-    backdrop-filter: var(--gutter-backdrop-filter);
-    box-shadow: var(--nav-control-shadow);
-    filter: var(--gutter-edge-shadow);
+    background: var(--nav-lens-bg);
+    opacity: 0.76;
+    -webkit-backdrop-filter: var(--nav-lens-backdrop-filter);
+    backdrop-filter: var(--nav-lens-backdrop-filter);
+    box-shadow: var(--nav-lens-shadow);
+    filter: var(--nav-lens-edge-filter);
   }
 
   :root[data-effective-theme="dark"][data-scene="artists"]:has(.artist-index__link:hover) .main-nav::after,
   :root[data-effective-theme="dark"][data-scene="artists"]:has(.artist-index__link:focus-visible) .main-nav::after {
-    background: var(--nav-control-bg);
-    opacity: 0.62;
-    -webkit-backdrop-filter: var(--gutter-backdrop-filter);
-    backdrop-filter: var(--gutter-backdrop-filter);
-    box-shadow: var(--nav-control-shadow);
-    filter: var(--gutter-edge-shadow);
+    background: var(--nav-lens-bg);
+    opacity: 0.72;
+    -webkit-backdrop-filter: var(--nav-lens-backdrop-filter);
+    backdrop-filter: var(--nav-lens-backdrop-filter);
+    box-shadow: var(--nav-lens-shadow);
+    filter: var(--nav-lens-edge-filter);
   }
 
   html[data-scene="artists"]:has(.artist-index__link:hover) .main-nav a::after,
@@ -2300,7 +2363,19 @@ html[data-scene="artists"]:has(.artist-index__link:nth-child(7):is(:hover, :focu
   padding: 0;
   border: 1px solid currentColor;
   border-radius: 999px;
-  background: transparent;
+  background:
+    radial-gradient(
+      circle at 38% 32%,
+      color-mix(in srgb, #fff 24%, transparent) 0,
+      transparent 58%
+    ),
+    color-mix(in srgb, var(--page-bg) 68%, transparent);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, currentColor 8%, transparent),
+    inset 0 1px 0 color-mix(in srgb, #fff 18%, transparent),
+    0 10px 24px color-mix(in srgb, #000 7%, transparent);
+  backdrop-filter: blur(10px) saturate(112%);
+  -webkit-backdrop-filter: blur(10px) saturate(112%);
   color: var(--muted-text);
   cursor: pointer;
   opacity: 0.78;
@@ -3185,6 +3260,10 @@ html.has-open-dossier {
     transform-origin: 50% 100%;
   }
 
+  .artist-dossier__panel::before {
+    display: none;
+  }
+
   .artist-dossier__close {
     --dossier-close-y: 0px;
     grid-area: close;
@@ -3192,6 +3271,8 @@ html.has-open-dossier {
     grid-row: auto;
     top: var(--dossier-panel-padding-block);
     justify-self: end;
+    width: 38px;
+    height: 38px;
     margin-right: 0;
     transform: translate3d(0, var(--dossier-close-y), 0);
   }

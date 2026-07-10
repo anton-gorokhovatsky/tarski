@@ -1060,6 +1060,11 @@ const getVisibleFocusableElements = (root) => {
     en: 'captionEn',
     ja: 'captionJa'
   };
+  const creditKeys = {
+    ru: 'credit',
+    en: 'creditEn',
+    ja: 'creditJa'
+  };
   const labelKeys = {
     ru: 'label',
     en: 'labelEn',
@@ -1089,6 +1094,12 @@ const getVisibleFocusableElements = (root) => {
     const labelKey = labelKeys[language] || labelKeys.ru;
 
     return item.dataset[labelKey] || item.dataset.label || '';
+  };
+  const getLocalizedCredit = (item) => {
+    const language = window.tarskiI18n?.getLanguage?.() || document.documentElement.dataset.language || 'ru';
+    const creditKey = creditKeys[language] || creditKeys.ru;
+
+    return item?.dataset[creditKey] || item?.dataset.credit || '';
   };
 
   const syncDetailTriggerLabels = () => {
@@ -1132,7 +1143,7 @@ const getVisibleFocusableElements = (root) => {
       links: cardLinks,
       galleryItems,
       galleryLayout: galleryTemplate?.dataset.layout || '',
-      galleryCredit: galleryTemplate?.dataset.credit || ''
+      galleryCredit: getLocalizedCredit(galleryTemplate)
     };
   };
 
