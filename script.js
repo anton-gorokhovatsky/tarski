@@ -213,20 +213,15 @@ const getVisibleFocusableElements = (root) => {
     if (!menu) return;
 
     const wasHidden = panel.hidden;
-    const wasOpen = service.classList.contains('is-open');
-    const wasClosing = service.classList.contains('is-closing');
-    const wasMenuOpen = menu.classList.contains('is-service-open');
 
     panel.hidden = false;
-    menu.classList.add('is-service-open');
-    service.classList.remove('is-closing');
-    service.classList.add('is-open');
+    menu.classList.add('is-measuring-service');
 
     const menuStyle = window.getComputedStyle(menu);
     const panelWidth = panel.getBoundingClientRect().width;
     const gap = Number.parseFloat(menuStyle.getPropertyValue('--mobile-service-open-gap')) || 0;
-    const padX = (Number.parseFloat(menuStyle.paddingLeft) || 0)
-      + (Number.parseFloat(menuStyle.paddingRight) || 0);
+    const padX = (Number.parseFloat(menuStyle.getPropertyValue('--mobile-service-pad-left')) || 0)
+      + (Number.parseFloat(menuStyle.getPropertyValue('--mobile-service-pad-right')) || 0);
     const toggleWidth = Number.parseFloat(menuStyle.getPropertyValue('--mobile-service-toggle-open-size'))
       || toggle.getBoundingClientRect().height;
     const minShellWidth = Number.parseFloat(menuStyle.getPropertyValue('--mobile-service-shell-min-width')) || 0;
@@ -234,10 +229,8 @@ const getVisibleFocusableElements = (root) => {
 
     menu.style.setProperty('--mobile-service-shell-width', `${shellWidth}px`);
 
-    menu.classList.toggle('is-service-open', wasMenuOpen);
-    service.classList.toggle('is-open', wasOpen);
-    service.classList.toggle('is-closing', wasClosing);
     panel.hidden = wasHidden;
+    menu.classList.remove('is-measuring-service');
   };
 
   const setPanelHiddenState = (isHidden) => {
