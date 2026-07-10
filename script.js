@@ -176,6 +176,7 @@ const getVisibleFocusableElements = (root) => {
   const toggle = service?.querySelector('[data-mobile-service-toggle]');
   const panel = service?.querySelector('[data-mobile-service-panel]');
   const code = service?.querySelector('[data-mobile-service-code]');
+  const mobileQuery = window.matchMedia('(max-width: 720px)');
   const languageCodes = {
     ru: 'RU',
     en: 'EN',
@@ -195,9 +196,7 @@ const getVisibleFocusableElements = (root) => {
     code.textContent = languageCodes[language] || language.toUpperCase();
   };
 
-  let hidePanelTimer = null;
-  let collapseTimer = null;
-  let handoffTimer = null;
+  let transitionTimer = null;
   let returningTimer = null;
   let activeTrigger = null;
 
@@ -239,42 +238,39 @@ const getVisibleFocusableElements = (root) => {
   };
 
   const setOpen = (isOpen, options = {}) => {
-    window.clearTimeout(hidePanelTimer);
-    window.clearTimeout(collapseTimer);
-    window.clearTimeout(handoffTimer);
-    window.clearTimeout(returningTimer);
-
-    const isActive = service.classList.contains('is-open')
+    const isExpanded = service.classList.contains('is-open')
       || service.classList.contains('is-closing')
       || menu?.classList.contains('is-service-open')
       || menu?.classList.contains('is-service-handoff')
-      || menu?.classList.contains('is-service-returning')
+      || menu?.classList.contains('is-service-closing')
       || toggle.getAttribute('aria-expanded') === 'true';
 
+    if (!isOpen && !isExpanded) {
+      setToggleState(false);
+      if (!menu?.classList.contains('is-service-returning')) {
+        setPanelHiddenState(true);
+      }
+      return;
+    }
+
+    window.clearTimeout(transitionTimer);
+    window.clearTimeout(returningTimer);
+
     if (isOpen) {
-      if (!isActive) {
+      if (!isExpanded) {
         activeTrigger = document.activeElement instanceof HTMLElement ? document.activeElement : toggle;
       }
       window.dispatchEvent(new CustomEvent('tarski:mobileserviceopen'));
-    }
-
-    if (!isOpen && !isActive) {
-      setToggleState(false);
-      setPanelHiddenState(true);
-      service.classList.remove('is-open', 'is-closing');
-      menu?.classList.remove('is-service-open', 'is-service-handoff', 'is-service-returning');
-      activeTrigger = null;
-      return;
     }
 
     if (isOpen) {
       updateServiceShellWidth();
       setPanelHiddenState(false);
       service.classList.remove('is-closing');
-      menu?.classList.remove('is-service-returning');
+      menu?.classList.remove('is-service-closing', 'is-service-returning');
+      setToggleState(true);
 
       if (service.classList.contains('is-open') || menu?.classList.contains('is-service-open')) {
-        setToggleState(true);
         service.classList.add('is-open');
         menu?.classList.add('is-service-open');
         menu?.classList.remove('is-service-handoff');
@@ -282,51 +278,40 @@ const getVisibleFocusableElements = (root) => {
       }
 
       menu?.classList.add('is-service-handoff');
+      window.requestAnimationFrame(() => {
+        service.classList.add('is-open');
+        menu?.classList.add('is-service-open');
+        menu?.classList.remove('is-service-handoff');
+      });
+      return;
     }
 
-    window.requestAnimationFrame(() => {
-      const handoffDelay = prefersReducedMotion() ? 0 : 160;
-      const returningDelay = prefersReducedMotion() ? 0 : 420;
+    const morphDuration = prefersReducedMotion() ? 0 : 480;
+    const returnDuration = prefersReducedMotion() ? 0 : 260;
+    const shouldRestoreFocus = options.restoreFocus !== false;
 
-      setToggleState(isOpen);
+    setToggleState(false);
+    service.classList.add('is-closing');
+    menu?.classList.add('is-service-closing');
 
-      if (isOpen) {
-        handoffTimer = window.setTimeout(() => {
-          service.classList.add('is-open');
-          menu?.classList.add('is-service-open');
-          menu?.classList.remove('is-service-handoff');
-        }, handoffDelay);
-        return;
-      }
-
-      service.classList.add('is-closing');
-      collapseTimer = window.setTimeout(() => {
-        service.classList.remove('is-open', 'is-closing');
-        menu?.classList.remove('is-service-open', 'is-service-handoff');
-        menu?.classList.add('is-service-returning');
-        window.dispatchEvent(new CustomEvent('tarski:mobileislandresize'));
-        returningTimer = window.setTimeout(() => {
-          menu?.classList.remove('is-service-returning');
-        }, returningDelay);
-      }, handoffDelay);
-    });
-
-    if (!isOpen) {
-      const shouldRestoreFocus = options.restoreFocus !== false;
-      if (shouldRestoreFocus && activeTrigger instanceof HTMLElement && service.contains(document.activeElement)) {
-        const triggerToRestore = activeTrigger;
-        window.setTimeout(() => focusWithoutScroll(triggerToRestore), 0);
-      }
-
-      activeTrigger = null;
-
-      hidePanelTimer = window.setTimeout(() => {
-        if (!service.classList.contains('is-open')) {
-          setPanelHiddenState(true);
-          service.classList.remove('is-closing');
-        }
-      }, prefersReducedMotion() ? 0 : 720);
+    if (shouldRestoreFocus && activeTrigger instanceof HTMLElement && service.contains(document.activeElement)) {
+      const triggerToRestore = activeTrigger;
+      window.setTimeout(() => focusWithoutScroll(triggerToRestore), 0);
     }
+
+    activeTrigger = null;
+
+    transitionTimer = window.setTimeout(() => {
+      service.classList.remove('is-open', 'is-closing');
+      menu?.classList.remove('is-service-open', 'is-service-handoff', 'is-service-closing');
+      menu?.classList.add('is-service-returning');
+      setPanelHiddenState(true);
+      window.dispatchEvent(new CustomEvent('tarski:mobileislandresize'));
+
+      returningTimer = window.setTimeout(() => {
+        menu?.classList.remove('is-service-returning');
+      }, returnDuration);
+    }, morphDuration);
   };
 
   toggle.addEventListener('click', (event) => {
@@ -366,6 +351,9 @@ const getVisibleFocusableElements = (root) => {
 
   window.addEventListener('resize', updateServiceShellWidth);
   window.addEventListener('tarski:mobilemenuopen', () => setOpen(false));
+  mobileQuery.addEventListener('change', (event) => {
+    if (!event.matches) setOpen(false, { restoreFocus: false });
+  });
   document.fonts?.ready?.then(updateServiceShellWidth);
 
   syncLanguageCode();
@@ -378,11 +366,20 @@ const getVisibleFocusableElements = (root) => {
   const toggle = document.querySelector('[data-mobile-menu-toggle]');
   const drawer = document.querySelector('[data-mobile-menu-drawer]');
   const panel = menu?.querySelector('.mobile-menu-expanded');
+  const mobileQuery = window.matchMedia('(max-width: 720px)');
   const closeControls = Array.from(document.querySelectorAll('[data-mobile-menu-close]'));
+  const modalBackground = [
+    document.querySelector('.site-header'),
+    document.querySelector('.content'),
+    document.querySelector('.site-footer'),
+    toggle,
+    menu?.querySelector('.mobile-mail-pill'),
+    menu?.querySelector('.mobile-service')
+  ].filter(Boolean);
 
   if (!menu || !toggle || !drawer || !panel) return;
 
-  let hideTimer = null;
+  let closeTimer = null;
   let returnTimer = null;
   let activeTrigger = null;
 
@@ -400,18 +397,24 @@ const getVisibleFocusableElements = (root) => {
     toggle.setAttribute('title', label);
   };
 
-  const setOpen = (isOpen, options = {}) => {
-    window.clearTimeout(hideTimer);
-    window.clearTimeout(returnTimer);
+  const setModalBackgroundInert = (isInert) => {
+    modalBackground.forEach((element) => {
+      element.toggleAttribute('inert', isInert);
+    });
+  };
 
+  const setOpen = (isOpen, options = {}) => {
     if (isOpen) {
+      window.clearTimeout(closeTimer);
+      window.clearTimeout(returnTimer);
       activeTrigger = document.activeElement instanceof HTMLElement ? document.activeElement : toggle;
       window.dispatchEvent(new CustomEvent('tarski:mobilemenuopen'));
       drawer.hidden = false;
       panel.hidden = false;
       panel.setAttribute('aria-hidden', 'false');
-      menu.classList.remove('is-menu-returning');
+      menu.classList.remove('is-menu-closing', 'is-menu-returning');
       syncToggleState(true);
+      setModalBackgroundInert(true);
       panel.getBoundingClientRect();
 
       window.requestAnimationFrame(() => {
@@ -425,13 +428,27 @@ const getVisibleFocusableElements = (root) => {
       return;
     }
 
+    const isExpanded = menu.classList.contains('is-menu-open')
+      || menu.classList.contains('is-menu-closing')
+      || toggle.getAttribute('aria-expanded') === 'true';
+
+    if (!isExpanded) {
+      syncToggleState(false);
+      return;
+    }
+
+    window.clearTimeout(closeTimer);
+    window.clearTimeout(returnTimer);
+
     const shouldRestoreFocus = options.restoreFocus !== false;
+    const morphDuration = prefersReducedMotion() ? 0 : 480;
+    const returnDuration = prefersReducedMotion() ? 0 : 260;
+
     drawer.classList.remove('is-open');
-    menu.classList.add('is-menu-returning');
-    menu.classList.remove('is-menu-open');
+    menu.classList.add('is-menu-closing');
     panel.setAttribute('aria-hidden', 'true');
     syncToggleState(false);
-    window.dispatchEvent(new CustomEvent('tarski:mobileislandresize'));
+    setModalBackgroundInert(false);
 
     if (shouldRestoreFocus && activeTrigger instanceof HTMLElement) {
       const triggerToRestore = activeTrigger;
@@ -440,16 +457,20 @@ const getVisibleFocusableElements = (root) => {
 
     activeTrigger = null;
 
-    returnTimer = window.setTimeout(() => {
-      menu.classList.remove('is-menu-returning');
-    }, prefersReducedMotion() ? 0 : 420);
+    closeTimer = window.setTimeout(() => {
+      menu.classList.remove('is-menu-open', 'is-menu-closing');
+      menu.classList.add('is-menu-returning');
+      window.dispatchEvent(new CustomEvent('tarski:mobileislandresize'));
 
-    hideTimer = window.setTimeout(() => {
       if (!drawer.classList.contains('is-open')) {
         drawer.hidden = true;
         panel.hidden = true;
       }
-    }, prefersReducedMotion() ? 0 : 420);
+
+      returnTimer = window.setTimeout(() => {
+        menu.classList.remove('is-menu-returning');
+      }, returnDuration);
+    }, morphDuration);
   };
 
   toggle.addEventListener('click', (event) => {
@@ -493,7 +514,10 @@ const getVisibleFocusableElements = (root) => {
     const firstElement = focusableElements[0];
     const lastElement = focusableElements[focusableElements.length - 1];
 
-    if (!panel.contains(document.activeElement)) {
+    if (document.activeElement === panel) {
+      event.preventDefault();
+      focusWithoutScroll(event.shiftKey ? lastElement : firstElement);
+    } else if (!panel.contains(document.activeElement)) {
       event.preventDefault();
       focusWithoutScroll(event.shiftKey ? lastElement : firstElement);
     } else if (event.shiftKey && document.activeElement === firstElement) {
@@ -506,6 +530,9 @@ const getVisibleFocusableElements = (root) => {
   });
 
   window.addEventListener('tarski:mobileserviceopen', () => setOpen(false));
+  mobileQuery.addEventListener('change', (event) => {
+    if (!event.matches) setOpen(false, { restoreFocus: false });
+  });
   window.addEventListener('tarski:languagechange', () => {
     syncToggleState(toggle.getAttribute('aria-expanded') === 'true');
   });
@@ -523,9 +550,6 @@ const getVisibleFocusableElements = (root) => {
   const mainNav = document.querySelector('.main-nav');
   const mobileMenu = document.querySelector('[data-mobile-menu]');
   const mobileMenuHome = document.querySelector('[data-mobile-menu-home]');
-  const mobileToggle = mobileMenu?.querySelector('[data-mobile-menu-toggle]');
-  const mobileMail = mobileMenu?.querySelector('.mobile-mail-pill');
-  const mobileService = mobileMenu?.querySelector('.mobile-service');
   const navLabel = mainNav?.querySelector('.nav-label');
   const mobileQuery = window.matchMedia('(max-width: 720px)');
   const fallbackSceneLabels = {
@@ -595,7 +619,8 @@ const getVisibleFocusableElements = (root) => {
 
   let currentActiveId = null;
   let currentScene = document.documentElement.dataset.scene || 'cover';
-  let mobileIslandWidthTimer = null;
+  let navigationFrame = null;
+  let needsIndicatorUpdate = false;
   const indicatorTimers = new WeakMap();
   const pulseIndicator = (container) => {
     if (!container) return;
@@ -650,32 +675,6 @@ const getVisibleFocusableElements = (root) => {
     updateDesktopIndicator(animate);
   };
 
-  const updateMobileIslandWidth = () => {
-    if (!mobileMenu || !mobileMail || !mobileService || !mobileQuery.matches) return;
-    if (mobileMenu.classList.contains('is-service-open') || mobileMenu.classList.contains('is-menu-open')) return;
-    if (!mobileToggle) return;
-
-    const toPx = (value) => Number.parseFloat(value) || 0;
-    const menuStyle = window.getComputedStyle(mobileMenu);
-    const padX = toPx(menuStyle.paddingLeft) + toPx(menuStyle.paddingRight);
-    const shellGap = toPx(menuStyle.gap);
-    const shellWidth = Math.ceil(
-      toPx(window.getComputedStyle(mobileToggle).width)
-      + toPx(window.getComputedStyle(mobileMail).width)
-      + toPx(window.getComputedStyle(mobileService).width)
-      + shellGap * 2
-      + padX
-    );
-
-    mobileMenu.style.setProperty('--mobile-island-shell-width', `${shellWidth}px`);
-  };
-
-  const scheduleMobileIslandWidth = () => {
-    updateMobileIslandWidth();
-    window.clearTimeout(mobileIslandWidthTimer);
-    mobileIslandWidthTimer = window.setTimeout(updateMobileIslandWidth, 260);
-  };
-
   const setActive = (id) => {
     const previousActiveId = currentActiveId;
     const hasChanged = previousActiveId !== id;
@@ -698,7 +697,6 @@ const getVisibleFocusableElements = (root) => {
       updateMenuIndicators(false);
     }
 
-    scheduleMobileIslandWidth();
   };
 
   const updateActive = () => {
@@ -745,44 +743,42 @@ const getVisibleFocusableElements = (root) => {
     const shouldShow = mobileHomeBottom !== null ? mobileHomeBottom < 0 : navBottom < 0;
 
     mobileMenu.classList.toggle('is-visible', shouldShow);
+  };
 
-    if (shouldShow) {
-      scheduleMobileIslandWidth();
+  const updateNavigationState = () => {
+    navigationFrame = null;
+    updateActive();
+    updateNavLabel();
+    if (needsIndicatorUpdate) {
+      updateMenuIndicators(false);
+      needsIndicatorUpdate = false;
+    }
+    updateMobileMenuVisibility();
+  };
+
+  const scheduleNavigationState = (withIndicator = false) => {
+    needsIndicatorUpdate ||= withIndicator;
+    if (navigationFrame === null) {
+      navigationFrame = window.requestAnimationFrame(updateNavigationState);
     }
   };
 
   updateActive();
   updateMenuIndicators(false);
-  scheduleMobileIslandWidth();
   updateMobileMenuVisibility();
 
-  window.addEventListener('scroll', () => {
-    updateActive();
-    updateNavLabel();
-    updateMobileMenuVisibility();
-    scheduleMobileIslandWidth();
-  }, { passive: true });
+  window.addEventListener('scroll', () => scheduleNavigationState(), { passive: true });
 
-  window.addEventListener('resize', () => {
-    updateActive();
-    updateNavLabel();
-    updateMenuIndicators(false);
-    scheduleMobileIslandWidth();
-    updateMobileMenuVisibility();
-  });
+  window.addEventListener('resize', () => scheduleNavigationState(true));
 
   window.addEventListener('tarski:languagechange', () => {
     updateActive();
     updateNavLabel();
     updateMenuIndicators(false);
-    window.setTimeout(() => {
-      scheduleMobileIslandWidth();
-      updateMobileMenuVisibility();
-    }, 40);
+    window.setTimeout(() => scheduleNavigationState(true), 40);
   });
 
-  window.addEventListener('tarski:mobileislandresize', scheduleMobileIslandWidth);
-  document.fonts?.ready?.then(scheduleMobileIslandWidth);
+  window.addEventListener('tarski:mobileislandresize', () => scheduleNavigationState());
 })();
 
 (() => {
@@ -1030,6 +1026,7 @@ const getVisibleFocusableElements = (root) => {
 
 (() => {
   const dossier = document.querySelector('[data-artist-dossier]');
+  const page = document.querySelector('.page');
   const panel = dossier?.querySelector('.artist-dossier__panel');
   const image = dossier?.querySelector('[data-artist-dossier-image]');
   const galleryBlock = dossier?.querySelector('[data-artist-dossier-gallery-block]');
@@ -1365,7 +1362,8 @@ const getVisibleFocusableElements = (root) => {
     }
     panel.scrollTop = 0;
 
-    dossier.inert = false;
+    dossier.removeAttribute('inert');
+    page?.setAttribute('inert', '');
     dossier.classList.add('is-open');
     dossier.setAttribute('aria-hidden', 'false');
     document.documentElement.classList.add('has-open-dossier');
@@ -1393,7 +1391,8 @@ const getVisibleFocusableElements = (root) => {
 
     dossier.classList.remove('is-open');
     dossier.classList.add('is-closing');
-    dossier.inert = true;
+    dossier.setAttribute('inert', '');
+    page?.removeAttribute('inert');
     window.clearTimeout(openTimerId);
     window.clearTimeout(closeTimerId);
     indexLinks.forEach((link) => link.removeAttribute('aria-current'));
