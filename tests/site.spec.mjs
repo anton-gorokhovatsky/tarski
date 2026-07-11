@@ -5,19 +5,25 @@ const languages = {
     privacyTitle: /Аналитика/,
     menu: 'Меню',
     widget: 'Световой день и тема',
-    auto: 'Авто'
+    auto: 'Авто',
+    day: 'День',
+    night: 'Ночь'
   },
   en: {
     privacyTitle: /Analytics/,
     menu: 'Menu',
     widget: 'Daylight and theme',
-    auto: 'Auto'
+    auto: 'Auto',
+    day: 'Day',
+    night: 'Night'
   },
   ja: {
     privacyTitle: /アクセス解析/,
     menu: 'メニュー',
     widget: '日照時間とテーマ',
-    auto: '自動'
+    auto: '自動',
+    day: '昼',
+    night: '夜'
   }
 };
 
@@ -59,6 +65,8 @@ for (const [language, copy] of Object.entries(languages)) {
     const widget = page.locator('[data-daylight-widget]');
     await expect(widget).toHaveAttribute('aria-label', copy.widget);
     await expect(widget.locator('[data-theme-mode="auto"]')).toHaveText(copy.auto);
+    await expect(widget.locator('[data-theme-mode="light"]')).toHaveText(copy.day);
+    await expect(widget.locator('[data-theme-mode="dark"]')).toHaveText(copy.night);
     await page.waitForTimeout(560);
 
     const widgetBounds = await widget.evaluate((element) => {
@@ -153,7 +161,7 @@ test('daylight widget expands the service material and keeps theme modes accessi
   await page.goto('/?lang=ru');
 
   await expect(page.locator('.mobile-island-rim')).toHaveCount(0);
-  await expect(page.locator('html')).toHaveAttribute('data-theme-mode', 'auto');
+  await expect(page.locator('html')).toHaveAttribute('data-theme-preference', 'auto');
 
   const serviceToggle = page.locator('[data-mobile-service-toggle]');
   const serviceRoot = page.locator('[data-mobile-service]');
@@ -168,13 +176,27 @@ test('daylight widget expands the service material and keeps theme modes accessi
   await expect(widget.locator('time')).toHaveCount(3);
   await page.waitForTimeout(560);
 
-  const expandedGeometry = await serviceRoot.evaluate((element) => ({
-    height: element.getBoundingClientRect().height,
-    menuHasWidgetState: element.closest('[data-mobile-menu]').classList.contains('is-daylight-open')
-  }));
-  expect(expandedGeometry.height).toBeGreaterThanOrEqual(168);
-  expect(expandedGeometry.height).toBeLessThanOrEqual(176);
+  const expandedGeometry = await serviceRoot.evaluate((element) => {
+    const menu = element.closest('[data-mobile-menu]');
+    const widgetElement = element.querySelector('[data-daylight-widget]');
+    const serviceRect = element.getBoundingClientRect();
+    const widgetRect = widgetElement.getBoundingClientRect();
+
+    return {
+      height: serviceRect.height,
+      menuHasWidgetState: menu.classList.contains('is-daylight-open'),
+      materialRadius: getComputedStyle(menu, '::after').borderRadius,
+      shadowRadius: getComputedStyle(element, '::after').borderRadius,
+      widgetInsetLeft: widgetRect.left - serviceRect.left,
+      widgetInsetRight: serviceRect.right - widgetRect.right
+    };
+  });
+  expect(expandedGeometry.height).toBeGreaterThanOrEqual(216);
+  expect(expandedGeometry.height).toBeLessThanOrEqual(224);
   expect(expandedGeometry.menuHasWidgetState).toBe(true);
+  expect(expandedGeometry.shadowRadius).toBe(expandedGeometry.materialRadius);
+  expect(expandedGeometry.widgetInsetLeft).toBeCloseTo(28, 0);
+  expect(expandedGeometry.widgetInsetRight).toBeCloseTo(28, 0);
 
   const darkMode = widget.locator('[data-theme-mode="dark"]');
   const autoMode = widget.locator('[data-theme-mode="auto"]');
@@ -182,7 +204,7 @@ test('daylight widget expands the service material and keeps theme modes accessi
   await expect(page.locator('html')).toHaveAttribute('data-effective-theme', 'dark');
   await expect(darkMode).toHaveAttribute('aria-pressed', 'true');
   await autoMode.click();
-  await expect(page.locator('html')).toHaveAttribute('data-theme-mode', 'auto');
+  await expect(page.locator('html')).toHaveAttribute('data-theme-preference', 'auto');
   await expect(autoMode).toHaveAttribute('aria-pressed', 'true');
 
   await page.keyboard.press('Escape');
@@ -190,6 +212,43 @@ test('daylight widget expands the service material and keeps theme modes accessi
   await expect(serviceToggle).toHaveAttribute('aria-expanded', 'true');
   await page.keyboard.press('Escape');
   await expect(serviceToggle).toHaveAttribute('aria-expanded', 'false');
+});
+
+test('widget language switching preserves the live page and preview URL', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/?lang=ru&preview=mobile-lens-cluster&review=locale-switch');
+
+  const service = page.locator('[data-mobile-service]');
+  const widget = page.locator('[data-daylight-widget]');
+  await page.locator('[data-mobile-service-toggle]').click();
+  await page.locator('[data-daylight-toggle]').click();
+  await expect(widget).toBeVisible();
+
+  await service.locator('[data-language-option="en"]').click();
+  await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+  await expect(service).toBeVisible();
+  await expect(widget).toBeVisible();
+  const englishParams = await page.evaluate(() => Object.fromEntries(new URLSearchParams(window.location.search)));
+  expect(englishParams).toMatchObject({
+    lang: 'en',
+    preview: 'mobile-lens-cluster',
+    review: 'locale-switch'
+  });
+  await expect(widget.locator('[data-theme-mode="light"]')).toHaveText('Day');
+  await expect(widget.locator('[data-theme-mode="dark"]')).toHaveText('Night');
+
+  await service.locator('[data-language-option="ja"]').click();
+  await expect(page.locator('html')).toHaveAttribute('lang', 'ja');
+  await expect(service).toBeVisible();
+  await expect(widget).toBeVisible();
+  const japaneseParams = await page.evaluate(() => Object.fromEntries(new URLSearchParams(window.location.search)));
+  expect(japaneseParams).toMatchObject({
+    lang: 'ja',
+    preview: 'mobile-lens-cluster',
+    review: 'locale-switch'
+  });
+  await expect(widget.locator('[data-theme-mode="light"]')).toHaveText('昼');
+  await expect(widget.locator('[data-theme-mode="dark"]')).toHaveText('夜');
 });
 
 test('mobile archipelago enters vertically at both scroll placements', async ({ page }) => {

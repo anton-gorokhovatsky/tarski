@@ -58,8 +58,8 @@
         themeSettingsClose: 'Закрыть настройки темы',
         themeMode: 'Режим темы',
         themeAuto: 'Авто',
-        themeLightShort: 'Свет',
-        themeDarkShort: 'Тьма',
+        themeLightShort: 'День',
+        themeDarkShort: 'Ночь',
         daylightWidget: 'Световой день и тема',
         daylightDay: 'Световой день',
         daylightNight: 'Ночь',
@@ -132,8 +132,8 @@
         themeSettingsClose: 'Close theme settings',
         themeMode: 'Theme mode',
         themeAuto: 'Auto',
-        themeLightShort: 'Light',
-        themeDarkShort: 'Dark',
+        themeLightShort: 'Day',
+        themeDarkShort: 'Night',
         daylightWidget: 'Daylight and theme',
         daylightDay: 'Daylight',
         daylightNight: 'Night',
@@ -304,8 +304,8 @@
         themeSettingsClose: 'テーマ設定を閉じる',
         themeMode: 'テーマモード',
         themeAuto: '自動',
-        themeLightShort: 'ライト',
-        themeDarkShort: 'ダーク',
+        themeLightShort: '昼',
+        themeDarkShort: '夜',
         daylightWidget: '日照時間とテーマ',
         daylightDay: '昼',
         daylightNight: '夜',
@@ -544,8 +544,8 @@
   const getBlock = (section, key) => section?.querySelector(`[data-i18n-block="${key}"]`);
   const getItem = (container, key) => container?.querySelector(`[data-i18n-item="${key}"]`);
 
-  const getLocalizedUrl = (language) => {
-    const url = new URL(siteBaseUrl);
+  const getLocalizedUrl = (language, baseUrl = window.location.href) => {
+    const url = new URL(baseUrl);
     url.hash = window.location.hash;
 
     if (language === 'ru') {
@@ -558,7 +558,7 @@
   };
 
   const getCanonicalUrl = (language) => {
-    const url = getLocalizedUrl(language);
+    const url = getLocalizedUrl(language, siteBaseUrl);
     url.hash = '';
     return url.toString();
   };
@@ -649,9 +649,9 @@
     setAttr(document.querySelector('[data-mobile-service-panel]'), 'aria-label', data.ui.serviceSettings);
     setAttr(document.querySelector('[data-daylight-widget]'), 'aria-label', data.ui.daylightWidget);
     setAttr(document.querySelector('[data-theme-mode-group]'), 'aria-label', data.ui.themeMode);
-    setText(document.querySelector('[data-theme-mode="auto"]'), data.ui.themeAuto);
-    setText(document.querySelector('[data-theme-mode="light"]'), data.ui.themeLightShort);
-    setText(document.querySelector('[data-theme-mode="dark"]'), data.ui.themeDarkShort);
+    setText(document.querySelector('[data-theme-mode-group] [data-theme-mode="auto"]'), data.ui.themeAuto);
+    setText(document.querySelector('[data-theme-mode-group] [data-theme-mode="light"]'), data.ui.themeLightShort);
+    setText(document.querySelector('[data-theme-mode-group] [data-theme-mode="dark"]'), data.ui.themeDarkShort);
     document.querySelectorAll('[data-daylight-toggle]').forEach((toggle) => {
       const isOpen = toggle.getAttribute('aria-expanded') === 'true';
       const label = isOpen ? data.ui.themeSettingsClose : data.ui.themeSettingsOpen;

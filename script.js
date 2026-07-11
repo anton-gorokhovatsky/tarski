@@ -247,7 +247,7 @@ const getMobileServiceMotionDuration = (element) => {
     const effectiveTheme = getEffectiveTheme(mode, daylight);
 
     document.documentElement.dataset.theme = effectiveTheme;
-    document.documentElement.dataset.themeMode = mode;
+    document.documentElement.dataset.themePreference = mode;
     document.documentElement.dataset.effectiveTheme = effectiveTheme;
     updateThemeColor(effectiveTheme);
     syncThemeControls(effectiveTheme, mode);
