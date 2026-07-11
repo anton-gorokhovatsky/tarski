@@ -2041,11 +2041,25 @@ html[data-scene="artists"]:has(.artist-index__link:nth-child(7):is(:hover, :focu
 }
 
 .artist-card__detail-trigger {
+  -webkit-appearance: none;
+  appearance: none;
+  display: inline;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  line-height: inherit;
+  text-align: inherit;
   cursor: pointer;
   transition:
     filter var(--duration-normal) var(--ease-smooth),
     opacity var(--duration-normal) var(--ease-smooth),
     text-decoration-color var(--duration-normal) var(--ease-smooth);
+}
+
+.artist-card__image--detail-pointer {
+  cursor: pointer;
 }
 
 .artist-card__detail-trigger:focus-visible {
@@ -2056,26 +2070,20 @@ html[data-scene="artists"]:has(.artist-index__link:nth-child(7):is(:hover, :focu
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .artist-card__name.artist-card__detail-trigger {
+  .artist-card__name .artist-card__detail-trigger {
     text-decoration-line: underline;
     text-decoration-color: transparent;
     text-decoration-thickness: 1px;
     text-underline-offset: 0.1em;
   }
 
-  .artist-card__name.artist-card__detail-trigger:hover {
+  .artist-card__name .artist-card__detail-trigger:hover {
     text-decoration-color: currentColor;
   }
 
-  .artist-card__image.artist-card__detail-trigger:hover {
+  .artist-card__image--detail-pointer:hover {
     filter: drop-shadow(0 12px 22px color-mix(in srgb, currentColor 9%, transparent));
   }
-}
-
-.artist-card__image.artist-card__detail-trigger:focus-visible {
-  outline: 0;
-  text-decoration: none;
-  filter: drop-shadow(0 0 0.35rem color-mix(in srgb, currentColor 18%, transparent));
 }
 
 .artist-card__role {
@@ -2162,7 +2170,7 @@ html[data-scene="artists"]:has(.artist-index__link:nth-child(7):is(:hover, :focu
 }
 
 .has-text-focus .artist-card.focus-text .artist-card__link {
-  opacity: 0.46;
+  opacity: 0.78;
 }
 
 .has-text-focus .artist-card.focus-text.is-text-focus-active .artist-card__body {
@@ -2489,6 +2497,11 @@ html[data-scene="artists"]:has(.artist-index__link:nth-child(7):is(:hover, :focu
   width: 100%;
   height: auto;
   min-width: 0;
+}
+
+.artist-dossier__gallery picture {
+  display: block;
+  width: 100%;
 }
 
 .artist-dossier__gallery-caption {
@@ -3390,6 +3403,11 @@ html.has-open-dossier {
   .superlead p,
   h1 {
     font-size: 34px;
+  }
+
+  .section-intro h1 {
+    hyphens: manual;
+    overflow-wrap: break-word;
   }
 
   .superlead {

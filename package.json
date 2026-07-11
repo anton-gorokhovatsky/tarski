@@ -1,0 +1,13 @@
+{
+  "name": "tarski-site",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node tools/check-media-assets.mjs && playwright test",
+    "test:e2e": "playwright test",
+    "test:media": "node tools/check-media-assets.mjs"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.61.1"
+  }
+}

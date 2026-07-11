@@ -14,12 +14,23 @@ Static GitHub Pages site for Tarski.
 - `yandex_887484d1e6af8b3b.html` — Yandex Webmaster verification file.
 - `.nojekyll` — keeps GitHub Pages from running Jekyll over the site.
 - `tools/check-media-assets.mjs` — lightweight media-size guard for new images.
+- `tests/site.spec.mjs` — Playwright regression checks for locales, reflow, menu focus and gallery loading.
 
 The site supports Russian, English and Japanese versions, automatic light/dark theme selection via `prefers-color-scheme`, and a manual theme switcher.
 
 ## Local preview
 
 Open `index.html` in a browser. No build step is required.
+
+For a local server and the automated checks:
+
+```text
+pnpm install
+pnpm exec playwright install chromium
+pnpm test
+```
+
+The test suite starts its own local server and checks all three languages at 320 px, the localized privacy page, mobile menu and service-panel focus return, artist-card semantics, and responsive lazy gallery loading.
 
 ## Media hygiene
 
@@ -32,6 +43,12 @@ node tools/check-media-assets.mjs
 ```
 
 Warnings are acceptable when an image visibly needs the extra detail; failures should be fixed before publishing.
+
+Responsive AVIF variants for the two dossier galleries are generated from their source JPEGs with Pillow (including AVIF support):
+
+```text
+python3 tools/generate-gallery-variants.py
+```
 
 ## Accessibility notes
 
@@ -52,6 +69,12 @@ https://tarski.ru/
 ```
 
 GitHub Pages still hosts the site behind the custom domain.
+
+### Security headers
+
+Both HTML documents set a strict-origin referrer policy in markup. GitHub Pages does not provide repository-level control over response headers, so response-only protections such as `Content-Security-Policy`, `X-Content-Type-Options`, `Permissions-Policy`, and a project-controlled HSTS policy cannot be configured in this repository.
+
+If those headers become a requirement, put a configurable CDN or reverse proxy in front of GitHub Pages and verify the final responses after deployment. A restrictive CSP must explicitly account for the inline theme bootstrap and Yandex Metrica before enforcement; do not add an untested policy directly to production.
 
 ## Custom domain
 
@@ -86,6 +109,8 @@ Analytics and privacy note is available at:
 
 ```text
 https://tarski.ru/privacy.html
+https://tarski.ru/privacy.html?lang=en
+https://tarski.ru/privacy.html?lang=ja
 ```
 
 Yandex Webmaster verification is available at:

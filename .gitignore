@@ -1,4 +1,7 @@
 .DS_Store
+node_modules/
+playwright-report/
+test-results/
 assets/fonts/*
 !assets/fonts/noto-serif-tarski-regular.woff2
 !assets/fonts/noto-serif-tarski-regular-italic.woff2

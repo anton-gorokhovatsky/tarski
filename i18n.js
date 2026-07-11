@@ -640,6 +640,11 @@
     setAttr(document.querySelector('.artist-dossier__scrim'), 'aria-label', data.ui.closeDetails);
     setAttr(document.querySelector('.artist-dossier__close'), 'aria-label', data.ui.closeDetails);
     setText(document.querySelector('.site-footer__privacy'), data.ui.privacy);
+    setAttr(
+      document.querySelector('.site-footer__privacy'),
+      'href',
+      currentLanguage === 'ru' ? 'privacy.html' : `privacy.html?lang=${currentLanguage}`
+    );
     setFooterLegal(currentLanguage === 'ru' ? undefined : data.ui.footerLegal);
   };
 
@@ -712,7 +717,7 @@
       const displayName = artist?.name;
       setText(indexLink, artist?.index || displayName);
       setAttr(indexLink, 'aria-label', displayName);
-      setText(card.querySelector('.artist-card__name'), displayName);
+      setText(card.querySelector('.artist-card__detail-trigger'), displayName);
       setText(card.querySelector('.artist-card__role'), artist?.role);
       setText(card.querySelector('.artist-card__body > p:not(.artist-card__role)'), artist?.text);
       setAttr(card.querySelector('.artist-card__image'), 'alt', displayName);

@@ -312,7 +312,7 @@ const getMobileServiceSwapDelay = (element) => {
       window.requestAnimationFrame(() => menu?.classList.remove('is-service-transitioning'));
     }, getMobileServiceSwapDelay(menu));
 
-    if (shouldRestoreFocus && activeTrigger instanceof HTMLElement && service.contains(document.activeElement)) {
+    if (shouldRestoreFocus && activeTrigger instanceof HTMLElement) {
       const triggerToRestore = activeTrigger;
       window.setTimeout(() => focusWithoutScroll(triggerToRestore), 0);
     }
@@ -395,6 +395,8 @@ const getMobileServiceSwapDelay = (element) => {
   if (!menu || !toggle || !drawer || !panel) return;
 
   let closeTimer = null;
+  let openFrame = null;
+  let focusTimer = null;
   let activeTrigger = null;
 
   const prefersReducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -420,6 +422,8 @@ const getMobileServiceSwapDelay = (element) => {
   const setOpen = (isOpen, options = {}) => {
     if (isOpen) {
       window.clearTimeout(closeTimer);
+      window.clearTimeout(focusTimer);
+      window.cancelAnimationFrame(openFrame);
       activeTrigger = document.activeElement instanceof HTMLElement ? document.activeElement : toggle;
       window.dispatchEvent(new CustomEvent('tarski:mobilemenuopen'));
       drawer.hidden = false;
@@ -430,12 +434,20 @@ const getMobileServiceSwapDelay = (element) => {
       setModalBackgroundInert(true);
       panel.getBoundingClientRect();
 
-      window.requestAnimationFrame(() => {
+      openFrame = window.requestAnimationFrame(() => {
+        openFrame = null;
+        if (toggle.getAttribute('aria-expanded') !== 'true') return;
+
         menu.classList.add('is-menu-open');
         drawer.classList.add('is-open');
         window.dispatchEvent(new CustomEvent('tarski:mobileislandresize'));
         if (options.focus) {
-          window.setTimeout(() => panel.focus({ preventScroll: true }), prefersReducedMotion() ? 0 : 440);
+          focusTimer = window.setTimeout(() => {
+            focusTimer = null;
+            if (toggle.getAttribute('aria-expanded') === 'true') {
+              focusWithoutScroll(panel);
+            }
+          }, prefersReducedMotion() ? 0 : 440);
         }
       });
       return;
@@ -451,6 +463,10 @@ const getMobileServiceSwapDelay = (element) => {
     }
 
     window.clearTimeout(closeTimer);
+    window.clearTimeout(focusTimer);
+    window.cancelAnimationFrame(openFrame);
+    openFrame = null;
+    focusTimer = null;
 
     const shouldRestoreFocus = options.restoreFocus !== false;
 
@@ -1075,6 +1091,7 @@ const getMobileServiceSwapDelay = (element) => {
   let activeCard = null;
   let openTimerId = null;
   let closeTimerId = null;
+  let galleryImageObserver = null;
 
   const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const getOpenDetailsPrefix = () => window.tarskiI18n?.t('ui.openDetails') || 'Открыть подробности: ';
@@ -1117,17 +1134,30 @@ const getMobileServiceSwapDelay = (element) => {
     const cardLinks = Array.from(card.querySelectorAll('.artist-card__link'));
     const copy = Array.from(card.querySelectorAll('.artist-card__body > p:not(.artist-card__role)'));
     const galleryTemplate = card.querySelector('[data-artist-gallery]');
+    const hasResponsiveAvif = galleryTemplate?.dataset.responsiveMedia === 'avif';
     const galleryItems = galleryTemplate
-      ? Array.from(galleryTemplate.content.querySelectorAll('img')).map((item) => ({
-        src: item.getAttribute('src') || '',
-        alt: item.getAttribute('alt') || '',
-        width: item.getAttribute('width') || '',
-        height: item.getAttribute('height') || '',
-        caption: getLocalizedCaption(item),
-        label: getLocalizedLabel(item),
-        variant: item.dataset.variant || '',
-        isWide: item.classList.contains('artist-card__gallery-image--wide')
-      })).filter((item) => item.src)
+      ? Array.from(galleryTemplate.content.querySelectorAll('img')).map((item) => {
+        const src = item.getAttribute('src') || '';
+        const intrinsicWidth = Number(item.getAttribute('width')) || 1400;
+        const avifBase = src.replace(/\.[^.]+$/, '');
+        const avifSrcset = hasResponsiveAvif && src
+          ? [800, 1400]
+            .map((targetWidth) => `${avifBase}-${targetWidth}.avif ${Math.min(targetWidth, intrinsicWidth)}w`)
+            .join(', ')
+          : '';
+
+        return {
+          src,
+          avifSrcset,
+          alt: item.getAttribute('alt') || '',
+          width: item.getAttribute('width') || '',
+          height: item.getAttribute('height') || '',
+          caption: getLocalizedCaption(item),
+          label: getLocalizedLabel(item),
+          variant: item.dataset.variant || '',
+          isWide: item.classList.contains('artist-card__gallery-image--wide')
+        };
+      }).filter((item) => item.src)
       : [];
 
     return {
@@ -1227,6 +1257,45 @@ const getMobileServiceSwapDelay = (element) => {
     panel.classList.add('is-content-entering');
   };
 
+  const loadGalleryImage = (galleryImage) => {
+    if (!(galleryImage instanceof HTMLImageElement) || !galleryImage.dataset.src) return;
+
+    const picture = galleryImage.closest('picture');
+    picture?.querySelectorAll('source[data-srcset]').forEach((source) => {
+      source.srcset = source.dataset.srcset;
+      source.removeAttribute('data-srcset');
+    });
+
+    galleryImage.src = galleryImage.dataset.src;
+    galleryImage.removeAttribute('data-src');
+    galleryImageObserver?.unobserve(galleryImage);
+  };
+
+  const observeGalleryImages = () => {
+    galleryImageObserver?.disconnect();
+    galleryImageObserver = null;
+
+    const pendingImages = Array.from(gallery.querySelectorAll('img[data-src]'));
+    if (!pendingImages.length) return;
+
+    if (!('IntersectionObserver' in window)) {
+      pendingImages.forEach(loadGalleryImage);
+      return;
+    }
+
+    galleryImageObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) loadGalleryImage(entry.target);
+      });
+    }, {
+      root: panel,
+      rootMargin: '320px 0px',
+      threshold: 0.01
+    });
+
+    pendingImages.forEach((galleryImage) => galleryImageObserver.observe(galleryImage));
+  };
+
   const syncDossierHash = (id, mode = 'replace') => {
     const hash = `#${id}`;
     if (window.location.hash === hash) return;
@@ -1270,7 +1339,8 @@ const getMobileServiceSwapDelay = (element) => {
     const {
       history = 'replace',
       focus = true,
-      forceRefresh = false
+      forceRefresh = false,
+      focusReturnTarget = trigger
     } = options;
 
     if (
@@ -1288,8 +1358,8 @@ const getMobileServiceSwapDelay = (element) => {
     const previousCard = activeCard;
     const isSwitching = dossier.classList.contains('is-open') && previousCard && previousCard !== card;
     activeCard = card;
-    if (trigger instanceof HTMLElement) {
-      activeTrigger = trigger;
+    if (focusReturnTarget instanceof HTMLElement) {
+      activeTrigger = focusReturnTarget;
     } else if (previousCard !== card) {
       activeTrigger = null;
     } else if (!(activeTrigger instanceof HTMLElement)) {
@@ -1301,7 +1371,9 @@ const getMobileServiceSwapDelay = (element) => {
     setPanelOrigin(trigger);
     const galleryItems = data.galleryItems.map((item) => {
       const galleryItem = document.createElement('figure');
+      const galleryPicture = document.createElement('picture');
       const galleryImage = document.createElement('img');
+      const gallerySource = item.avifSrcset ? document.createElement('source') : null;
       const galleryLabel = item.label ? document.createElement('span') : null;
       const galleryCaption = item.caption ? document.createElement('figcaption') : null;
 
@@ -1317,12 +1389,19 @@ const getMobileServiceSwapDelay = (element) => {
         galleryImage.classList.add('artist-dossier__gallery-image--wide');
       }
 
-      galleryImage.src = item.src;
+      galleryImage.dataset.src = item.src;
       galleryImage.alt = item.alt || item.caption;
       if (item.width) galleryImage.width = Number(item.width);
       if (item.height) galleryImage.height = Number(item.height);
       galleryImage.loading = 'lazy';
       galleryImage.decoding = 'async';
+
+      if (gallerySource) {
+        gallerySource.type = 'image/avif';
+        gallerySource.dataset.srcset = item.avifSrcset;
+        gallerySource.sizes = '(max-width: 720px) calc(100vw - 64px), 50vw';
+        galleryPicture.append(gallerySource);
+      }
 
       if (galleryLabel) {
         galleryLabel.className = 'artist-dossier__gallery-label';
@@ -1330,7 +1409,8 @@ const getMobileServiceSwapDelay = (element) => {
         galleryItem.append(galleryLabel);
       }
 
-      galleryItem.append(galleryImage);
+      galleryPicture.append(galleryImage);
+      galleryItem.append(galleryPicture);
 
       if (galleryCaption) {
         galleryCaption.className = 'artist-dossier__gallery-caption';
@@ -1351,6 +1431,7 @@ const getMobileServiceSwapDelay = (element) => {
     image.src = data.imageSrc;
     image.alt = data.imageAlt;
     gallery.replaceChildren(...galleryItems);
+    observeGalleryImages();
     gallery.hidden = galleryItems.length === 0;
     credit.textContent = data.galleryCredit;
     credit.hidden = !data.galleryCredit;
@@ -1413,6 +1494,8 @@ const getMobileServiceSwapDelay = (element) => {
     }
 
     const finishClose = () => {
+      galleryImageObserver?.disconnect();
+      galleryImageObserver = null;
       dossier.classList.remove('is-closing');
       dossier.setAttribute('aria-hidden', 'true');
       document.documentElement.classList.remove('has-open-dossier');
@@ -1430,27 +1513,23 @@ const getMobileServiceSwapDelay = (element) => {
   };
 
   cards.forEach((card) => {
-    const detailTriggers = [
-      card.querySelector('.artist-card__image'),
-      card.querySelector('.artist-card__name')
-    ].filter(Boolean);
+    const detailTrigger = card.querySelector('.artist-card__detail-trigger');
+    const cardImage = card.querySelector('.artist-card__image');
+    if (!detailTrigger) return;
 
-    detailTriggers.forEach((trigger) => {
-      trigger.classList.add('artist-card__detail-trigger');
-      trigger.setAttribute('role', 'button');
-      trigger.setAttribute('tabindex', '0');
-      trigger.setAttribute('aria-haspopup', 'dialog');
-      trigger.setAttribute('aria-controls', panel.id);
-      trigger.setAttribute('aria-expanded', 'false');
-      trigger.setAttribute('aria-label', `${getOpenDetailsPrefix()}${getCardName(card)}`);
-      trigger.addEventListener('click', () => openDossier(card, trigger, { history: 'push' }));
-      trigger.addEventListener('keydown', (event) => {
-        if (event.key !== 'Enter' && event.key !== ' ') return;
+    detailTrigger.setAttribute('aria-haspopup', 'dialog');
+    detailTrigger.setAttribute('aria-controls', panel.id);
+    detailTrigger.setAttribute('aria-expanded', 'false');
+    detailTrigger.setAttribute('aria-label', `${getOpenDetailsPrefix()}${getCardName(card)}`);
+    detailTrigger.addEventListener('click', () => openDossier(card, detailTrigger, { history: 'push' }));
 
-        event.preventDefault();
-        openDossier(card, trigger, { history: 'push' });
-      });
-    });
+    if (cardImage) {
+      cardImage.classList.add('artist-card__image--detail-pointer');
+      cardImage.addEventListener('click', () => openDossier(card, cardImage, {
+        history: 'push',
+        focusReturnTarget: detailTrigger
+      }));
+    }
   });
 
   indexLinks.forEach((link) => {
