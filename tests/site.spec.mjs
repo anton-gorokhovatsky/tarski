@@ -3,15 +3,21 @@ import { expect, test } from '@playwright/test';
 const languages = {
   ru: {
     privacyTitle: /Аналитика/,
-    menu: 'Меню'
+    menu: 'Меню',
+    widget: 'Световой день и тема',
+    auto: 'Авто'
   },
   en: {
     privacyTitle: /Analytics/,
-    menu: 'Menu'
+    menu: 'Menu',
+    widget: 'Daylight and theme',
+    auto: 'Auto'
   },
   ja: {
     privacyTitle: /アクセス解析/,
-    menu: 'メニュー'
+    menu: 'メニュー',
+    widget: '日照時間とテーマ',
+    auto: '自動'
   }
 };
 
@@ -47,6 +53,20 @@ for (const [language, copy] of Object.entries(languages)) {
       };
     });
     expect(dimensions.content, dimensions.offenders.join('\n')).toBeLessThanOrEqual(dimensions.viewport);
+
+    await page.locator('[data-mobile-service-toggle]').click();
+    await page.locator('[data-daylight-toggle]').click();
+    const widget = page.locator('[data-daylight-widget]');
+    await expect(widget).toHaveAttribute('aria-label', copy.widget);
+    await expect(widget.locator('[data-theme-mode="auto"]')).toHaveText(copy.auto);
+    await page.waitForTimeout(560);
+
+    const widgetBounds = await widget.evaluate((element) => {
+      const rect = element.closest('[data-mobile-service]').getBoundingClientRect();
+      return { left: rect.left, right: rect.right, viewport: document.documentElement.clientWidth };
+    });
+    expect(widgetBounds.left).toBeGreaterThanOrEqual(0);
+    expect(widgetBounds.right).toBeLessThanOrEqual(widgetBounds.viewport);
   });
 
   test(`${language}: privacy page is localized and canonical`, async ({ page }) => {
@@ -103,8 +123,10 @@ test('mobile menu and service panel preserve state, Escape, and focus return', a
     const serviceRoot = document.querySelector('[data-mobile-service]');
     const expandedMenu = document.querySelector('#mobile-menu-expanded');
     return {
-      compactBackdrop: getComputedStyle(menuRoot, '::before').backdropFilter,
+      compactBackdrop: getComputedStyle(menuRoot.querySelector('.mobile-island-surface'), '::before').backdropFilter,
+      compactBackground: getComputedStyle(menuRoot.querySelector('.mobile-island-surface'), '::before').backgroundImage,
       expandedBackdrop: getComputedStyle(menuRoot, '::after').backdropFilter,
+      expandedBackground: getComputedStyle(menuRoot, '::after').backgroundImage,
       height: serviceRoot.getBoundingClientRect().height,
       serviceMaterialTransform: getComputedStyle(menuRoot, '::after').transform,
       menuBackdrop: getComputedStyle(expandedMenu).backdropFilter,
@@ -112,6 +134,9 @@ test('mobile menu and service panel preserve state, Escape, and focus return', a
     };
   });
   expect(serviceSurface.expandedBackdrop).toBe(serviceSurface.compactBackdrop);
+  expect(serviceSurface.compactBackground).toBe(serviceSurface.expandedBackground);
+  expect(serviceSurface.compactBackground.match(/linear-gradient/g)).toHaveLength(1);
+  expect(serviceSurface.compactBackground).toContain('0.98');
   expect(serviceSurface.menuBackdrop).toBe(serviceSurface.compactBackdrop);
   expect(serviceSurface.height).toBeGreaterThanOrEqual(50);
   expect(serviceSurface.height).toBeLessThanOrEqual(54);
@@ -121,6 +146,101 @@ test('mobile menu and service panel preserve state, Escape, and focus return', a
   await expect(serviceToggle).toHaveAttribute('aria-expanded', 'false');
   await expect(serviceToggle).toBeFocused();
   await expect(servicePanel).toBeHidden();
+});
+
+test('daylight widget expands the service material and keeps theme modes accessible', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/?lang=ru');
+
+  await expect(page.locator('.mobile-island-rim')).toHaveCount(0);
+  await expect(page.locator('html')).toHaveAttribute('data-theme-mode', 'auto');
+
+  const serviceToggle = page.locator('[data-mobile-service-toggle]');
+  const serviceRoot = page.locator('[data-mobile-service]');
+  const daylightToggle = page.locator('[data-daylight-toggle]');
+  const widget = page.locator('[data-daylight-widget]');
+
+  await serviceToggle.click();
+  await daylightToggle.click();
+  await expect(daylightToggle).toHaveAttribute('aria-expanded', 'true');
+  await expect(widget).toHaveAttribute('aria-hidden', 'false');
+  await expect(widget).toBeVisible();
+  await expect(widget.locator('time')).toHaveCount(3);
+  await page.waitForTimeout(560);
+
+  const expandedGeometry = await serviceRoot.evaluate((element) => ({
+    height: element.getBoundingClientRect().height,
+    menuHasWidgetState: element.closest('[data-mobile-menu]').classList.contains('is-daylight-open')
+  }));
+  expect(expandedGeometry.height).toBeGreaterThanOrEqual(168);
+  expect(expandedGeometry.height).toBeLessThanOrEqual(176);
+  expect(expandedGeometry.menuHasWidgetState).toBe(true);
+
+  const darkMode = widget.locator('[data-theme-mode="dark"]');
+  const autoMode = widget.locator('[data-theme-mode="auto"]');
+  await darkMode.click();
+  await expect(page.locator('html')).toHaveAttribute('data-effective-theme', 'dark');
+  await expect(darkMode).toHaveAttribute('aria-pressed', 'true');
+  await autoMode.click();
+  await expect(page.locator('html')).toHaveAttribute('data-theme-mode', 'auto');
+  await expect(autoMode).toHaveAttribute('aria-pressed', 'true');
+
+  await page.keyboard.press('Escape');
+  await expect(daylightToggle).toHaveAttribute('aria-expanded', 'false');
+  await expect(serviceToggle).toHaveAttribute('aria-expanded', 'true');
+  await page.keyboard.press('Escape');
+  await expect(serviceToggle).toHaveAttribute('aria-expanded', 'false');
+});
+
+test('mobile archipelago enters vertically at both scroll placements', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/?lang=ru');
+
+  const menu = page.locator('[data-mobile-menu]');
+  const threshold = await page.locator('[data-mobile-menu-home]').evaluate((element) => (
+    element.getBoundingClientRect().bottom + window.scrollY + 2
+  ));
+
+  await page.evaluate((top) => window.scrollTo(0, top), threshold);
+  await expect(menu).toHaveClass(/is-visible/);
+  await expect(menu).toHaveClass(/is-docking/);
+
+  const dockingMotion = await menu.evaluate((element) => {
+    const animation = element.getAnimations()[0];
+    return {
+      name: getComputedStyle(element).animationName,
+      keyframes: animation?.effect?.getKeyframes().map(({ translate, transform }) => ({
+        translate,
+        transform
+      })) || []
+    };
+  });
+
+  expect(dockingMotion.name).toBe('mobile-island-dock-in');
+  expect(dockingMotion.keyframes[0].translate).toBe('0px 24px');
+  expect(dockingMotion.keyframes.at(-1).translate).toBe('0px');
+  expect(dockingMotion.keyframes.every(({ transform }) => !transform || transform === 'none')).toBe(true);
+
+  await expect(menu).not.toHaveClass(/is-docking/);
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await expect(menu).not.toHaveClass(/is-visible/);
+  await expect(menu).toHaveClass(/is-returning-home/);
+
+  const homeMotion = await menu.evaluate((element) => {
+    const animation = element.getAnimations()[0];
+    return {
+      name: getComputedStyle(element).animationName,
+      keyframes: animation?.effect?.getKeyframes().map(({ translate, transform }) => ({
+        translate,
+        transform
+      })) || []
+    };
+  });
+
+  expect(homeMotion.name).toBe('mobile-island-home-in');
+  expect(homeMotion.keyframes[0].translate).toBe('0px -24px');
+  expect(homeMotion.keyframes.at(-1).translate).toBe('0px');
+  expect(homeMotion.keyframes.every(({ transform }) => !transform || transform === 'none')).toBe(true);
 });
 
 test('artist names remain headings with one keyboard trigger each', async ({ page }) => {

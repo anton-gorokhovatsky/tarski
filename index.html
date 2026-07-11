@@ -63,7 +63,7 @@
     <meta name="twitter:image" content="https://tarski.ru/assets/og-image.png?v=20260704-footer-og" />
     <meta name="twitter:image:alt" content="Tarski — среда связей и вовлекающего искусства" />
     <link rel="icon" href="assets/favicon.svg?v=20260701-caps-favicon" type="image/svg+xml" sizes="any" />
-    <link rel="stylesheet" href="styles.css?v=20260711-island-reveal-43" />
+    <link rel="stylesheet" href="styles.css?v=20260711-daylight-widget-44" />
   </head>
   <body>
     <noscript><div><img src="https://mc.yandex.ru/watch/110320853" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
@@ -97,6 +97,8 @@
 
       <div class="mobile-menu-home" data-mobile-menu-home>
         <nav class="mobile-floating-menu" data-mobile-menu aria-label="Мобильная навигация">
+          <span class="mobile-island-surface" aria-hidden="true"></span>
+
           <button class="mobile-menu-toggle" type="button" data-mobile-menu-toggle aria-expanded="false" aria-controls="mobile-menu-expanded" aria-label="Открыть меню" title="Открыть меню">
             <span data-mobile-menu-toggle-label>Меню</span>
           </button>
@@ -115,9 +117,32 @@
                 <button type="button" data-language-option="en" lang="en" aria-pressed="false">EN</button>
                 <button type="button" data-language-option="ja" lang="ja" aria-pressed="false">JP</button>
               </div>
-              <button class="theme-toggle" type="button" data-theme-toggle aria-label="Переключить тему" aria-pressed="false" title="Переключить тему">
+              <button class="theme-toggle" type="button" data-theme-toggle data-daylight-toggle aria-expanded="false" aria-controls="mobile-daylight-widget" aria-label="Открыть настройки темы" aria-pressed="false" title="Открыть настройки темы">
                 <span class="theme-toggle__icon" aria-hidden="true"></span>
               </button>
+            </div>
+            <div id="mobile-daylight-widget" class="daylight-widget" data-daylight-widget aria-label="Световой день и тема" aria-hidden="true" hidden>
+              <div class="daylight-widget__meta">
+                <span data-daylight-status>Световой день</span>
+                <time data-daylight-now datetime="">—:—</time>
+              </div>
+              <div class="daylight-widget__chart">
+                <svg viewBox="0 0 232 48" aria-hidden="true" focusable="false">
+                  <path class="daylight-widget__baseline" d="M 6 41.5 H 226" />
+                  <path class="daylight-widget__curve" d="M 6 41.5 C 54 41.5 62 7 116 7 C 170 7 178 41.5 226 41.5" />
+                  <circle class="daylight-widget__marker-halo" data-daylight-marker-halo cx="6" cy="41.5" r="6.5" />
+                  <circle class="daylight-widget__marker" data-daylight-marker cx="6" cy="41.5" r="3.2" />
+                </svg>
+                <div class="daylight-widget__axis">
+                  <time data-daylight-sunrise datetime="">—:—</time>
+                  <time data-daylight-sunset datetime="">—:—</time>
+                </div>
+              </div>
+              <div class="daylight-widget__modes" data-theme-mode-group role="group" aria-label="Режим темы">
+                <button type="button" data-theme-mode="auto" aria-pressed="true">Авто</button>
+                <button type="button" data-theme-mode="light" aria-pressed="false">Свет</button>
+                <button type="button" data-theme-mode="dark" aria-pressed="false">Тьма</button>
+              </div>
             </div>
           </div>
 
@@ -446,7 +471,7 @@
       </section>
     </aside>
 
-    <script src="i18n.js?v=20260711-review-fixes-32"></script>
-    <script src="script.js?v=20260711-island-reveal-43"></script>
+    <script src="i18n.js?v=20260711-daylight-widget-44"></script>
+    <script src="script.js?v=20260711-daylight-widget-44"></script>
   </body>
 </html>

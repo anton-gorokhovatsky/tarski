@@ -103,34 +103,110 @@ const getMobileServiceMotionDuration = (element) => {
 (() => {
   const storageKey = 'tarski-theme';
   const themeToggles = Array.from(document.querySelectorAll('[data-theme-toggle]'));
-  const systemThemeQuery = window.matchMedia('(prefers-color-scheme: dark)');
+  const themeModeControls = Array.from(document.querySelectorAll('[data-theme-mode]'));
   const themeColors = {
     light: '#f2f2f2',
     dark: '#101010'
   };
+  const solarPosition = {
+    latitude: 55.7558,
+    longitude: 37.6173,
+    timeZone: 'Europe/Moscow'
+  };
 
   const getLabel = (path, fallback) => window.tarskiI18n?.t(path) || fallback;
+  const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+  const normalizeDegrees = (value) => ((value % 360) + 360) % 360;
+  const toRadians = (degrees) => degrees * (Math.PI / 180);
+  const toDegrees = (radians) => radians * (180 / Math.PI);
 
-  const getStoredTheme = () => {
+  const getZonedDateParts = (date) => {
+    const parts = new Intl.DateTimeFormat('en-CA', {
+      timeZone: solarPosition.timeZone,
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit'
+    }).formatToParts(date);
+    const values = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+
+    return {
+      year: Number(values.year),
+      month: Number(values.month),
+      day: Number(values.day)
+    };
+  };
+
+  const getDayOfYear = ({ year, month, day }) => {
+    const start = Date.UTC(year, 0, 0);
+    const current = Date.UTC(year, month - 1, day);
+    return Math.floor((current - start) / 86400000);
+  };
+
+  const getSolarEventUtcHours = (dayOfYear, isSunrise) => {
+    const longitudeHour = solarPosition.longitude / 15;
+    const approximateTime = dayOfYear + (((isSunrise ? 6 : 18) - longitudeHour) / 24);
+    const meanAnomaly = (0.9856 * approximateTime) - 3.289;
+    const trueLongitude = normalizeDegrees(
+      meanAnomaly
+      + (1.916 * Math.sin(toRadians(meanAnomaly)))
+      + (0.02 * Math.sin(toRadians(2 * meanAnomaly)))
+      + 282.634
+    );
+    let rightAscension = normalizeDegrees(toDegrees(Math.atan(0.91764 * Math.tan(toRadians(trueLongitude)))));
+    const longitudeQuadrant = Math.floor(trueLongitude / 90) * 90;
+    const rightAscensionQuadrant = Math.floor(rightAscension / 90) * 90;
+    rightAscension = (rightAscension + longitudeQuadrant - rightAscensionQuadrant) / 15;
+
+    const sinDeclination = 0.39782 * Math.sin(toRadians(trueLongitude));
+    const cosDeclination = Math.cos(Math.asin(sinDeclination));
+    const cosHourAngle = (
+      Math.cos(toRadians(90.833))
+      - (sinDeclination * Math.sin(toRadians(solarPosition.latitude)))
+    ) / (cosDeclination * Math.cos(toRadians(solarPosition.latitude)));
+
+    if (cosHourAngle > 1 || cosHourAngle < -1) return isSunrise ? 6 : 18;
+
+    const hourAngle = (
+      isSunrise
+        ? 360 - toDegrees(Math.acos(cosHourAngle))
+        : toDegrees(Math.acos(cosHourAngle))
+    ) / 15;
+    const localMeanTime = hourAngle + rightAscension - (0.06571 * approximateTime) - 6.622;
+    return ((localMeanTime - longitudeHour) % 24 + 24) % 24;
+  };
+
+  const getDaylightState = (now = new Date()) => {
+    const dateParts = getZonedDateParts(now);
+    const dayOfYear = getDayOfYear(dateParts);
+    const utcMidnight = Date.UTC(dateParts.year, dateParts.month - 1, dateParts.day);
+    const sunrise = new Date(utcMidnight + (getSolarEventUtcHours(dayOfYear, true) * 3600000));
+    const sunset = new Date(utcMidnight + (getSolarEventUtcHours(dayOfYear, false) * 3600000));
+    const isDay = now >= sunrise && now < sunset;
+    const progress = clamp((now - sunrise) / Math.max(1, sunset - sunrise), 0, 1);
+
+    return { now, sunrise, sunset, isDay, progress, timeZone: solarPosition.timeZone };
+  };
+
+  const getStoredMode = () => {
     try {
-      const theme = window.localStorage.getItem(storageKey);
-      return theme === 'dark' || theme === 'light' ? theme : null;
+      const mode = window.localStorage.getItem(storageKey);
+      return mode === 'dark' || mode === 'light' || mode === 'auto' ? mode : 'auto';
     } catch (error) {
-      return null;
+      return 'auto';
     }
   };
 
-  const setStoredTheme = (theme) => {
+  const setStoredMode = (mode) => {
     try {
-      window.localStorage.setItem(storageKey, theme);
+      window.localStorage.setItem(storageKey, mode);
     } catch (error) {
       // The toggle still works for the current page when storage is unavailable.
     }
   };
 
-  const getEffectiveTheme = (theme = getStoredTheme()) => {
-    if (theme === 'dark' || theme === 'light') return theme;
-    return systemThemeQuery.matches ? 'dark' : 'light';
+  const getEffectiveTheme = (mode = getStoredMode(), daylight = getDaylightState()) => {
+    if (mode === 'dark' || mode === 'light') return mode;
+    return daylight.isDay ? 'light' : 'dark';
   };
 
   const updateThemeColor = (theme) => {
@@ -139,53 +215,206 @@ const getMobileServiceMotionDuration = (element) => {
       .forEach((meta) => meta.setAttribute('content', themeColors[theme]));
   };
 
-  const syncThemeControls = (theme) => {
+  const syncThemeControls = (theme, mode = getStoredMode()) => {
     const isDark = theme === 'dark';
     const label = isDark
       ? getLabel('ui.themeLight', 'Включить светлую тему')
       : getLabel('ui.themeDark', 'Включить темную тему');
 
     themeToggles.forEach((toggle) => {
-      toggle.setAttribute('aria-label', label);
       toggle.setAttribute('aria-pressed', String(isDark));
-      toggle.setAttribute('title', label);
+
+      if (toggle.matches('[data-daylight-toggle]')) {
+        const isOpen = toggle.getAttribute('aria-expanded') === 'true';
+        const settingsLabel = isOpen
+          ? getLabel('ui.themeSettingsClose', 'Закрыть настройки темы')
+          : getLabel('ui.themeSettingsOpen', 'Открыть настройки темы');
+        toggle.setAttribute('aria-label', settingsLabel);
+        toggle.setAttribute('title', settingsLabel);
+      } else {
+        toggle.setAttribute('aria-label', label);
+        toggle.setAttribute('title', label);
+      }
+    });
+
+    themeModeControls.forEach((control) => {
+      control.setAttribute('aria-pressed', String(control.dataset.themeMode === mode));
     });
   };
 
-  const applyTheme = (theme = getStoredTheme()) => {
-    const effectiveTheme = getEffectiveTheme(theme);
+  const applyTheme = (mode = getStoredMode()) => {
+    const daylight = getDaylightState();
+    const effectiveTheme = getEffectiveTheme(mode, daylight);
 
-    if (theme === 'dark' || theme === 'light') {
-      document.documentElement.dataset.theme = theme;
-    } else {
-      document.documentElement.removeAttribute('data-theme');
-    }
-
+    document.documentElement.dataset.theme = effectiveTheme;
+    document.documentElement.dataset.themeMode = mode;
     document.documentElement.dataset.effectiveTheme = effectiveTheme;
     updateThemeColor(effectiveTheme);
-    syncThemeControls(effectiveTheme);
+    syncThemeControls(effectiveTheme, mode);
     window.dispatchEvent(new CustomEvent('tarski:themechange', {
-      detail: { theme: effectiveTheme }
+      detail: { theme: effectiveTheme, mode, daylight }
     }));
+  };
+
+  const setMode = (mode) => {
+    const nextMode = mode === 'light' || mode === 'dark' ? mode : 'auto';
+    setStoredMode(nextMode);
+    applyTheme(nextMode);
   };
 
   themeToggles.forEach((toggle) => {
     toggle.addEventListener('click', () => {
+      if (toggle.matches('[data-daylight-toggle]')) return;
       const nextTheme = getEffectiveTheme() === 'dark' ? 'light' : 'dark';
-      setStoredTheme(nextTheme);
-      applyTheme(nextTheme);
+      setMode(nextTheme);
     });
   });
 
-  systemThemeQuery.addEventListener('change', () => {
-    if (!getStoredTheme()) {
-      applyTheme(null);
-    }
+  themeModeControls.forEach((control) => {
+    control.addEventListener('click', () => setMode(control.dataset.themeMode));
   });
 
-  window.addEventListener('tarski:languagechange', () => syncThemeControls(getEffectiveTheme()));
+  const refreshAutoTheme = () => {
+    if (getStoredMode() === 'auto') {
+      applyTheme('auto');
+    } else {
+      syncThemeControls(getEffectiveTheme(), getStoredMode());
+    }
+  };
+
+  let minuteTimer = window.setInterval(refreshAutoTheme, 60000);
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) refreshAutoTheme();
+  });
+  window.addEventListener('pagehide', () => window.clearInterval(minuteTimer), { once: true });
+  window.addEventListener('tarski:languagechange', refreshAutoTheme);
+
+  window.tarskiTheme = {
+    applyTheme,
+    getDaylightState,
+    getEffectiveTheme,
+    getMode: getStoredMode,
+    setMode
+  };
 
   applyTheme();
+})();
+
+(() => {
+  const widget = document.querySelector('[data-daylight-widget]');
+  const toggle = document.querySelector('[data-daylight-toggle]');
+  const service = widget?.closest('[data-mobile-service]');
+  const serviceToggle = service?.querySelector('[data-mobile-service-toggle]');
+  const menu = service?.closest('[data-mobile-menu]');
+  const marker = widget?.querySelector('[data-daylight-marker]');
+  const markerHalo = widget?.querySelector('[data-daylight-marker-halo]');
+  const status = widget?.querySelector('[data-daylight-status]');
+  const nowLabel = widget?.querySelector('[data-daylight-now]');
+  const sunriseLabel = widget?.querySelector('[data-daylight-sunrise]');
+  const sunsetLabel = widget?.querySelector('[data-daylight-sunset]');
+
+  if (!widget || !toggle || !service || !serviceToggle || !menu || !marker || !markerHalo) return;
+
+  const getLabel = (path, fallback) => window.tarskiI18n?.t(path) || fallback;
+  const formatTime = (date, timeZone) => new Intl.DateTimeFormat(
+    window.tarskiI18n?.getLanguage?.() || 'ru',
+    { hour: '2-digit', minute: '2-digit', hour12: false, timeZone }
+  ).format(date);
+  let closeTimer = null;
+
+  const syncWidget = () => {
+    const daylight = window.tarskiTheme?.getDaylightState?.();
+    if (!daylight) return;
+
+    const progress = Math.min(1, Math.max(0, daylight.progress));
+    const markerX = 6 + (220 * progress);
+    const markerY = 41.5 - (34.5 * Math.sin(Math.PI * progress));
+    const statusLabel = daylight.isDay
+      ? getLabel('ui.daylightDay', 'Световой день')
+      : getLabel('ui.daylightNight', 'Ночь');
+
+    marker.setAttribute('cx', markerX.toFixed(2));
+    marker.setAttribute('cy', markerY.toFixed(2));
+    markerHalo.setAttribute('cx', markerX.toFixed(2));
+    markerHalo.setAttribute('cy', markerY.toFixed(2));
+    status.textContent = statusLabel;
+    nowLabel.textContent = formatTime(daylight.now, daylight.timeZone);
+    nowLabel.setAttribute('datetime', daylight.now.toISOString());
+    sunriseLabel.textContent = formatTime(daylight.sunrise, daylight.timeZone);
+    sunriseLabel.setAttribute('datetime', daylight.sunrise.toISOString());
+    sunsetLabel.textContent = formatTime(daylight.sunset, daylight.timeZone);
+    sunsetLabel.setAttribute('datetime', daylight.sunset.toISOString());
+    widget.dataset.phase = daylight.isDay ? 'day' : 'night';
+  };
+
+  const syncToggleLabel = () => {
+    const isOpen = toggle.getAttribute('aria-expanded') === 'true';
+    const label = isOpen
+      ? getLabel('ui.themeSettingsClose', 'Закрыть настройки темы')
+      : getLabel('ui.themeSettingsOpen', 'Открыть настройки темы');
+    toggle.setAttribute('aria-label', label);
+    toggle.setAttribute('title', label);
+  };
+
+  const setOpen = (isOpen, options = {}) => {
+    window.clearTimeout(closeTimer);
+
+    if (isOpen) {
+      syncWidget();
+      widget.hidden = false;
+      widget.setAttribute('aria-hidden', 'false');
+      toggle.setAttribute('aria-expanded', 'true');
+      menu.classList.add('is-daylight-open');
+      service.classList.add('is-daylight-open');
+      window.requestAnimationFrame(() => widget.classList.add('is-visible'));
+      syncToggleLabel();
+      return;
+    }
+
+    toggle.setAttribute('aria-expanded', 'false');
+    menu.classList.remove('is-daylight-open');
+    service.classList.remove('is-daylight-open');
+    widget.classList.remove('is-visible');
+    widget.setAttribute('aria-hidden', 'true');
+    syncToggleLabel();
+
+    closeTimer = window.setTimeout(() => {
+      if (toggle.getAttribute('aria-expanded') === 'true') return;
+      widget.hidden = true;
+    }, 540);
+
+    if (options.restoreFocus) {
+      window.setTimeout(() => focusWithoutScroll(toggle), 0);
+    }
+  };
+
+  toggle.addEventListener('click', (event) => {
+    event.stopPropagation();
+    setOpen(toggle.getAttribute('aria-expanded') !== 'true');
+    if (event.detail > 0) toggle.blur();
+  });
+
+  serviceToggle.addEventListener('click', () => {
+    if (toggle.getAttribute('aria-expanded') === 'true') setOpen(false);
+  }, { capture: true });
+
+  window.addEventListener('keydown', (event) => {
+    if (event.key !== 'Escape' || toggle.getAttribute('aria-expanded') !== 'true') return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    setOpen(false, { restoreFocus: true });
+  }, { capture: true });
+
+  window.addEventListener('tarski:daylightclose', () => setOpen(false));
+  window.addEventListener('tarski:themechange', syncWidget);
+  window.addEventListener('tarski:languagechange', () => {
+    syncWidget();
+    syncToggleLabel();
+  });
+
+  syncWidget();
+  syncToggleLabel();
+  setOpen(false);
 })();
 
 (() => {
@@ -306,6 +535,7 @@ const getMobileServiceMotionDuration = (element) => {
 
     const shouldRestoreFocus = options.restoreFocus !== false;
 
+    window.dispatchEvent(new CustomEvent('tarski:daylightclose'));
     setToggleState(false);
     service.classList.add('is-closing');
     menu?.classList.add('is-service-closing');
@@ -648,6 +878,7 @@ const getMobileServiceMotionDuration = (element) => {
   let currentActiveId = null;
   let currentScene = document.documentElement.dataset.scene || 'cover';
   let navigationFrame = null;
+  let mobilePlacementTimer = null;
   let needsIndicatorUpdate = false;
   const indicatorTimers = new WeakMap();
   const pulseIndicator = (container) => {
@@ -761,7 +992,9 @@ const getMobileServiceMotionDuration = (element) => {
     if (!mobileMenu) return;
 
     if (!mobileQuery.matches) {
-      mobileMenu.classList.remove('is-visible');
+      window.clearTimeout(mobilePlacementTimer);
+      mobilePlacementTimer = null;
+      mobileMenu.classList.remove('is-visible', 'is-docking', 'is-returning-home');
       return;
     }
 
@@ -769,8 +1002,23 @@ const getMobileServiceMotionDuration = (element) => {
     const mobileHomeBottom = mobileMenuHome ? mobileMenuHome.getBoundingClientRect().bottom : null;
     const navBottom = mainNav ? mainNav.getBoundingClientRect().bottom : 0;
     const shouldShow = mobileHomeBottom !== null ? mobileHomeBottom < 0 : navBottom < 0;
+    const isVisible = mobileMenu.classList.contains('is-visible');
 
+    if (shouldShow === isVisible) return;
+
+    window.clearTimeout(mobilePlacementTimer);
+    mobilePlacementTimer = null;
+    mobileMenu.classList.remove('is-docking', 'is-returning-home');
     mobileMenu.classList.toggle('is-visible', shouldShow);
+
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    const placementClass = shouldShow ? 'is-docking' : 'is-returning-home';
+    mobileMenu.classList.add(placementClass);
+    mobilePlacementTimer = window.setTimeout(() => {
+      mobilePlacementTimer = null;
+      mobileMenu.classList.remove(placementClass);
+    }, getMobileIslandMotionDuration(mobileMenu));
   };
 
   const updateNavigationState = () => {

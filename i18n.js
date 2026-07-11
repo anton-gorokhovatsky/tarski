@@ -54,6 +54,15 @@
         },
         themeDark: 'Включить темную тему',
         themeLight: 'Включить светлую тему',
+        themeSettingsOpen: 'Открыть настройки темы',
+        themeSettingsClose: 'Закрыть настройки темы',
+        themeMode: 'Режим темы',
+        themeAuto: 'Авто',
+        themeLightShort: 'Свет',
+        themeDarkShort: 'Тьма',
+        daylightWidget: 'Световой день и тема',
+        daylightDay: 'Световой день',
+        daylightNight: 'Ночь',
         serviceSettings: 'Настройки сайта',
         serviceOpen: 'Открыть настройки сайта',
         serviceClose: 'Закрыть настройки сайта',
@@ -119,6 +128,15 @@
         },
         themeDark: 'Switch to dark theme',
         themeLight: 'Switch to light theme',
+        themeSettingsOpen: 'Open theme settings',
+        themeSettingsClose: 'Close theme settings',
+        themeMode: 'Theme mode',
+        themeAuto: 'Auto',
+        themeLightShort: 'Light',
+        themeDarkShort: 'Dark',
+        daylightWidget: 'Daylight and theme',
+        daylightDay: 'Daylight',
+        daylightNight: 'Night',
         serviceSettings: 'Site settings',
         serviceOpen: 'Open site settings',
         serviceClose: 'Close site settings',
@@ -282,6 +300,15 @@
         },
         themeDark: 'ダークテーマに切り替える',
         themeLight: 'ライトテーマに切り替える',
+        themeSettingsOpen: 'テーマ設定を開く',
+        themeSettingsClose: 'テーマ設定を閉じる',
+        themeMode: 'テーマモード',
+        themeAuto: '自動',
+        themeLightShort: 'ライト',
+        themeDarkShort: 'ダーク',
+        daylightWidget: '日照時間とテーマ',
+        daylightDay: '昼',
+        daylightNight: '夜',
         serviceSettings: 'サイト設定',
         serviceOpen: 'サイト設定を開く',
         serviceClose: 'サイト設定を閉じる',
@@ -620,6 +647,17 @@
       setAttr(toggle, 'title', label);
     });
     setAttr(document.querySelector('[data-mobile-service-panel]'), 'aria-label', data.ui.serviceSettings);
+    setAttr(document.querySelector('[data-daylight-widget]'), 'aria-label', data.ui.daylightWidget);
+    setAttr(document.querySelector('[data-theme-mode-group]'), 'aria-label', data.ui.themeMode);
+    setText(document.querySelector('[data-theme-mode="auto"]'), data.ui.themeAuto);
+    setText(document.querySelector('[data-theme-mode="light"]'), data.ui.themeLightShort);
+    setText(document.querySelector('[data-theme-mode="dark"]'), data.ui.themeDarkShort);
+    document.querySelectorAll('[data-daylight-toggle]').forEach((toggle) => {
+      const isOpen = toggle.getAttribute('aria-expanded') === 'true';
+      const label = isOpen ? data.ui.themeSettingsClose : data.ui.themeSettingsOpen;
+      setAttr(toggle, 'aria-label', label);
+      setAttr(toggle, 'title', label);
+    });
 
     setText(document.querySelector('.nav-label'), data.ui.scenes[document.documentElement.dataset.scene || 'cover']);
     setText(document.querySelector('[data-mobile-menu-toggle-label]'), data.ui.scenes.cover);
