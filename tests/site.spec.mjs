@@ -77,16 +77,50 @@ test('mobile menu and service panel preserve state, Escape, and focus return', a
   await page.keyboard.press('Escape');
   await expect(menuToggle).toHaveAttribute('aria-expanded', 'false');
   await expect(menuToggle).toBeFocused();
+  await page.waitForTimeout(120);
+  const menuClosingFrame = await menuToggle.evaluate(() => {
+    const panel = document.querySelector('#mobile-menu-expanded');
+    return {
+      panelStillMounted: !panel.hidden,
+      panelMaterialTransform: getComputedStyle(panel).transform,
+      generatedCollapseDot: getComputedStyle(document.querySelector('[data-mobile-menu-toggle]'), '::after').content
+    };
+  });
+  expect(menuClosingFrame.panelStillMounted).toBe(true);
+  expect(menuClosingFrame.panelMaterialTransform).toBe('none');
+  expect(menuClosingFrame.generatedCollapseDot).toBe('none');
   await expect(menu).toBeHidden();
 
   const serviceToggle = page.locator('[data-mobile-service-toggle]');
+  const serviceRoot = page.locator('[data-mobile-service]');
   const servicePanel = page.locator('[data-mobile-service-panel]');
   await serviceToggle.click();
   await expect(serviceToggle).toHaveAttribute('aria-expanded', 'true');
   await expect(servicePanel).toHaveAttribute('aria-hidden', 'false');
+  await expect(serviceRoot).toHaveClass(/is-open/);
+  const serviceSurface = await page.evaluate(() => {
+    const menuRoot = document.querySelector('[data-mobile-menu]');
+    const serviceRoot = document.querySelector('[data-mobile-service]');
+    const expandedMenu = document.querySelector('#mobile-menu-expanded');
+    return {
+      compactBackdrop: getComputedStyle(menuRoot, '::before').backdropFilter,
+      expandedBackdrop: getComputedStyle(menuRoot, '::after').backdropFilter,
+      height: serviceRoot.getBoundingClientRect().height,
+      serviceMaterialTransform: getComputedStyle(menuRoot, '::after').transform,
+      menuBackdrop: getComputedStyle(expandedMenu).backdropFilter,
+      menuMaterialTransform: getComputedStyle(expandedMenu).transform
+    };
+  });
+  expect(serviceSurface.expandedBackdrop).toBe(serviceSurface.compactBackdrop);
+  expect(serviceSurface.menuBackdrop).toBe(serviceSurface.compactBackdrop);
+  expect(serviceSurface.height).toBeGreaterThanOrEqual(50);
+  expect(serviceSurface.height).toBeLessThanOrEqual(54);
+  expect(serviceSurface.serviceMaterialTransform).toBe('none');
+  expect(serviceSurface.menuMaterialTransform).toBe('none');
   await page.keyboard.press('Escape');
   await expect(serviceToggle).toHaveAttribute('aria-expanded', 'false');
   await expect(serviceToggle).toBeFocused();
+  await expect(servicePanel).toBeHidden();
 });
 
 test('artist names remain headings with one keyboard trigger each', async ({ page }) => {

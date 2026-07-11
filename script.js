@@ -37,13 +37,13 @@ const getMobileIslandMotionDuration = (element) => {
   return Number.isFinite(value) ? value : 720;
 };
 
-const getMobileServiceSwapDelay = (element) => {
+const getMobileServiceMotionDuration = (element) => {
   if (!element || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return 0;
 
   const value = Number.parseFloat(
-    window.getComputedStyle(element).getPropertyValue('--mobile-service-swap-delay')
+    window.getComputedStyle(element).getPropertyValue('--mobile-service-motion')
   );
-  return Number.isFinite(value) ? value : 160;
+  return Number.isFinite(value) ? value : 560;
 };
 
 (() => {
@@ -215,7 +215,7 @@ const getMobileServiceSwapDelay = (element) => {
   };
 
   let transitionTimer = null;
-  let shellSwapTimer = null;
+  let openFrame = null;
   let activeTrigger = null;
 
   const setToggleState = (isOpen) => {
@@ -267,7 +267,8 @@ const getMobileServiceSwapDelay = (element) => {
     }
 
     window.clearTimeout(transitionTimer);
-    window.clearTimeout(shellSwapTimer);
+    window.cancelAnimationFrame(openFrame);
+    openFrame = null;
 
     if (isOpen) {
       if (!isExpanded) {
@@ -291,11 +292,15 @@ const getMobileServiceSwapDelay = (element) => {
       }
 
       menu?.classList.add('is-service-transitioning');
-      shellSwapTimer = window.setTimeout(() => {
+      menu?.getBoundingClientRect();
+      openFrame = window.requestAnimationFrame(() => {
+        openFrame = null;
+        if (toggle.getAttribute('aria-expanded') !== 'true') return;
+
         service.classList.add('is-open');
         menu?.classList.add('is-service-open');
         window.requestAnimationFrame(() => menu?.classList.remove('is-service-transitioning'));
-      }, getMobileServiceSwapDelay(menu));
+      });
       return;
     }
 
@@ -305,12 +310,12 @@ const getMobileServiceSwapDelay = (element) => {
     service.classList.add('is-closing');
     menu?.classList.add('is-service-closing');
     menu?.classList.add('is-service-transitioning');
-
-    shellSwapTimer = window.setTimeout(() => {
-      service.classList.remove('is-open');
-      menu?.classList.remove('is-service-open');
-      window.requestAnimationFrame(() => menu?.classList.remove('is-service-transitioning'));
-    }, getMobileServiceSwapDelay(menu));
+    service.classList.remove('is-open');
+    menu?.classList.remove('is-service-open');
+    openFrame = window.requestAnimationFrame(() => {
+      openFrame = null;
+      menu?.classList.remove('is-service-transitioning');
+    });
 
     if (shouldRestoreFocus && activeTrigger instanceof HTMLElement) {
       const triggerToRestore = activeTrigger;
@@ -326,7 +331,7 @@ const getMobileServiceSwapDelay = (element) => {
       menu?.classList.remove('is-service-transitioning');
       setPanelHiddenState(true);
       window.dispatchEvent(new CustomEvent('tarski:mobileislandresize'));
-    }, (getMobileServiceSwapDelay(menu) * 2) + 40);
+    }, getMobileServiceMotionDuration(menu));
   };
 
   toggle.addEventListener('click', (event) => {
