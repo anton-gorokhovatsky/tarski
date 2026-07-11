@@ -2701,7 +2701,8 @@ html.has-open-dossier {
   margin: 0;
 }
 
-.site-footer__privacy {
+.site-footer__privacy,
+.site-footer__weather {
   color: var(--muted-text);
   text-decoration-thickness: 1px;
   text-underline-offset: 0.16em;
@@ -3503,8 +3504,13 @@ html.has-open-dossier {
     --island-service-gap: 12px;
     --island-service-toggle-size: 32px;
     --island-daylight-width: min(332px, calc(100vw - 24px));
-    --island-daylight-height: 220px;
+    --island-daylight-height: 308px;
     --island-daylight-top: 8px;
+    --island-daylight-overflow-y: calc(
+      var(--island-daylight-top)
+      + var(--island-daylight-height)
+      - var(--island-cluster-height)
+    );
     --island-glass-bg: linear-gradient(
       135deg,
       rgba(255, 255, 255, 0.98),
@@ -3539,6 +3545,12 @@ html.has-open-dossier {
     --island-edge-highlight: rgba(255, 255, 255, 0.36);
     --island-edge-shadow: rgba(0, 0, 0, 0.22);
     --island-surface-shadow: rgba(0, 0, 0, 0.16);
+    --island-surface-filter:
+      drop-shadow(calc(-1 * var(--island-edge-width)) 0 0 var(--island-edge-highlight))
+      drop-shadow(0 calc(-1 * var(--island-edge-width)) 0 var(--island-edge-highlight))
+      drop-shadow(var(--island-edge-width) 0 0 var(--island-edge-shadow))
+      drop-shadow(0 var(--island-edge-width) 0 var(--island-edge-shadow))
+      drop-shadow(0 18px 28px var(--island-surface-shadow));
     /* JS-facing aliases for dynamic shell measurements. */
     --mobile-control-size: var(--island-control-size);
     --mobile-island-shell-width: var(--island-compact-width);
@@ -3610,17 +3622,18 @@ html.has-open-dossier {
   }
 
   /* Compact contours and expanded service states share one material recipe. */
-  .mobile-island-surface::before,
+  .mobile-island-surface,
   .mobile-floating-menu::after {
     background: var(--island-glass-bg);
     backdrop-filter: var(--island-glass-backdrop);
     -webkit-backdrop-filter: var(--island-glass-backdrop);
+    filter: var(--island-surface-filter);
   }
 
   /*
-   * The wrapper owns only the outer contour effect. Keeping the clipped material
-   * on its child prevents clip-path from cutting off that edge; no second glass
-   * surface or duplicated material recipe is introduced.
+   * The compact archipelago is one literal material element. Keeping backdrop
+   * sampling and the contour effect on that same element avoids the filtered
+   * ancestor that breaks matte blur in iOS Safari.
    */
   .mobile-island-surface {
     position: absolute;
@@ -3629,28 +3642,13 @@ html.has-open-dossier {
     width: var(--island-cluster-width);
     height: var(--island-cluster-height);
     pointer-events: none;
-    filter:
-      drop-shadow(calc(-1 * var(--island-edge-width)) 0 0 var(--island-edge-highlight))
-      drop-shadow(0 calc(-1 * var(--island-edge-width)) 0 var(--island-edge-highlight))
-      drop-shadow(var(--island-edge-width) 0 0 var(--island-edge-shadow))
-      drop-shadow(0 var(--island-edge-width) 0 var(--island-edge-shadow))
-      drop-shadow(0 18px 28px var(--island-surface-shadow));
-    opacity: 1;
-    transition: opacity 220ms var(--island-motion-ease);
-    will-change: opacity;
-  }
-
-  .mobile-island-surface::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    width: var(--island-cluster-width);
-    height: var(--island-cluster-height);
-    /* The original CSS material repeats once in the empty gap between contour rows. */
     background-size: 100% 92px;
     background-repeat: repeat-y;
     -webkit-clip-path: var(--mobile-island-clip);
     clip-path: var(--mobile-island-clip);
+    opacity: 1;
+    transition: opacity 220ms var(--island-motion-ease);
+    will-change: opacity;
   }
 
   /* The service surface stays full-size; only its reveal mask expands from the locale dot. */
@@ -3663,11 +3661,9 @@ html.has-open-dossier {
     width: var(--island-service-width);
     height: var(--island-lens-service-height);
     pointer-events: none;
-    border: var(--island-edge-width) solid var(--island-edge-highlight);
+    border: 0;
     border-radius: 999px;
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.28),
-      0 0 0 var(--island-edge-width) var(--island-edge-shadow);
+    box-shadow: none;
     opacity: 0;
     -webkit-clip-path: circle(26px at calc(50% + 43px) 50%);
     clip-path: circle(26px at calc(50% + 43px) 50%);
@@ -3691,6 +3687,25 @@ html.has-open-dossier {
     pointer-events: auto;
     transform: translate3d(-50%, 0, 0);
     transform-origin: 50% 100%;
+  }
+
+  .mobile-floating-menu.is-visible.is-daylight-open {
+    bottom: max(
+      calc(var(--island-daylight-overflow-y) + 12px + env(safe-area-inset-bottom)),
+      calc(var(--island-daylight-overflow-y) + 12px + var(--mobile-visual-bottom-inset, 0px))
+    );
+  }
+
+  @supports (-webkit-touch-callout: none) {
+    @media (hover: none) and (pointer: coarse) {
+      .mobile-floating-menu.is-visible.is-daylight-open {
+        bottom: max(
+          calc(var(--island-daylight-overflow-y) + 64px),
+          calc(var(--island-daylight-overflow-y) + 12px + env(safe-area-inset-bottom)),
+          calc(var(--island-daylight-overflow-y) + 12px + var(--mobile-visual-bottom-inset, 0px))
+        );
+      }
+    }
   }
 
   @keyframes mobile-island-dock-in {
@@ -4056,19 +4071,7 @@ html.has-open-dossier {
   }
 
   .mobile-service::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    border-radius: 999px;
-    box-shadow: 0 22px 52px var(--island-surface-shadow);
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 180ms var(--island-motion-ease);
-  }
-
-  .mobile-service.is-daylight-open::after {
-    border-radius: 32px;
+    content: none;
   }
 
   .mobile-service.is-daylight-open::before {
@@ -4076,7 +4079,7 @@ html.has-open-dossier {
     position: absolute;
     left: 0;
     right: 0;
-    top: 68px;
+    top: 72px;
     z-index: 0;
     border-top: 1px solid rgba(0, 0, 0, 0.09);
     pointer-events: none;
@@ -4084,17 +4087,6 @@ html.has-open-dossier {
 
   :root[data-effective-theme="dark"] .mobile-service.is-daylight-open::before {
     border-color: rgba(255, 255, 255, 0.12);
-  }
-
-  .mobile-floating-menu.is-service-open .mobile-service::after {
-    opacity: 1;
-    transition-delay: 360ms;
-  }
-
-  .mobile-floating-menu.is-service-closing .mobile-service::after {
-    opacity: 0;
-    transition-duration: var(--island-motion-handoff-duration);
-    transition-delay: var(--island-motion-compact-return-delay);
   }
 
   .mobile-floating-menu.is-service-open .mobile-service {
@@ -4194,7 +4186,7 @@ html.has-open-dossier {
   }
 
   .mobile-service.is-daylight-open .mobile-service-toggle {
-    top: 8px;
+    top: 10px;
   }
 
   .mobile-service.is-open .mobile-service-toggle span {
@@ -4245,7 +4237,7 @@ html.has-open-dossier {
   .mobile-service.is-daylight-open .mobile-service-panel {
     left: 28px;
     width: calc(100% - 86px);
-    height: 68px;
+    height: 72px;
     justify-content: space-between;
   }
 
@@ -4308,12 +4300,13 @@ html.has-open-dossier {
   }
 
   .daylight-widget {
+    --daylight-content-inset: 28px;
     position: absolute;
-    left: 28px;
-    top: 78px;
+    left: var(--daylight-content-inset);
+    top: 84px;
     z-index: 2;
-    width: calc(100% - 56px);
-    height: 127px;
+    width: calc(100% - (var(--daylight-content-inset) * 2));
+    height: 210px;
     color: var(--mobile-pill-text);
     opacity: 0;
     pointer-events: none;
@@ -4339,30 +4332,43 @@ html.has-open-dossier {
     display: flex;
     align-items: baseline;
     justify-content: space-between;
-    min-height: 18px;
+    min-height: 20px;
     color: color-mix(in srgb, currentColor 74%, transparent);
-    font-family: var(--font-ui-latin);
-    font-size: 12px;
-    line-height: 1;
+    font-family: var(--font-serif-display);
+    font-size: 14px;
+    line-height: 1.1;
     letter-spacing: 0.01em;
   }
 
+  .daylight-widget__meta > span {
+    min-width: 0;
+    padding-right: 16px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
   .daylight-widget__meta time {
+    flex: 0 0 auto;
     color: currentColor;
+    font-style: normal;
     font-variant-numeric: tabular-nums;
+    white-space: nowrap;
   }
 
   .daylight-widget__chart {
-    position: relative;
-    width: 100%;
-    height: 58px;
-    margin-top: 7px;
+    display: grid;
+    grid-template-rows: 64px 18px;
+    width: calc(100% + (var(--daylight-content-inset) * 2));
+    height: 82px;
+    margin-top: 8px;
+    margin-left: calc(-1 * var(--daylight-content-inset));
   }
 
   .daylight-widget__chart svg {
     display: block;
     width: 100%;
-    height: 58px;
+    height: 64px;
     overflow: visible;
   }
 
@@ -4386,6 +4392,8 @@ html.has-open-dossier {
     fill: color-mix(in srgb, currentColor 14%, transparent);
     stroke: color-mix(in srgb, currentColor 22%, transparent);
     stroke-width: 0.7px;
+    transform-box: fill-box;
+    transform-origin: center;
   }
 
   .daylight-widget__marker {
@@ -4396,30 +4404,124 @@ html.has-open-dossier {
     fill: color-mix(in srgb, currentColor 58%, transparent);
   }
 
+  .daylight-widget.is-marker-arriving .daylight-widget__marker-halo {
+    animation: daylight-marker-arrival 820ms var(--island-motion-ease) both;
+  }
+
+  @keyframes daylight-marker-arrival {
+    0% { opacity: 0.35; transform: scale(0.72); }
+    68% { opacity: 0.82; transform: scale(1); }
+    86% { opacity: 1; transform: scale(1.18); }
+    100% { opacity: 1; transform: scale(1); }
+  }
+
   .daylight-widget__axis {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
     display: flex;
+    align-items: flex-end;
     justify-content: space-between;
+    padding: 0 var(--daylight-content-inset);
     color: color-mix(in srgb, currentColor 50%, transparent);
-    font-family: var(--font-ui-latin);
-    font-size: 10px;
+    font-family: var(--font-serif-display);
+    font-size: 12px;
+    font-style: normal;
     font-variant-numeric: tabular-nums;
-    line-height: 1;
+    line-height: 18px;
+  }
+
+  .daylight-widget__axis time {
+    white-space: nowrap;
+  }
+
+  .daylight-time__separator {
+    position: relative;
+    display: inline-block;
+    width: 0.22rem;
+    height: 0.58rem;
+    margin: 0 0.015em;
+    overflow: hidden;
+    color: inherit;
+    font-size: 0;
+    vertical-align: -0.02rem;
+  }
+
+  .daylight-time__separator::before,
+  .daylight-time__separator::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    width: 1.25px;
+    height: 1.25px;
+    border-radius: 50%;
+    background: currentColor;
+    transform: translateX(-50%);
+  }
+
+  .daylight-time__separator::before {
+    top: 1.8px;
+  }
+
+  .daylight-time__separator::after {
+    bottom: 1.8px;
+  }
+
+  .daylight-widget__weather {
+    display: flex;
+    align-items: baseline;
+    justify-content: flex-start;
+    min-height: 32px;
+    margin-top: 16px;
+    color: color-mix(in srgb, currentColor 84%, transparent);
+  }
+
+  .daylight-widget__weather strong {
+    font-family: var(--font-serif-display);
+    font-size: 28px;
+    font-style: normal;
+    font-variant-numeric: lining-nums tabular-nums;
+    font-weight: 400;
+    line-height: 32px;
   }
 
   .daylight-widget__modes {
+    --theme-mode-index: 0;
+    position: relative;
+    isolation: isolate;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 4px;
-    height: 34px;
-    margin-top: 10px;
+    height: 40px;
+    margin-top: 12px;
     padding: 2px;
     border: 0.5px solid color-mix(in srgb, currentColor 14%, transparent);
     border-radius: 999px;
     background: color-mix(in srgb, var(--page-bg) 12%, transparent);
+    overflow: hidden;
+  }
+
+  .daylight-widget__modes::before {
+    content: "";
+    position: absolute;
+    left: 2px;
+    top: 2px;
+    z-index: 0;
+    width: calc((100% - 12px) / 3);
+    height: calc(100% - 4px);
+    border: 0.75px solid color-mix(in srgb, currentColor 34%, transparent);
+    border-radius: 999px;
+    background: color-mix(in srgb, currentColor 10%, transparent);
+    box-shadow:
+      inset 0 1px 0 color-mix(in srgb, #fff 24%, transparent),
+      0 4px 12px color-mix(in srgb, #000 14%, transparent);
+    transform: translate3d(
+      calc(var(--theme-mode-index) * (100% + 4px)),
+      0,
+      0
+    );
+    transition:
+      transform 560ms cubic-bezier(0.16, 1, 0.3, 1),
+      background 280ms var(--island-motion-ease),
+      border-color 280ms var(--island-motion-ease),
+      box-shadow 280ms var(--island-motion-ease);
   }
 
   .daylight-widget__modes button {
@@ -4434,8 +4536,10 @@ html.has-open-dossier {
     cursor: pointer;
     font: inherit;
     font-family: var(--font-ui-latin);
-    font-size: 11px;
+    font-size: 12px;
     line-height: 1;
+    position: relative;
+    z-index: 1;
     transition:
       color var(--duration-fast) var(--ease-smooth),
       background var(--duration-fast) var(--ease-smooth),
@@ -4443,8 +4547,8 @@ html.has-open-dossier {
   }
 
   .daylight-widget__modes button[aria-pressed="true"] {
-    background: color-mix(in srgb, currentColor 10%, transparent);
-    box-shadow: inset 0 1px 0 color-mix(in srgb, #fff 16%, transparent);
+    background: transparent;
+    box-shadow: none;
     color: currentColor;
   }
 
@@ -4790,7 +4894,6 @@ html.has-open-dossier {
 
   @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
     .mobile-island-surface,
-    .mobile-island-surface::before,
     .mobile-floating-menu::after,
     .mobile-menu-expanded,
     .mobile-menu-toggle::before,
@@ -4821,6 +4924,25 @@ html.has-open-dossier {
   .mobile-floating-menu.is-visible {
     left: 50%;
     bottom: calc(4px + env(safe-area-inset-bottom));
+  }
+
+  .mobile-floating-menu.is-visible.is-daylight-open {
+    bottom: max(
+      calc(var(--island-daylight-overflow-y) + 12px + env(safe-area-inset-bottom)),
+      calc(var(--island-daylight-overflow-y) + 12px + var(--mobile-visual-bottom-inset, 0px))
+    );
+  }
+
+  @supports (-webkit-touch-callout: none) {
+    @media (hover: none) and (pointer: coarse) {
+      .mobile-floating-menu.is-visible.is-daylight-open {
+        bottom: max(
+          calc(var(--island-daylight-overflow-y) + 64px),
+          calc(var(--island-daylight-overflow-y) + 12px + env(safe-area-inset-bottom)),
+          calc(var(--island-daylight-overflow-y) + 12px + var(--mobile-visual-bottom-inset, 0px))
+        );
+      }
+    }
   }
 
   .mobile-menu-toggle {

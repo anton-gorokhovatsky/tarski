@@ -63,6 +63,18 @@
         daylightWidget: 'Световой день и тема',
         daylightDay: 'Световой день',
         daylightNight: 'Ночь',
+        weatherCredit: 'Погода: Open-Meteo',
+        weather: {
+          clear: 'Ясно',
+          partlyCloudy: 'Переменная облачность',
+          cloudy: 'Облачно',
+          fog: 'Туман',
+          drizzle: 'Морось',
+          rain: 'Дождь',
+          showers: 'Ливни',
+          snow: 'Снег',
+          thunderstorm: 'Гроза'
+        },
         serviceSettings: 'Настройки сайта',
         serviceOpen: 'Открыть настройки сайта',
         serviceClose: 'Закрыть настройки сайта',
@@ -137,6 +149,18 @@
         daylightWidget: 'Daylight and theme',
         daylightDay: 'Daylight',
         daylightNight: 'Night',
+        weatherCredit: 'Weather: Open-Meteo',
+        weather: {
+          clear: 'Clear',
+          partlyCloudy: 'Partly cloudy',
+          cloudy: 'Cloudy',
+          fog: 'Fog',
+          drizzle: 'Drizzle',
+          rain: 'Rain',
+          showers: 'Showers',
+          snow: 'Snow',
+          thunderstorm: 'Thunderstorm'
+        },
         serviceSettings: 'Site settings',
         serviceOpen: 'Open site settings',
         serviceClose: 'Close site settings',
@@ -309,6 +333,18 @@
         daylightWidget: '日照時間とテーマ',
         daylightDay: '昼',
         daylightNight: '夜',
+        weatherCredit: '天気：Open-Meteo',
+        weather: {
+          clear: '晴れ',
+          partlyCloudy: '晴れ時々曇り',
+          cloudy: '曇り',
+          fog: '霧',
+          drizzle: '霧雨',
+          rain: '雨',
+          showers: 'にわか雨',
+          snow: '雪',
+          thunderstorm: '雷雨'
+        },
         serviceSettings: 'サイト設定',
         serviceOpen: 'サイト設定を開く',
         serviceClose: 'サイト設定を閉じる',
@@ -618,7 +654,7 @@
       const isCurrent = language === currentLanguage;
       button.setAttribute('aria-pressed', String(isCurrent));
       setAttr(button, 'aria-label', data.ui.languageNames[language]);
-      setAttr(button, 'title', data.ui.languageNames[language]);
+      button.removeAttribute('title');
     });
   };
 
@@ -648,11 +684,12 @@
     });
     setAttr(document.querySelector('[data-mobile-service-panel]'), 'aria-label', data.ui.serviceSettings);
     setAttr(document.querySelector('[data-daylight-widget]'), 'aria-label', data.ui.daylightWidget);
+    setText(document.querySelector('[data-weather-credit]'), data.ui.weatherCredit);
     setAttr(document.querySelector('[data-theme-mode-group]'), 'aria-label', data.ui.themeMode);
     setText(document.querySelector('[data-theme-mode-group] [data-theme-mode="auto"]'), data.ui.themeAuto);
     setText(document.querySelector('[data-theme-mode-group] [data-theme-mode="light"]'), data.ui.themeLightShort);
     setText(document.querySelector('[data-theme-mode-group] [data-theme-mode="dark"]'), data.ui.themeDarkShort);
-    document.querySelectorAll('[data-daylight-toggle]').forEach((toggle) => {
+    document.querySelectorAll('[data-daylight-toggle], [data-daylight-launcher]').forEach((toggle) => {
       const isOpen = toggle.getAttribute('aria-expanded') === 'true';
       const label = isOpen ? data.ui.themeSettingsClose : data.ui.themeSettingsOpen;
       setAttr(toggle, 'aria-label', label);

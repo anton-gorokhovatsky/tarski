@@ -104,6 +104,7 @@ const getMobileServiceMotionDuration = (element) => {
   const storageKey = 'tarski-theme';
   const themeToggles = Array.from(document.querySelectorAll('[data-theme-toggle]'));
   const themeModeControls = Array.from(document.querySelectorAll('[data-theme-mode]'));
+  const themeModeGroups = Array.from(document.querySelectorAll('[data-theme-mode-group]'));
   const themeColors = {
     light: '#f2f2f2',
     dark: '#101010'
@@ -224,7 +225,7 @@ const getMobileServiceMotionDuration = (element) => {
     themeToggles.forEach((toggle) => {
       toggle.setAttribute('aria-pressed', String(isDark));
 
-      if (toggle.matches('[data-daylight-toggle]')) {
+      if (toggle.matches('[data-daylight-toggle], [data-daylight-launcher]')) {
         const isOpen = toggle.getAttribute('aria-expanded') === 'true';
         const settingsLabel = isOpen
           ? getLabel('ui.themeSettingsClose', 'Закрыть настройки темы')
@@ -239,6 +240,11 @@ const getMobileServiceMotionDuration = (element) => {
 
     themeModeControls.forEach((control) => {
       control.setAttribute('aria-pressed', String(control.dataset.themeMode === mode));
+    });
+
+    const modeIndex = Math.max(0, ['auto', 'light', 'dark'].indexOf(mode));
+    themeModeGroups.forEach((group) => {
+      group.style.setProperty('--theme-mode-index', String(modeIndex));
     });
   };
 
@@ -264,7 +270,7 @@ const getMobileServiceMotionDuration = (element) => {
 
   themeToggles.forEach((toggle) => {
     toggle.addEventListener('click', () => {
-      if (toggle.matches('[data-daylight-toggle]')) return;
+      if (toggle.matches('[data-daylight-toggle], [data-daylight-launcher]')) return;
       const nextTheme = getEffectiveTheme() === 'dark' ? 'light' : 'dark';
       setMode(nextTheme);
     });
@@ -294,6 +300,7 @@ const getMobileServiceMotionDuration = (element) => {
     getDaylightState,
     getEffectiveTheme,
     getMode: getStoredMode,
+    getSolarPosition: () => ({ ...solarPosition }),
     setMode
   };
 
@@ -312,37 +319,195 @@ const getMobileServiceMotionDuration = (element) => {
   const nowLabel = widget?.querySelector('[data-daylight-now]');
   const sunriseLabel = widget?.querySelector('[data-daylight-sunrise]');
   const sunsetLabel = widget?.querySelector('[data-daylight-sunset]');
+  const temperatureLabel = widget?.querySelector('[data-weather-temperature]');
+  const launchers = Array.from(document.querySelectorAll('[data-daylight-launcher]'));
 
-  if (!widget || !toggle || !service || !serviceToggle || !menu || !marker || !markerHalo) return;
+  if (!widget || !toggle || !service || !serviceToggle || !menu || !marker || !markerHalo || !temperatureLabel) return;
 
   const getLabel = (path, fallback) => window.tarskiI18n?.t(path) || fallback;
-  const formatTime = (date, timeZone) => new Intl.DateTimeFormat(
-    window.tarskiI18n?.getLanguage?.() || 'ru',
-    { hour: '2-digit', minute: '2-digit', hour12: false, timeZone }
-  ).format(date);
+  const formatTime = (date, timeZone) => {
+    const language = window.tarskiI18n?.getLanguage?.() || 'ru';
+    const locales = { ru: 'ru-RU', en: 'en-US', ja: 'ja-JP' };
+    const formatted = new Intl.DateTimeFormat(locales[language] || locales.ru, {
+      hour: language === 'en' ? 'numeric' : '2-digit',
+      minute: '2-digit',
+      timeZone
+    }).format(date);
+
+    return language === 'en'
+      ? formatted.replace(/\s*(AM|PM)$/i, (_, dayPeriod) => ` ${dayPeriod.toLowerCase()}`)
+      : formatted;
+  };
+  const renderTime = (element, date, timeZone) => {
+    const value = formatTime(date, timeZone);
+    const separatorIndex = value.indexOf(':');
+    element.setAttribute('aria-label', value);
+
+    if (separatorIndex < 0) {
+      element.textContent = value;
+      return;
+    }
+
+    const separator = document.createElement('span');
+    separator.className = 'daylight-time__separator';
+    separator.setAttribute('aria-hidden', 'true');
+    separator.textContent = ':';
+    element.replaceChildren(
+      document.createTextNode(value.slice(0, separatorIndex)),
+      separator,
+      document.createTextNode(value.slice(separatorIndex + 1))
+    );
+  };
   let closeTimer = null;
+  let markerFrame = null;
+  let weatherRequest = null;
+  let cachedWeather = null;
+  let weatherFetchedAt = 0;
 
-  const syncWidget = () => {
-    const daylight = window.tarskiTheme?.getDaylightState?.();
-    if (!daylight) return;
+  const getWeatherKey = (code) => {
+    if (code === 0) return 'clear';
+    if (code === 1 || code === 2) return 'partlyCloudy';
+    if (code === 3) return 'cloudy';
+    if (code === 45 || code === 48) return 'fog';
+    if ([51, 53, 55, 56, 57].includes(code)) return 'drizzle';
+    if ([61, 63, 65, 66, 67].includes(code)) return 'rain';
+    if ([80, 81, 82].includes(code)) return 'showers';
+    if ([71, 73, 75, 77, 85, 86].includes(code)) return 'snow';
+    if ([95, 96, 99].includes(code)) return 'thunderstorm';
+    return 'cloudy';
+  };
 
-    const progress = Math.min(1, Math.max(0, daylight.progress));
+  const weatherFallbacks = {
+    clear: 'Clear',
+    partlyCloudy: 'Partly cloudy',
+    cloudy: 'Cloudy',
+    fog: 'Fog',
+    drizzle: 'Drizzle',
+    rain: 'Rain',
+    showers: 'Showers',
+    snow: 'Snow',
+    thunderstorm: 'Thunderstorm'
+  };
+
+  const syncWeather = (fallbackStatus) => {
+    if (!cachedWeather) {
+      status.textContent = fallbackStatus;
+      temperatureLabel.textContent = '—\u00A0°C';
+      return;
+    }
+
+    const weatherKey = getWeatherKey(cachedWeather.code);
+    status.textContent = getLabel(`ui.weather.${weatherKey}`, weatherFallbacks[weatherKey]);
+    temperatureLabel.textContent = `${Math.round(cachedWeather.temperature)}\u00A0°C`;
+  };
+
+  const loadWeather = async () => {
+    if (cachedWeather && Date.now() - weatherFetchedAt < 15 * 60 * 1000) {
+      return cachedWeather;
+    }
+    if (weatherRequest) return weatherRequest;
+
+    const position = window.tarskiTheme?.getSolarPosition?.();
+    if (!position) return null;
+
+    const url = new URL('https://api.open-meteo.com/v1/forecast');
+    url.search = new URLSearchParams({
+      latitude: String(position.latitude),
+      longitude: String(position.longitude),
+      current: 'temperature_2m,weather_code',
+      temperature_unit: 'celsius',
+      timezone: position.timeZone
+    }).toString();
+
+    weatherRequest = fetch(url, { mode: 'cors' })
+      .then((response) => {
+        if (!response.ok) throw new Error(`Weather request failed: ${response.status}`);
+        return response.json();
+      })
+      .then((data) => {
+        const temperature = Number(data.current?.temperature_2m);
+        const code = Number(data.current?.weather_code);
+        if (!Number.isFinite(temperature) || !Number.isFinite(code)) return null;
+
+        cachedWeather = { temperature, code };
+        weatherFetchedAt = Date.now();
+        syncWidget();
+        return cachedWeather;
+      })
+      .catch(() => null)
+      .finally(() => {
+        weatherRequest = null;
+      });
+
+    return weatherRequest;
+  };
+
+  const setMarkerProgress = (progress) => {
     const markerX = 6 + (220 * progress);
-    const markerY = 41.5 - (34.5 * Math.sin(Math.PI * progress));
-    const statusLabel = daylight.isDay
-      ? getLabel('ui.daylightDay', 'Световой день')
-      : getLabel('ui.daylightNight', 'Ночь');
+    const markerY = 46.5 - (39.5 * Math.sin(Math.PI * progress));
 
     marker.setAttribute('cx', markerX.toFixed(2));
     marker.setAttribute('cy', markerY.toFixed(2));
     markerHalo.setAttribute('cx', markerX.toFixed(2));
     markerHalo.setAttribute('cy', markerY.toFixed(2));
-    status.textContent = statusLabel;
-    nowLabel.textContent = formatTime(daylight.now, daylight.timeZone);
+  };
+
+  const animateMarker = (targetProgress) => {
+    window.cancelAnimationFrame(markerFrame);
+
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setMarkerProgress(targetProgress);
+      return;
+    }
+
+    const startedAt = performance.now();
+    const duration = 820;
+    widget.classList.remove('is-marker-arriving');
+    widget.getBoundingClientRect();
+    widget.classList.add('is-marker-arriving');
+
+    const tick = (now) => {
+      const elapsed = Math.min(1, (now - startedAt) / duration);
+      const eased = 1 - Math.pow(1 - elapsed, 3);
+      setMarkerProgress(targetProgress * eased);
+
+      if (elapsed < 1) {
+        markerFrame = window.requestAnimationFrame(tick);
+      } else {
+        markerFrame = null;
+        widget.classList.remove('is-marker-arriving');
+      }
+    };
+
+    setMarkerProgress(0);
+    markerFrame = window.requestAnimationFrame(tick);
+  };
+
+  const updateViewportInset = () => {
+    const viewport = window.visualViewport;
+    const coveredBottom = viewport
+      ? Math.max(0, window.innerHeight - viewport.offsetTop - viewport.height)
+      : 0;
+    menu.style.setProperty('--mobile-visual-bottom-inset', `${coveredBottom}px`);
+  };
+
+  const syncWidget = (options = {}) => {
+    const daylight = window.tarskiTheme?.getDaylightState?.();
+    if (!daylight) return;
+
+    const progress = Math.min(1, Math.max(0, daylight.progress));
+    const statusLabel = daylight.isDay
+      ? getLabel('ui.daylightDay', 'Световой день')
+      : getLabel('ui.daylightNight', 'Ночь');
+
+    if (options.animateMarker) animateMarker(progress);
+    else setMarkerProgress(progress);
+    syncWeather(statusLabel);
+    renderTime(nowLabel, daylight.now, daylight.timeZone);
     nowLabel.setAttribute('datetime', daylight.now.toISOString());
-    sunriseLabel.textContent = formatTime(daylight.sunrise, daylight.timeZone);
+    renderTime(sunriseLabel, daylight.sunrise, daylight.timeZone);
     sunriseLabel.setAttribute('datetime', daylight.sunrise.toISOString());
-    sunsetLabel.textContent = formatTime(daylight.sunset, daylight.timeZone);
+    renderTime(sunsetLabel, daylight.sunset, daylight.timeZone);
     sunsetLabel.setAttribute('datetime', daylight.sunset.toISOString());
     widget.dataset.phase = daylight.isDay ? 'day' : 'night';
   };
@@ -360,17 +525,25 @@ const getMobileServiceMotionDuration = (element) => {
     window.clearTimeout(closeTimer);
 
     if (isOpen) {
-      syncWidget();
+      updateViewportInset();
       widget.hidden = false;
       widget.setAttribute('aria-hidden', 'false');
+      syncWidget({ animateMarker: true });
+      loadWeather();
       toggle.setAttribute('aria-expanded', 'true');
       menu.classList.add('is-daylight-open');
       service.classList.add('is-daylight-open');
       window.requestAnimationFrame(() => widget.classList.add('is-visible'));
       syncToggleLabel();
+      if (options.focusToggle) {
+        window.setTimeout(() => focusWithoutScroll(toggle), 80);
+      }
       return;
     }
 
+    window.cancelAnimationFrame(markerFrame);
+    markerFrame = null;
+    widget.classList.remove('is-marker-arriving');
     toggle.setAttribute('aria-expanded', 'false');
     menu.classList.remove('is-daylight-open');
     service.classList.remove('is-daylight-open');
@@ -394,6 +567,14 @@ const getMobileServiceMotionDuration = (element) => {
     if (event.detail > 0) toggle.blur();
   });
 
+  launchers.forEach((launcher) => {
+    launcher.addEventListener('click', (event) => {
+      event.stopPropagation();
+      window.dispatchEvent(new CustomEvent('tarski:daylightrequest'));
+      if (event.detail > 0) launcher.blur();
+    });
+  });
+
   serviceToggle.addEventListener('click', () => {
     if (toggle.getAttribute('aria-expanded') === 'true') setOpen(false);
   }, { capture: true });
@@ -406,12 +587,22 @@ const getMobileServiceMotionDuration = (element) => {
   }, { capture: true });
 
   window.addEventListener('tarski:daylightclose', () => setOpen(false));
+  window.addEventListener('tarski:daylightrequest', () => {
+    window.dispatchEvent(new CustomEvent('tarski:mobileserviceopenrequest'));
+    window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(() => setOpen(true, { focusToggle: true }));
+    });
+  });
   window.addEventListener('tarski:themechange', syncWidget);
   window.addEventListener('tarski:languagechange', () => {
     syncWidget();
     syncToggleLabel();
   });
+  window.addEventListener('resize', updateViewportInset);
+  window.visualViewport?.addEventListener('resize', updateViewportInset);
+  window.visualViewport?.addEventListener('scroll', updateViewportInset);
 
+  updateViewportInset();
   syncWidget();
   syncToggleLabel();
   setOpen(false);
@@ -501,7 +692,9 @@ const getMobileServiceMotionDuration = (element) => {
 
     if (isOpen) {
       if (!isExpanded) {
-        activeTrigger = document.activeElement instanceof HTMLElement ? document.activeElement : toggle;
+        activeTrigger = options.restoreTarget instanceof HTMLElement
+          ? options.restoreTarget
+          : (document.activeElement instanceof HTMLElement ? document.activeElement : toggle);
       }
       window.dispatchEvent(new CustomEvent('tarski:mobileserviceopen'));
     }
@@ -600,6 +793,9 @@ const getMobileServiceMotionDuration = (element) => {
   });
 
   window.addEventListener('resize', updateServiceShellWidth);
+  window.addEventListener('tarski:mobileserviceopenrequest', () => {
+    setOpen(true, { restoreTarget: toggle });
+  });
   window.addEventListener('tarski:mobilemenuopen', () => setOpen(false));
   mobileQuery.addEventListener('change', (event) => {
     if (!event.matches) setOpen(false, { restoreFocus: false });
@@ -787,7 +983,7 @@ const getMobileServiceMotionDuration = (element) => {
     }
   });
 
-  window.addEventListener('tarski:mobileserviceopen', () => setOpen(false));
+  window.addEventListener('tarski:mobileserviceopen', () => setOpen(false, { restoreFocus: false }));
   mobileQuery.addEventListener('change', (event) => {
     if (!event.matches) setOpen(false, { restoreFocus: false });
   });

@@ -7,7 +7,8 @@ const languages = {
     widget: 'Световой день и тема',
     auto: 'Авто',
     day: 'День',
-    night: 'Ночь'
+    night: 'Ночь',
+    weather: 'Ясно'
   },
   en: {
     privacyTitle: /Analytics/,
@@ -15,7 +16,8 @@ const languages = {
     widget: 'Daylight and theme',
     auto: 'Auto',
     day: 'Day',
-    night: 'Night'
+    night: 'Night',
+    weather: 'Clear'
   },
   ja: {
     privacyTitle: /アクセス解析/,
@@ -23,12 +25,23 @@ const languages = {
     widget: '日照時間とテーマ',
     auto: '自動',
     day: '昼',
-    night: '夜'
+    night: '夜',
+    weather: '晴れ'
   }
 };
 
 test.beforeEach(async ({ page }) => {
   await page.route('https://mc.yandex.ru/**', (route) => route.abort());
+  await page.route('https://api.open-meteo.com/**', (route) => route.fulfill({
+    status: 200,
+    contentType: 'application/json',
+    body: JSON.stringify({
+      current: {
+        temperature_2m: 13.2,
+        weather_code: 0
+      }
+    })
+  }));
 });
 
 for (const [language, copy] of Object.entries(languages)) {
@@ -67,6 +80,8 @@ for (const [language, copy] of Object.entries(languages)) {
     await expect(widget.locator('[data-theme-mode="auto"]')).toHaveText(copy.auto);
     await expect(widget.locator('[data-theme-mode="light"]')).toHaveText(copy.day);
     await expect(widget.locator('[data-theme-mode="dark"]')).toHaveText(copy.night);
+    await expect(widget.locator('[data-daylight-status]')).toHaveText(copy.weather);
+    await expect(widget.locator('[data-weather-temperature]')).toHaveText('13\u00A0°C');
     await page.waitForTimeout(560);
 
     const widgetBounds = await widget.evaluate((element) => {
@@ -75,6 +90,21 @@ for (const [language, copy] of Object.entries(languages)) {
     });
     expect(widgetBounds.left).toBeGreaterThanOrEqual(0);
     expect(widgetBounds.right).toBeLessThanOrEqual(widgetBounds.viewport);
+
+    const formattedTimes = await widget.locator('time').allTextContents();
+    await expect(widget.locator('.daylight-time__separator')).toHaveCount(3);
+    expect(await widget.evaluate((element) => (
+      Array.from(element.querySelectorAll('time'))
+        .every((time) => time.getAttribute('aria-label') === time.textContent)
+    ))).toBe(true);
+    if (language === 'en') {
+      expect(formattedTimes.every((value) => /\b(?:am|pm)$/i.test(value))).toBe(true);
+      expect(formattedTimes.every((value) => !/[\u00a0\u202f]/.test(value))).toBe(true);
+    } else {
+      expect(formattedTimes.every((value) => !/\b(?:am|pm)$/i.test(value))).toBe(true);
+    }
+
+    await expect(page.locator('[data-language-option][title]')).toHaveCount(0);
   });
 
   test(`${language}: privacy page is localized and canonical`, async ({ page }) => {
@@ -131,10 +161,13 @@ test('mobile menu and service panel preserve state, Escape, and focus return', a
     const serviceRoot = document.querySelector('[data-mobile-service]');
     const expandedMenu = document.querySelector('#mobile-menu-expanded');
     return {
-      compactBackdrop: getComputedStyle(menuRoot.querySelector('.mobile-island-surface'), '::before').backdropFilter,
-      compactBackground: getComputedStyle(menuRoot.querySelector('.mobile-island-surface'), '::before').backgroundImage,
+      compactBackdrop: getComputedStyle(menuRoot.querySelector('.mobile-island-surface')).backdropFilter,
+      compactBackground: getComputedStyle(menuRoot.querySelector('.mobile-island-surface')).backgroundImage,
+      compactFilter: getComputedStyle(menuRoot.querySelector('.mobile-island-surface')).filter,
+      compactPseudoContent: getComputedStyle(menuRoot.querySelector('.mobile-island-surface'), '::before').content,
       expandedBackdrop: getComputedStyle(menuRoot, '::after').backdropFilter,
       expandedBackground: getComputedStyle(menuRoot, '::after').backgroundImage,
+      expandedFilter: getComputedStyle(menuRoot, '::after').filter,
       height: serviceRoot.getBoundingClientRect().height,
       serviceMaterialTransform: getComputedStyle(menuRoot, '::after').transform,
       menuBackdrop: getComputedStyle(expandedMenu).backdropFilter,
@@ -143,6 +176,8 @@ test('mobile menu and service panel preserve state, Escape, and focus return', a
   });
   expect(serviceSurface.expandedBackdrop).toBe(serviceSurface.compactBackdrop);
   expect(serviceSurface.compactBackground).toBe(serviceSurface.expandedBackground);
+  expect(serviceSurface.compactFilter).toBe(serviceSurface.expandedFilter);
+  expect(serviceSurface.compactPseudoContent).toBe('none');
   expect(serviceSurface.compactBackground.match(/linear-gradient/g)).toHaveLength(1);
   expect(serviceSurface.compactBackground).toContain('0.98');
   expect(serviceSurface.menuBackdrop).toBe(serviceSurface.compactBackdrop);
@@ -174,44 +209,101 @@ test('daylight widget expands the service material and keeps theme modes accessi
   await expect(widget).toHaveAttribute('aria-hidden', 'false');
   await expect(widget).toBeVisible();
   await expect(widget.locator('time')).toHaveCount(3);
-  await page.waitForTimeout(560);
+  await page.waitForTimeout(700);
 
   const expandedGeometry = await serviceRoot.evaluate((element) => {
     const menu = element.closest('[data-mobile-menu]');
     const widgetElement = element.querySelector('[data-daylight-widget]');
     const serviceRect = element.getBoundingClientRect();
     const widgetRect = widgetElement.getBoundingClientRect();
+    const chartRect = widgetElement.querySelector('.daylight-widget__chart').getBoundingClientRect();
+    const metaRect = widgetElement.querySelector('.daylight-widget__meta').getBoundingClientRect();
+    const weatherRect = widgetElement.querySelector('.daylight-widget__weather').getBoundingClientRect();
+    const modesRect = widgetElement.querySelector('.daylight-widget__modes').getBoundingClientRect();
 
     return {
       height: serviceRect.height,
       menuHasWidgetState: menu.classList.contains('is-daylight-open'),
       materialRadius: getComputedStyle(menu, '::after').borderRadius,
-      shadowRadius: getComputedStyle(element, '::after').borderRadius,
+      ghostShadowContent: getComputedStyle(element, '::after').content,
       widgetInsetLeft: widgetRect.left - serviceRect.left,
-      widgetInsetRight: serviceRect.right - widgetRect.right
+      widgetInsetRight: serviceRect.right - widgetRect.right,
+      widgetInsetBottom: serviceRect.bottom - widgetRect.bottom,
+      chartInsetLeft: chartRect.left - serviceRect.left,
+      chartInsetRight: serviceRect.right - chartRect.right,
+      metaInsetLeft: metaRect.left - serviceRect.left,
+      metaInsetRight: serviceRect.right - metaRect.right,
+      weatherInsetLeft: weatherRect.left - serviceRect.left,
+      weatherInsetRight: serviceRect.right - weatherRect.right,
+      modesInsetLeft: modesRect.left - serviceRect.left,
+      modesInsetRight: serviceRect.right - modesRect.right,
+      chartBottom: widgetElement.querySelector('svg').getBoundingClientRect().bottom,
+      axisTop: widgetElement.querySelector('.daylight-widget__axis').getBoundingClientRect().top,
+      chartBottomToWeather: widgetElement.querySelector('.daylight-widget__weather').getBoundingClientRect().top
+        - widgetElement.querySelector('.daylight-widget__chart').getBoundingClientRect().bottom,
+      timeFont: getComputedStyle(widgetElement.querySelector('time')).fontFamily
     };
   });
-  expect(expandedGeometry.height).toBeGreaterThanOrEqual(216);
-  expect(expandedGeometry.height).toBeLessThanOrEqual(224);
+  expect(expandedGeometry.height).toBeGreaterThanOrEqual(304);
+  expect(expandedGeometry.height).toBeLessThanOrEqual(312);
   expect(expandedGeometry.menuHasWidgetState).toBe(true);
-  expect(expandedGeometry.shadowRadius).toBe(expandedGeometry.materialRadius);
+  expect(expandedGeometry.ghostShadowContent).toBe('none');
   expect(expandedGeometry.widgetInsetLeft).toBeCloseTo(28, 0);
   expect(expandedGeometry.widgetInsetRight).toBeCloseTo(28, 0);
+  expect(expandedGeometry.widgetInsetBottom).toBeGreaterThanOrEqual(12);
+  expect(expandedGeometry.chartInsetLeft).toBeCloseTo(0, 1);
+  expect(expandedGeometry.chartInsetRight).toBeCloseTo(0, 1);
+  expect(expandedGeometry.metaInsetLeft).toBeCloseTo(28, 0);
+  expect(expandedGeometry.metaInsetRight).toBeCloseTo(28, 0);
+  expect(expandedGeometry.weatherInsetLeft).toBeCloseTo(28, 0);
+  expect(expandedGeometry.weatherInsetRight).toBeCloseTo(28, 0);
+  expect(expandedGeometry.modesInsetLeft).toBeCloseTo(28, 0);
+  expect(expandedGeometry.modesInsetRight).toBeCloseTo(28, 0);
+  expect(expandedGeometry.chartBottom).toBeLessThanOrEqual(expandedGeometry.axisTop);
+  expect(expandedGeometry.chartBottomToWeather).toBeGreaterThanOrEqual(15);
+  expect(expandedGeometry.timeFont).toContain('Noto Serif');
 
   const darkMode = widget.locator('[data-theme-mode="dark"]');
   const autoMode = widget.locator('[data-theme-mode="auto"]');
   await darkMode.click();
   await expect(page.locator('html')).toHaveAttribute('data-effective-theme', 'dark');
   await expect(darkMode).toHaveAttribute('aria-pressed', 'true');
+  await expect(widget.locator('[data-theme-mode-group]')).toHaveCSS('--theme-mode-index', '2');
   await autoMode.click();
   await expect(page.locator('html')).toHaveAttribute('data-theme-preference', 'auto');
   await expect(autoMode).toHaveAttribute('aria-pressed', 'true');
+
+  await page.evaluate(() => {
+    const home = document.querySelector('[data-mobile-menu-home]');
+    window.scrollTo(0, home.offsetTop + home.offsetHeight + 80);
+  });
+  await expect(page.locator('[data-mobile-menu]')).toHaveClass(/is-visible/);
+  await expect(page.locator('[data-mobile-menu]')).not.toHaveClass(/is-docking/);
+  const fixedBottomGap = await serviceRoot.evaluate((element) => (
+    window.innerHeight - element.getBoundingClientRect().bottom
+  ));
+  expect(fixedBottomGap).toBeGreaterThanOrEqual(11);
 
   await page.keyboard.press('Escape');
   await expect(daylightToggle).toHaveAttribute('aria-expanded', 'false');
   await expect(serviceToggle).toHaveAttribute('aria-expanded', 'true');
   await page.keyboard.press('Escape');
   await expect(serviceToggle).toHaveAttribute('aria-expanded', 'false');
+});
+
+test('main mobile menu launches the existing daylight widget', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/?lang=ru');
+
+  await page.locator('[data-mobile-menu-toggle]').click();
+  await expect(page.locator('#mobile-menu-expanded')).toBeVisible();
+  await page.locator('[data-daylight-launcher]').click();
+
+  await expect(page.locator('[data-mobile-menu-toggle]')).toHaveAttribute('aria-expanded', 'false');
+  await expect(page.locator('[data-mobile-service-toggle]')).toHaveAttribute('aria-expanded', 'true');
+  await expect(page.locator('[data-daylight-toggle]')).toHaveAttribute('aria-expanded', 'true');
+  await expect(page.locator('[data-daylight-widget]')).toBeVisible();
+  await expect(page.locator('[data-daylight-widget]')).toHaveCount(1);
 });
 
 test('widget language switching preserves the live page and preview URL', async ({ page }) => {
