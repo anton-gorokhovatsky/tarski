@@ -92,7 +92,7 @@ for (const [language, copy] of Object.entries(languages)) {
     expect(widgetBounds.right).toBeLessThanOrEqual(widgetBounds.viewport);
 
     const formattedTimes = await widget.locator('time').allTextContents();
-    await expect(widget.locator('.daylight-time__separator')).toHaveCount(3);
+    await expect(widget.locator('.daylight-time__separator')).toHaveCount(0);
     expect(await widget.evaluate((element) => (
       Array.from(element.querySelectorAll('time'))
         .every((time) => time.getAttribute('aria-label') === time.textContent)
@@ -220,6 +220,13 @@ test('daylight widget expands the service material and keeps theme modes accessi
     const metaRect = widgetElement.querySelector('.daylight-widget__meta').getBoundingClientRect();
     const weatherRect = widgetElement.querySelector('.daylight-widget__weather').getBoundingClientRect();
     const modesRect = widgetElement.querySelector('.daylight-widget__modes').getBoundingClientRect();
+    const modesElement = widgetElement.querySelector('.daylight-widget__modes');
+    const modeButtonCenters = Array.from(modesElement.querySelectorAll('button'))
+      .map((button) => {
+        const rect = button.getBoundingClientRect();
+        return rect.top + rect.height / 2;
+      });
+    const modeSliderStyle = getComputedStyle(modesElement, '::before');
 
     return {
       height: serviceRect.height,
@@ -237,6 +244,10 @@ test('daylight widget expands the service material and keeps theme modes accessi
       weatherInsetRight: serviceRect.right - weatherRect.right,
       modesInsetLeft: modesRect.left - serviceRect.left,
       modesInsetRight: serviceRect.right - modesRect.right,
+      modesPadding: parseFloat(getComputedStyle(modesElement).paddingLeft),
+      modeSliderTop: parseFloat(modeSliderStyle.top),
+      modeSliderHeight: parseFloat(modeSliderStyle.height),
+      modeButtonCenterDelta: Math.max(...modeButtonCenters) - Math.min(...modeButtonCenters),
       chartBottom: widgetElement.querySelector('svg').getBoundingClientRect().bottom,
       axisTop: widgetElement.querySelector('.daylight-widget__axis').getBoundingClientRect().top,
       chartBottomToWeather: widgetElement.querySelector('.daylight-widget__weather').getBoundingClientRect().top
@@ -259,9 +270,14 @@ test('daylight widget expands the service material and keeps theme modes accessi
   expect(expandedGeometry.weatherInsetRight).toBeCloseTo(28, 0);
   expect(expandedGeometry.modesInsetLeft).toBeCloseTo(28, 0);
   expect(expandedGeometry.modesInsetRight).toBeCloseTo(28, 0);
+  expect(expandedGeometry.modesPadding).toBeCloseTo(4, 1);
+  expect(expandedGeometry.modeSliderTop).toBeCloseTo(4, 1);
+  expect(expandedGeometry.modeSliderHeight).toBeGreaterThanOrEqual(30);
+  expect(expandedGeometry.modeSliderHeight).toBeLessThanOrEqual(32);
+  expect(expandedGeometry.modeButtonCenterDelta).toBeLessThanOrEqual(0.1);
   expect(expandedGeometry.chartBottom).toBeLessThanOrEqual(expandedGeometry.axisTop);
   expect(expandedGeometry.chartBottomToWeather).toBeGreaterThanOrEqual(15);
-  expect(expandedGeometry.timeFont).toContain('Noto Serif');
+  expect(expandedGeometry.timeFont).toContain('Arial');
 
   const darkMode = widget.locator('[data-theme-mode="dark"]');
   const autoMode = widget.locator('[data-theme-mode="auto"]');

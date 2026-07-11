@@ -4351,6 +4351,7 @@ html.has-open-dossier {
   .daylight-widget__meta time {
     flex: 0 0 auto;
     color: currentColor;
+    font-family: Arial, Helvetica, sans-serif;
     font-style: normal;
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
@@ -4429,39 +4430,8 @@ html.has-open-dossier {
   }
 
   .daylight-widget__axis time {
+    font-family: Arial, Helvetica, sans-serif;
     white-space: nowrap;
-  }
-
-  .daylight-time__separator {
-    position: relative;
-    display: inline-block;
-    width: 0.22rem;
-    height: 0.58rem;
-    margin: 0 0.015em;
-    overflow: hidden;
-    color: inherit;
-    font-size: 0;
-    vertical-align: -0.02rem;
-  }
-
-  .daylight-time__separator::before,
-  .daylight-time__separator::after {
-    content: "";
-    position: absolute;
-    left: 50%;
-    width: 1.25px;
-    height: 1.25px;
-    border-radius: 50%;
-    background: currentColor;
-    transform: translateX(-50%);
-  }
-
-  .daylight-time__separator::before {
-    top: 1.8px;
-  }
-
-  .daylight-time__separator::after {
-    bottom: 1.8px;
   }
 
   .daylight-widget__weather {
@@ -4488,10 +4458,10 @@ html.has-open-dossier {
     isolation: isolate;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 4px;
+    gap: 0;
     height: 40px;
     margin-top: 12px;
-    padding: 2px;
+    padding: 4px;
     border: 0.5px solid color-mix(in srgb, currentColor 14%, transparent);
     border-radius: 999px;
     background: color-mix(in srgb, var(--page-bg) 12%, transparent);
@@ -4501,19 +4471,19 @@ html.has-open-dossier {
   .daylight-widget__modes::before {
     content: "";
     position: absolute;
-    left: 2px;
-    top: 2px;
+    left: 4px;
+    top: 4px;
     z-index: 0;
-    width: calc((100% - 12px) / 3);
-    height: calc(100% - 4px);
-    border: 0.75px solid color-mix(in srgb, currentColor 34%, transparent);
+    width: calc((100% - 8px) / 3);
+    height: calc(100% - 8px);
+    border: 0.5px solid color-mix(in srgb, currentColor 30%, transparent);
     border-radius: 999px;
     background: color-mix(in srgb, currentColor 10%, transparent);
     box-shadow:
-      inset 0 1px 0 color-mix(in srgb, #fff 24%, transparent),
-      0 4px 12px color-mix(in srgb, #000 14%, transparent);
+      inset 0 1px 0 color-mix(in srgb, #fff 20%, transparent),
+      0 3px 9px color-mix(in srgb, #000 12%, transparent);
     transform: translate3d(
-      calc(var(--theme-mode-index) * (100% + 4px)),
+      calc(var(--theme-mode-index) * 100%),
       0,
       0
     );
@@ -4528,14 +4498,17 @@ html.has-open-dossier {
     -webkit-appearance: none;
     appearance: none;
     min-width: 0;
-    padding: 0 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1px 8px 0;
     border: 0;
     border-radius: 999px;
     background: transparent;
     color: color-mix(in srgb, currentColor 54%, transparent);
     cursor: pointer;
     font: inherit;
-    font-family: var(--font-ui-latin);
+    font-family: var(--font-sans);
     font-size: 12px;
     line-height: 1;
     position: relative;

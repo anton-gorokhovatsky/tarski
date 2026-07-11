@@ -340,23 +340,8 @@ const getMobileServiceMotionDuration = (element) => {
   };
   const renderTime = (element, date, timeZone) => {
     const value = formatTime(date, timeZone);
-    const separatorIndex = value.indexOf(':');
+    element.textContent = value;
     element.setAttribute('aria-label', value);
-
-    if (separatorIndex < 0) {
-      element.textContent = value;
-      return;
-    }
-
-    const separator = document.createElement('span');
-    separator.className = 'daylight-time__separator';
-    separator.setAttribute('aria-hidden', 'true');
-    separator.textContent = ':';
-    element.replaceChildren(
-      document.createTextNode(value.slice(0, separatorIndex)),
-      separator,
-      document.createTextNode(value.slice(separatorIndex + 1))
-    );
   };
   let closeTimer = null;
   let markerFrame = null;
