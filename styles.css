@@ -3483,22 +3483,31 @@ html.has-open-dossier {
     --island-service-pad-right: 18.5px;
     --island-service-gap: 12px;
     --island-service-toggle-size: 32px;
-    --island-glass-bg: var(--mobile-pill-bg);
-    --island-glass-backdrop: var(--matte-backdrop-filter);
+    --island-glass-bg: var(--matte-panel-bg);
+    --island-glass-backdrop: var(--matte-panel-backdrop-filter);
     --island-glass-shadow:
       0 28px 74px rgba(0, 0, 0, 0.18),
       inset 0 1px 0 rgba(255, 255, 255, 0.28);
     --mobile-island-clip: path("M 18.6433 54.7658 C 17.0966 40.6432 21.8307 29.4056 32.8455 21.0533 C 43.0745 12.7870 56.4407 7.7501 72.9442 5.9427 C 87.9618 5.0920 101.0086 8.0302 112.0842 14.7572 C 123.0743 20.6997 129.6495 29.9046 131.8096 42.3721 C 133.2704 55.7102 129.2800 66.4692 119.8365 74.6495 C 110.3933 82.8297 98.2060 87.7375 83.2743 89.3728 C 66.7708 91.1802 52.2383 89.1987 39.6767 83.4285 C 27.1152 77.6581 20.1040 68.1039 18.6433 54.7658 Z M 25.2443 101.8318 C 33.8994 94.2212 43.5671 92.1255 54.2473 95.5447 C 64.5039 98.4822 74.0791 105.0081 82.9727 115.1224 C 90.5384 124.6962 94.6699 134.7278 95.3670 145.2171 C 96.5450 155.2836 93.4990 163.9402 86.2290 171.1868 C 78.0547 178.3746 69.0509 180.7410 59.2178 178.2846 C 49.3846 175.8287 40.4447 170.0253 32.3981 160.8743 C 23.5045 150.7600 18.0452 140.1880 16.0202 129.1582 C 13.9953 118.1284 17.0699 109.0196 25.2443 101.8318 Z M 90.4708 108.1912 C 92.0036 101.4609 95.9621 97.0529 102.3462 94.9672 C 108.3559 92.7961 115.2931 92.6063 123.1580 94.3975 C 130.1888 96.3920 135.7127 99.8131 139.7299 104.6610 C 143.8322 109.1350 145.3894 114.4059 144.4015 120.4736 C 142.9538 126.8300 139.4124 131.1364 133.7772 133.3927 C 128.1421 135.6490 121.7666 135.9668 114.6508 134.3463 C 106.7859 132.5551 100.4278 129.3372 95.5764 124.6926 C 90.7250 120.0481 89.0232 114.5476 90.4708 108.1912 Z");
 
-    /* Island motion tokens. */
-    --island-motion-morph: 480ms;
-    --island-motion-content-fade: 160ms;
-    --island-motion-content-shift: 380ms;
-    --island-motion-content-collapse: 360ms;
-    --island-motion-collapse-delay: 140ms;
-    --island-motion-handoff-shift: translate3d(-16px, 0, 0) scale(0.98);
-    --island-motion-return-shift: translate3d(16px, 0, 0) scale(0.98);
-    --island-motion-menu-shift: translate3d(0, 18px, 0) scale(0.96);
+    /* Stable shared-element motion: contours never interpolate or deform. */
+    --island-motion-morph: 720ms;
+    --island-motion-content-fade: 320ms;
+    --island-motion-panel-content: 260ms;
+    --island-motion-panel-content-delay: 340ms;
+    --island-motion-content-shift: 720ms;
+    --island-motion-content-collapse: 0ms;
+    --island-motion-collapse-delay: 0ms;
+    --island-motion-ease: cubic-bezier(0.32, 0, 0.2, 1);
+    --island-motion-handoff-shift: none;
+    --island-motion-return-shift: none;
+    --island-motion-menu-shift: none;
+    --island-edge-highlight: rgba(255, 255, 255, 0.36);
+    --island-edge-shadow: rgba(0, 0, 0, 0.22);
+    --island-edge-rim: rgba(0, 0, 0, 0.2);
+    --island-surface-shadow: rgba(0, 0, 0, 0.16);
+    /* Geometry swaps while hidden; keep that handoff brief so it never reads as a blank frame. */
+    --mobile-service-swap-delay: 200ms;
 
     /* JS-facing aliases for dynamic shell measurements. */
     --mobile-control-size: var(--island-control-size);
@@ -3525,17 +3534,8 @@ html.has-open-dossier {
     --mobile-island-return-shift: var(--island-motion-return-shift);
     --mobile-island-menu-shift: var(--island-motion-menu-shift);
     --mobile-island-shell-transition:
-      opacity var(--duration-fast) var(--ease-smooth),
-      box-shadow var(--duration-fast) var(--ease-smooth),
-      border-radius var(--mobile-island-morph) var(--ease-smooth),
-      gap var(--mobile-island-morph) var(--ease-smooth),
-      height var(--mobile-island-morph) var(--ease-smooth),
-      padding var(--mobile-island-morph) var(--ease-smooth),
-      background var(--mobile-island-morph) var(--ease-smooth),
-      backdrop-filter var(--mobile-island-morph) var(--ease-smooth),
-      min-width var(--mobile-island-morph) var(--ease-smooth),
-      transform var(--mobile-island-morph) var(--ease-smooth),
-      width var(--mobile-island-morph) var(--ease-smooth);
+      opacity var(--mobile-island-content-fade) var(--island-motion-ease),
+      transform var(--mobile-island-morph) var(--island-motion-ease);
     --mobile-island-content-transition:
       opacity var(--mobile-island-content-fade) var(--ease-smooth),
       transform var(--mobile-island-content-shift) var(--ease-smooth),
@@ -3563,19 +3563,45 @@ html.has-open-dossier {
     padding: 0;
     overflow: visible;
     border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    -webkit-clip-path: none;
+    clip-path: none;
+    isolation: auto;
+    opacity: 1;
+    pointer-events: auto;
+    transform: translate3d(0, 0, 0);
+    transform-origin: 50% 50%;
+    transition: transform var(--mobile-island-morph) var(--island-motion-ease);
+    will-change: transform;
+  }
+
+  .mobile-floating-menu::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    width: var(--island-cluster-width);
+    height: var(--island-cluster-height);
+    pointer-events: none;
     background: var(--island-glass-bg);
     box-shadow: var(--island-glass-shadow);
     backdrop-filter: var(--island-glass-backdrop);
     -webkit-backdrop-filter: var(--island-glass-backdrop);
     -webkit-clip-path: var(--mobile-island-clip);
     clip-path: var(--mobile-island-clip);
-    isolation: auto;
+    filter:
+      drop-shadow(0 0 0.8px var(--island-edge-rim))
+      drop-shadow(0 -0.45px 0 var(--island-edge-highlight))
+      drop-shadow(0 0.65px 0 var(--island-edge-shadow))
+      drop-shadow(0 18px 28px var(--island-surface-shadow));
     opacity: 1;
-    pointer-events: auto;
-    transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0) scale(1);
     transform-origin: 50% 50%;
-    transition: var(--mobile-island-shell-transition);
-    will-change: clip-path, transform, opacity, width, height;
+    transition: opacity var(--mobile-service-swap-delay) var(--island-motion-ease);
+    will-change: opacity;
   }
 
   .mobile-floating-menu.is-visible {
@@ -3589,6 +3615,20 @@ html.has-open-dossier {
     transform-origin: 50% 100%;
   }
 
+  :root[data-effective-theme="light"] .mobile-floating-menu {
+    --island-edge-highlight: rgba(255, 255, 255, 0.68);
+    --island-edge-shadow: rgba(0, 0, 0, 0.18);
+    --island-edge-rim: rgba(0, 0, 0, 0.24);
+    --island-surface-shadow: rgba(0, 0, 0, 0.15);
+  }
+
+  :root[data-effective-theme="dark"] .mobile-floating-menu {
+    --island-edge-highlight: rgba(255, 255, 255, 0.2);
+    --island-edge-shadow: rgba(0, 0, 0, 0.5);
+    --island-edge-rim: rgba(255, 255, 255, 0.16);
+    --island-surface-shadow: rgba(0, 0, 0, 0.34);
+  }
+
   .mobile-menu-toggle,
   .mobile-mail-pill,
   .mobile-service-toggle {
@@ -3598,67 +3638,12 @@ html.has-open-dossier {
     -webkit-backdrop-filter: none;
   }
 
-  .mobile-floating-menu.is-menu-open,
-  .mobile-floating-menu.is-service-open {
-    -webkit-clip-path: none;
-    clip-path: none;
-  }
-
   .mobile-floating-menu.is-menu-open {
     z-index: 81;
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    justify-content: stretch;
-    gap: 0;
-    width: var(--mobile-menu-expanded-width);
-    height: min(var(--mobile-menu-expanded-height), calc(100dvh - 24px - env(safe-area-inset-bottom)));
-    max-width: var(--mobile-island-max-width);
-    max-height: calc(100dvh - 24px - env(safe-area-inset-bottom));
-    padding: 0;
-    overflow: auto;
-    border-radius: var(--corner-panel-mobile);
-    corner-shape: squircle;
-    background: var(--island-glass-bg);
-    box-shadow: var(--island-glass-shadow);
-    backdrop-filter: var(--island-glass-backdrop);
-    -webkit-backdrop-filter: var(--island-glass-backdrop);
-    transition: var(--mobile-island-shell-transition);
-    scrollbar-width: none;
-  }
-
-  .mobile-floating-menu.is-menu-open:not(.is-visible) {
-    position: absolute;
-    left: 50%;
-    top: 0;
-    transform: translate3d(-50%, 0, 0);
-    transform-origin: var(--island-menu-origin-x) var(--island-menu-origin-y);
-  }
-
-  .mobile-floating-menu.is-visible.is-menu-open {
-    transform-origin: var(--island-menu-origin-x) calc(100% - (var(--island-cluster-height) - var(--island-menu-origin-y)));
-  }
-
-  .mobile-floating-menu.is-menu-open::-webkit-scrollbar {
-    display: none;
   }
 
   .mobile-floating-menu.is-service-open {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-    gap: 0;
-    height: calc(var(--mobile-control-size) + var(--mobile-island-pad-y) * 2);
-    min-width: 0;
-    padding-left: var(--mobile-service-pad-left);
-    padding-right: var(--mobile-service-pad-right);
-    overflow: hidden;
-    border-radius: 999px;
-    width: min(var(--mobile-service-shell-width), var(--mobile-island-max-width));
-    isolation: isolate;
-    transition: var(--mobile-island-shell-transition);
-    transform-origin: 50% 50%;
+    z-index: 81;
   }
 
   .mobile-floating-menu.is-measuring-service {
@@ -3677,12 +3662,24 @@ html.has-open-dossier {
     transform: none;
   }
 
-  .mobile-floating-menu.is-service-open:not(.is-visible) {
-    transform: translate3d(var(--island-service-origin-x), var(--island-service-home-shift-y), 0);
+  .mobile-floating-menu.is-menu-open::before {
+    opacity: 0;
   }
 
-  .mobile-floating-menu.is-visible.is-service-open {
-    transform: translate3d(calc(-50% + var(--island-service-origin-x)), var(--island-service-fixed-shift-y), 0);
+  .mobile-floating-menu.is-service-open::before {
+    inset: auto;
+    left: 50%;
+    top: var(--island-lens-service-y);
+    width: min(var(--mobile-service-shell-width), var(--mobile-island-max-width));
+    height: calc(var(--mobile-control-size) + var(--mobile-island-pad-y) * 2);
+    -webkit-clip-path: inset(0 round 999px);
+    clip-path: inset(0 round 999px);
+    opacity: 1;
+    transform: translate3d(-50%, 0, 0);
+  }
+
+  .mobile-floating-menu.is-service-transitioning::before {
+    opacity: 0;
   }
 
   .mobile-floating-menu.is-menu-closing,
@@ -3842,32 +3839,24 @@ html.has-open-dossier {
   .mobile-floating-menu.is-service-open .mobile-menu-toggle,
   .mobile-floating-menu.is-menu-open .mobile-menu-toggle,
   .mobile-floating-menu.is-service-open .mobile-mail-pill {
-    width: 0;
-    max-width: 0;
-    min-width: 0;
-    height: 0;
-    margin: 0;
-    padding: 0;
-    overflow: hidden;
     opacity: 0;
     pointer-events: none;
-    transform: var(--mobile-island-handoff-shift);
-    transition: var(--mobile-island-content-transition-delayed);
+    transition: opacity var(--mobile-island-content-fade) var(--island-motion-ease);
+  }
+
+  .mobile-floating-menu.is-service-transitioning .mobile-menu-toggle,
+  .mobile-floating-menu.is-service-transitioning .mobile-mail-pill,
+  .mobile-floating-menu.is-service-transitioning .mobile-service {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--mobile-service-swap-delay) var(--island-motion-ease);
   }
 
   .mobile-floating-menu.is-menu-open .mobile-mail-pill,
   .mobile-floating-menu.is-menu-open .mobile-service {
-    width: 0;
-    max-width: 0;
-    min-width: 0;
-    height: 0;
-    margin: 0;
-    padding: 0;
-    overflow: hidden;
     opacity: 0;
     pointer-events: none;
-    transform: var(--mobile-island-menu-shift);
-    transition: var(--mobile-island-content-transition);
+    transition: opacity var(--mobile-island-content-fade) var(--island-motion-ease);
   }
 
   .mobile-mail-pill:active {
@@ -3906,22 +3895,22 @@ html.has-open-dossier {
     min-width: 0;
     transform: translate3d(0, 0, 0);
     transform-origin: 50% 50%;
-    transition:
-      flex var(--mobile-island-morph) var(--ease-smooth),
-      gap var(--mobile-island-morph) var(--ease-smooth),
-      transform var(--mobile-island-morph) var(--ease-smooth),
-      left var(--mobile-island-morph) var(--ease-smooth),
-      top var(--mobile-island-morph) var(--ease-smooth),
-      width var(--mobile-island-morph) var(--ease-smooth);
+    transition: opacity var(--mobile-island-content-fade) var(--island-motion-ease);
+    will-change: opacity;
+  }
+
+  .mobile-service::before {
+    content: none;
   }
 
   .mobile-floating-menu.is-service-open .mobile-service {
-    position: relative;
-    left: auto;
-    top: auto;
-    width: 100%;
-    height: var(--mobile-control-size);
-    transform: none;
+    position: absolute;
+    left: 50%;
+    top: var(--island-lens-service-y);
+    width: min(var(--mobile-service-shell-width), var(--mobile-island-max-width));
+    height: calc(var(--mobile-control-size) + var(--mobile-island-pad-y) * 2);
+    transform: translate3d(-50%, 0, 0);
+    transition: opacity var(--mobile-island-content-fade) var(--island-motion-ease);
   }
 
   .mobile-service.is-open {
@@ -3929,6 +3918,8 @@ html.has-open-dossier {
     justify-content: space-between;
     gap: 0;
     width: 100%;
+    padding-left: var(--mobile-service-pad-left);
+    padding-right: var(--mobile-service-pad-right);
   }
 
   .mobile-service-toggle {
@@ -3956,10 +3947,10 @@ html.has-open-dossier {
     -webkit-tap-highlight-color: transparent;
     touch-action: manipulation;
     --mobile-lens-clip: path("M 4.4708 20.1912 C 6.0036 13.4609 9.9621 9.0529 16.3462 6.9672 C 22.3559 4.7961 29.2931 4.6063 37.1580 6.3975 C 44.1888 8.3920 49.7127 11.8131 53.7299 16.6610 C 57.8322 21.1350 59.3894 26.4059 58.4015 32.4736 C 56.9538 38.8300 53.4124 43.1364 47.7772 45.3927 C 42.1421 47.6490 35.7666 47.9668 28.6508 46.3463 C 20.7859 44.5551 14.4278 41.3372 9.5764 36.6926 C 4.7250 32.0481 3.0232 26.5476 4.4708 20.1912 Z");
+    z-index: 1;
     transition:
       opacity var(--duration-fast) var(--ease-smooth),
-      transform var(--duration-fast) var(--ease-smooth),
-      width var(--mobile-island-morph) var(--ease-smooth);
+      transform var(--duration-fast) var(--ease-smooth);
   }
 
   .mobile-floating-menu.is-service-open .mobile-service-toggle::before {
@@ -3993,9 +3984,8 @@ html.has-open-dossier {
     display: inline-block;
     width: 21px;
     overflow: hidden;
-    transition:
-      width var(--duration-normal) var(--ease-smooth),
-      opacity var(--duration-fast) var(--ease-smooth);
+    /* The whole service island owns the fade; its code must never trail behind it. */
+    transition: none;
   }
 
   .mobile-service.is-open .mobile-service-toggle {
@@ -4007,9 +3997,7 @@ html.has-open-dossier {
   .mobile-service.is-open .mobile-service-toggle span {
     width: 0;
     opacity: 0;
-    transition:
-      width 120ms var(--ease-smooth),
-      opacity 1ms linear;
+    transition: none;
   }
 
   .mobile-service.is-open .mobile-service-toggle::after {
@@ -4024,6 +4012,7 @@ html.has-open-dossier {
   .mobile-service-panel {
     order: 1;
     position: relative;
+    z-index: 1;
     display: inline-flex;
     align-items: center;
     gap: 11px;
@@ -4035,14 +4024,12 @@ html.has-open-dossier {
     transform: translate3d(0, 0, 0) scale(1);
     transform-origin: 50% 50%;
     opacity: 1;
-    transition:
-      opacity var(--duration-normal) var(--ease-smooth),
-      transform var(--mobile-island-morph) var(--ease-smooth);
-    will-change: opacity, transform;
+    transition: opacity var(--mobile-island-content-fade) var(--island-motion-ease);
+    will-change: opacity;
   }
 
   .mobile-service.is-open .mobile-service-panel {
-    transition-delay: 55ms, 55ms;
+    transition-delay: 0ms;
   }
 
   .mobile-service:not(.is-open) .mobile-service-panel {
@@ -4051,7 +4038,7 @@ html.has-open-dossier {
     right: 0;
     opacity: 0;
     pointer-events: none;
-    transform: var(--mobile-island-return-shift);
+    transform: none;
   }
 
   .mobile-service:not(.is-open):not(.is-closing) .mobile-service-panel {
@@ -4118,16 +4105,77 @@ html.has-open-dossier {
   .mobile-menu-expanded {
     box-sizing: border-box;
     display: block;
-    width: 100%;
-    overflow: hidden;
+    position: absolute;
+    left: 50%;
+    top: 0;
+    z-index: 4;
+    width: var(--mobile-menu-expanded-width);
+    height: min(var(--mobile-menu-expanded-height), calc(100dvh - 24px - env(safe-area-inset-bottom)));
+    max-width: var(--mobile-island-max-width);
+    max-height: calc(100dvh - 24px - env(safe-area-inset-bottom));
+    overflow: auto;
+    isolation: isolate;
+    border: 0;
+    border-radius: var(--corner-panel-mobile);
+    background: transparent;
+    box-shadow: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
     color: var(--mobile-pill-text);
-    opacity: 0;
-    transform: translate3d(0, 18px, 0) scale(0.98);
-    transform-origin: 50% 100%;
+    opacity: 1;
+    pointer-events: none;
+    transform: translate3d(-50%, -30px, 0);
     transition:
-      opacity 140ms var(--ease-smooth),
-      transform 240ms var(--ease-smooth);
+      box-shadow var(--mobile-island-content-fade) var(--island-motion-ease),
+      transform var(--mobile-island-morph) var(--island-motion-ease);
+    will-change: transform;
+    scrollbar-width: none;
+  }
+
+  /* The surface morphs independently; text and controls never get raster-scaled. */
+  .mobile-menu-expanded::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    border: 0.5px solid var(--island-edge-highlight);
+    border-radius: inherit;
+    background: var(--island-glass-bg);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.28),
+      0 0 0 0.5px var(--island-edge-shadow);
+    backdrop-filter: var(--island-glass-backdrop);
+    -webkit-backdrop-filter: var(--island-glass-backdrop);
+    opacity: 0;
+    transform: translate3d(0, 0, 0) scale(0.3136);
+    transform-origin: 50% var(--island-menu-origin-y);
+    transition:
+      opacity var(--mobile-island-content-fade) var(--island-motion-ease),
+      transform var(--mobile-island-morph) var(--island-motion-ease);
     will-change: opacity, transform;
+  }
+
+  .mobile-menu-expanded > * {
+    position: relative;
+    z-index: 1;
+    opacity: 0;
+    transition: opacity var(--island-motion-panel-content) var(--island-motion-ease);
+    will-change: opacity;
+  }
+
+  .mobile-menu-expanded::-webkit-scrollbar {
+    display: none;
+  }
+
+  .mobile-floating-menu.is-visible .mobile-menu-expanded {
+    top: auto;
+    bottom: 0;
+    transform: translate3d(-50%, 0, 0);
+  }
+
+  .mobile-floating-menu.is-visible .mobile-menu-expanded::before {
+    transform-origin: 50% calc(100% - (var(--island-cluster-height) - var(--island-menu-origin-y)));
   }
 
   .mobile-menu-expanded[hidden] {
@@ -4135,11 +4183,30 @@ html.has-open-dossier {
   }
 
   .mobile-floating-menu.is-menu-open .mobile-menu-expanded {
+    pointer-events: auto;
+    transform: translate3d(-50%, 0, 0);
+    box-shadow: var(--island-glass-shadow);
+  }
+
+  .mobile-floating-menu.is-menu-open .mobile-menu-expanded::before {
     opacity: 1;
     transform: translate3d(0, 0, 0) scale(1);
-    transition:
-      opacity 160ms var(--ease-smooth) 40ms,
-      transform 240ms var(--ease-smooth) 40ms;
+  }
+
+  .mobile-floating-menu.is-menu-open .mobile-menu-expanded > * {
+    opacity: 1;
+    transition-delay: var(--island-motion-panel-content-delay);
+  }
+
+  .mobile-floating-menu.is-menu-closing .mobile-menu-expanded > * {
+    opacity: 0;
+    transition-delay: 0ms;
+  }
+
+  .mobile-floating-menu.is-menu-closing .mobile-menu-toggle,
+  .mobile-floating-menu.is-menu-closing .mobile-mail-pill,
+  .mobile-floating-menu.is-menu-closing .mobile-service {
+    transition-delay: var(--island-motion-panel-content-delay);
   }
 
   .mobile-menu-expanded:focus {
@@ -4319,8 +4386,8 @@ html.has-open-dossier {
   }
 
   @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-    .mobile-floating-menu.is-menu-open,
-    .mobile-floating-menu.is-service-open,
+    .mobile-floating-menu::before,
+    .mobile-menu-expanded::before,
     .mobile-menu-toggle::before,
     .mobile-mail-pill::before,
     .mobile-service-toggle::before {

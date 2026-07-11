@@ -28,165 +28,23 @@ const getVisibleFocusableElements = (root) => {
   ));
 };
 
-const mobileIslandMorph = (() => {
-  const compactClips = new WeakMap();
-  const activeFrames = new WeakMap();
-  const roundedCornerControl = 0.44771525;
+const getMobileIslandMotionDuration = (element) => {
+  if (!element || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return 0;
 
-  const formatPathNumber = (value) => Number(value.toFixed(3));
-
-  const readNumber = (element, property, fallback = 0) => {
-    const value = Number.parseFloat(window.getComputedStyle(element).getPropertyValue(property));
-    return Number.isFinite(value) ? value : fallback;
-  };
-
-  const rememberCompactClip = (element) => {
-    if (!compactClips.has(element)) {
-      compactClips.set(element, window.getComputedStyle(element).clipPath);
-    }
-
-    return compactClips.get(element);
-  };
-
-  const roundedSubpath = (width, height, radius) => {
-    const safeRadius = Math.min(radius, width / 2, height / 2);
-    const control = safeRadius * roundedCornerControl;
-    const right = width;
-    const bottom = height;
-
-    return [
-      `M ${formatPathNumber(safeRadius)} 0`,
-      `C ${formatPathNumber(control)} 0 0 ${formatPathNumber(control)} 0 ${formatPathNumber(safeRadius)}`,
-      `C 0 ${formatPathNumber(bottom - control)} ${formatPathNumber(control)} ${formatPathNumber(bottom)} ${formatPathNumber(safeRadius)} ${formatPathNumber(bottom)}`,
-      `C ${formatPathNumber(right - control)} ${formatPathNumber(bottom)} ${formatPathNumber(right)} ${formatPathNumber(bottom - control)} ${formatPathNumber(right)} ${formatPathNumber(bottom - safeRadius)}`,
-      `C ${formatPathNumber(right)} ${formatPathNumber(control)} ${formatPathNumber(right - control)} 0 ${formatPathNumber(right - safeRadius)} 0`,
-      'Z'
-    ].join(' ');
-  };
-
-  const expandedClip = (width, height, radius) => {
-    const subpath = roundedSubpath(width, height, radius);
-    return `path("${subpath} ${subpath} ${subpath}")`;
-  };
-
-  const setClip = (element, value) => {
-    element.style.clipPath = value;
-    element.style.webkitClipPath = value;
-  };
-
-  const cancel = (element) => {
-    const frame = activeFrames.get(element);
-    if (frame) window.cancelAnimationFrame(frame);
-    activeFrames.delete(element);
-  };
-
-  const clearClip = (element) => {
-    cancel(element);
-    element.style.removeProperty('clip-path');
-    element.style.removeProperty('-webkit-clip-path');
-  };
-
-  const tokenizePath = (value) => {
-    const quoteStart = value.indexOf('"');
-    const quoteEnd = value.lastIndexOf('"');
-    if (quoteStart < 0 || quoteEnd <= quoteStart) return [];
-    return value
-      .slice(quoteStart + 1, quoteEnd)
-      .match(/[A-Za-z]|-?(?:\d*\.)?\d+(?:e[-+]?\d+)?/gi) || [];
-  };
-
-  const easeSmooth = (progress) => {
-    let parameter = progress;
-
-    for (let index = 0; index < 5; index += 1) {
-      const inverse = 1 - parameter;
-      const x = (3 * inverse * inverse * parameter * 0.22)
-        + (3 * inverse * parameter * parameter * 0.36)
-        + (parameter ** 3);
-      const derivative = (3 * inverse * inverse * 0.22)
-        + (6 * inverse * parameter * (0.36 - 0.22))
-        + (3 * parameter * parameter * (1 - 0.36));
-      if (Math.abs(derivative) < 0.0001) break;
-      parameter = Math.min(1, Math.max(0, parameter - ((x - progress) / derivative)));
-    }
-
-    const inverse = 1 - parameter;
-    return (3 * inverse * inverse * parameter)
-      + (3 * inverse * parameter * parameter)
-      + (parameter ** 3);
-  };
-
-  const morphTo = (element, target) => {
-    cancel(element);
-
-    const from = window.getComputedStyle(element).clipPath;
-    const fromTokens = tokenizePath(from);
-    const targetTokens = tokenizePath(target);
-    const morphDuration = duration(element);
-    const compatible = fromTokens.length === targetTokens.length
-      && fromTokens.every((token, index) => (
-        Number.isFinite(Number.parseFloat(token)) === Number.isFinite(Number.parseFloat(targetTokens[index]))
-      ));
-
-    if (!compatible || morphDuration === 0) {
-      setClip(element, target);
-      return;
-    }
-
-    const startedAt = window.performance.now();
-    const tick = (now) => {
-      const progress = Math.min(1, (now - startedAt) / morphDuration);
-      const eased = easeSmooth(progress);
-      const tokens = fromTokens.map((token, index) => {
-        const fromNumber = Number.parseFloat(token);
-        const targetNumber = Number.parseFloat(targetTokens[index]);
-        if (!Number.isFinite(fromNumber) || !Number.isFinite(targetNumber)) return token;
-        return formatPathNumber(fromNumber + ((targetNumber - fromNumber) * eased));
-      });
-
-      setClip(element, `path("${tokens.join(' ')}")`);
-
-      if (progress < 1) {
-        activeFrames.set(element, window.requestAnimationFrame(tick));
-      } else {
-        activeFrames.delete(element);
-        setClip(element, target);
-      }
-    };
-
-    activeFrames.set(element, window.requestAnimationFrame(tick));
-  };
-
-  const serviceTarget = (element) => {
-    const maxWidth = Math.max(0, window.innerWidth - 24);
-    const width = Math.min(readNumber(element, '--mobile-service-shell-width', 211), maxWidth);
-    const height = readNumber(element, '--mobile-control-size', 40)
-      + (readNumber(element, '--mobile-island-pad-y', 6) * 2);
-    return expandedClip(width, height, height / 2);
-  };
-
-  const menuTarget = (element) => {
-    const width = Math.min(390, Math.max(0, window.innerWidth - 24));
-    const configuredHeight = readNumber(element, '--mobile-menu-expanded-height', 360);
-    const height = Math.min(configuredHeight, Math.max(0, window.innerHeight - 24));
-    return expandedClip(width, height, 30);
-  };
-
-  const duration = (element) => (
-    window.matchMedia('(prefers-reduced-motion: reduce)').matches
-      ? 0
-      : readNumber(element, '--mobile-island-morph', 480)
+  const value = Number.parseFloat(
+    window.getComputedStyle(element).getPropertyValue('--mobile-island-morph')
   );
+  return Number.isFinite(value) ? value : 720;
+};
 
-  return {
-    clearClip,
-    compactClip: rememberCompactClip,
-    duration,
-    menuTarget,
-    morphTo,
-    serviceTarget,
-  };
-})();
+const getMobileServiceSwapDelay = (element) => {
+  if (!element || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return 0;
+
+  const value = Number.parseFloat(
+    window.getComputedStyle(element).getPropertyValue('--mobile-service-swap-delay')
+  );
+  return Number.isFinite(value) ? value : 160;
+};
 
 (() => {
   const iconLink = document.querySelector('link[rel~="icon"]');
@@ -357,6 +215,7 @@ const mobileIslandMorph = (() => {
   };
 
   let transitionTimer = null;
+  let shellSwapTimer = null;
   let activeTrigger = null;
 
   const setToggleState = (isOpen) => {
@@ -408,6 +267,7 @@ const mobileIslandMorph = (() => {
     }
 
     window.clearTimeout(transitionTimer);
+    window.clearTimeout(shellSwapTimer);
 
     if (isOpen) {
       if (!isExpanded) {
@@ -426,16 +286,16 @@ const mobileIslandMorph = (() => {
       if (service.classList.contains('is-open') || menu?.classList.contains('is-service-open')) {
         service.classList.add('is-open');
         menu?.classList.add('is-service-open');
-        if (menu) mobileIslandMorph.morphTo(menu, mobileIslandMorph.serviceTarget(menu));
+        menu?.classList.remove('is-service-transitioning');
         return;
       }
 
-      if (menu) mobileIslandMorph.compactClip(menu);
-      window.requestAnimationFrame(() => {
-        if (menu) mobileIslandMorph.morphTo(menu, mobileIslandMorph.serviceTarget(menu));
+      menu?.classList.add('is-service-transitioning');
+      shellSwapTimer = window.setTimeout(() => {
         service.classList.add('is-open');
         menu?.classList.add('is-service-open');
-      });
+        window.requestAnimationFrame(() => menu?.classList.remove('is-service-transitioning'));
+      }, getMobileServiceSwapDelay(menu));
       return;
     }
 
@@ -444,9 +304,13 @@ const mobileIslandMorph = (() => {
     setToggleState(false);
     service.classList.add('is-closing');
     menu?.classList.add('is-service-closing');
-    service.classList.remove('is-open');
-    menu?.classList.remove('is-service-open');
-    if (menu) mobileIslandMorph.morphTo(menu, mobileIslandMorph.compactClip(menu));
+    menu?.classList.add('is-service-transitioning');
+
+    shellSwapTimer = window.setTimeout(() => {
+      service.classList.remove('is-open');
+      menu?.classList.remove('is-service-open');
+      window.requestAnimationFrame(() => menu?.classList.remove('is-service-transitioning'));
+    }, getMobileServiceSwapDelay(menu));
 
     if (shouldRestoreFocus && activeTrigger instanceof HTMLElement && service.contains(document.activeElement)) {
       const triggerToRestore = activeTrigger;
@@ -459,10 +323,10 @@ const mobileIslandMorph = (() => {
       if (toggle.getAttribute('aria-expanded') === 'true') return;
       service.classList.remove('is-closing');
       menu?.classList.remove('is-service-closing');
+      menu?.classList.remove('is-service-transitioning');
       setPanelHiddenState(true);
-      if (menu) mobileIslandMorph.clearClip(menu);
       window.dispatchEvent(new CustomEvent('tarski:mobileislandresize'));
-    }, menu ? mobileIslandMorph.duration(menu) : 0);
+    }, (getMobileServiceSwapDelay(menu) * 2) + 40);
   };
 
   toggle.addEventListener('click', (event) => {
@@ -564,16 +428,14 @@ const mobileIslandMorph = (() => {
       menu.classList.remove('is-menu-closing');
       syncToggleState(true);
       setModalBackgroundInert(true);
-      mobileIslandMorph.compactClip(menu);
       panel.getBoundingClientRect();
 
       window.requestAnimationFrame(() => {
-        mobileIslandMorph.morphTo(menu, mobileIslandMorph.menuTarget(menu));
         menu.classList.add('is-menu-open');
         drawer.classList.add('is-open');
         window.dispatchEvent(new CustomEvent('tarski:mobileislandresize'));
         if (options.focus) {
-          window.setTimeout(() => panel.focus({ preventScroll: true }), prefersReducedMotion() ? 0 : 240);
+          window.setTimeout(() => panel.focus({ preventScroll: true }), prefersReducedMotion() ? 0 : 440);
         }
       });
       return;
@@ -595,7 +457,6 @@ const mobileIslandMorph = (() => {
     drawer.classList.remove('is-open');
     menu.classList.add('is-menu-closing');
     menu.classList.remove('is-menu-open');
-    mobileIslandMorph.morphTo(menu, mobileIslandMorph.compactClip(menu));
     panel.setAttribute('aria-hidden', 'true');
     syncToggleState(false);
     setModalBackgroundInert(false);
@@ -610,14 +471,13 @@ const mobileIslandMorph = (() => {
     closeTimer = window.setTimeout(() => {
       if (toggle.getAttribute('aria-expanded') === 'true') return;
       menu.classList.remove('is-menu-closing');
-      mobileIslandMorph.clearClip(menu);
       window.dispatchEvent(new CustomEvent('tarski:mobileislandresize'));
 
       if (!drawer.classList.contains('is-open')) {
         drawer.hidden = true;
         panel.hidden = true;
       }
-    }, mobileIslandMorph.duration(menu));
+    }, getMobileIslandMotionDuration(menu));
   };
 
   toggle.addEventListener('click', (event) => {
