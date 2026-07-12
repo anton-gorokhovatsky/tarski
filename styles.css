@@ -2720,11 +2720,14 @@ html.has-open-dossier {
   --footer-column-gap: 34px;
   --footer-signature-width: min(100%, calc(100vw - (var(--page-padding-x) * 2) - var(--menu-width) - 84px));
   --footer-legal-column: min(680px, calc(var(--footer-signature-width) - var(--footer-meta-column) - var(--footer-column-gap)));
+  --footer-rail-column: minmax(240px, 1fr);
   position: relative;
-  min-height: 100svh;
+  box-sizing: border-box;
+  height: 100svh;
+  min-height: 720px;
   margin-top: clamp(88px, 14vh, 168px);
-  padding-top: clamp(156px, 22vh, 220px);
-  padding-bottom: 34px;
+  padding-top: clamp(48px, 6svh, 72px);
+  padding-bottom: 24px;
   text-align: left;
 }
 
@@ -2737,10 +2740,13 @@ html.has-open-dossier {
 
 .site-footer__stage {
   display: grid;
-  grid-template-columns: var(--footer-meta-column) minmax(0, var(--footer-legal-column));
+  grid-template-columns:
+    var(--footer-meta-column)
+    minmax(0, var(--footer-legal-column))
+    var(--footer-rail-column);
   column-gap: var(--footer-column-gap);
-  width: var(--footer-signature-width);
-  margin-top: clamp(48px, 6.5vw, 92px);
+  width: 100%;
+  margin-top: clamp(28px, 3.5svh, 44px);
 }
 
 .site-footer__eyebrow {
@@ -2752,12 +2758,13 @@ html.has-open-dossier {
 }
 
 .site-footer__cta {
+  grid-column: 2;
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: 20px;
   min-width: 0;
-  padding: 0 0 clamp(20px, 2.2vw, 30px);
+  padding: 0 0 clamp(14px, 1.5svh, 20px);
   border-bottom: 1px solid var(--rule);
   color: var(--text);
   font-size: clamp(46px, 6.2vw, 92px);
@@ -2791,11 +2798,9 @@ html.has-open-dossier {
 
 .site-footer__routes a {
   display: flex;
-  min-height: 78px;
+  min-height: 64px;
   align-items: flex-end;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 18px 14px 14px 0;
+  padding: 14px 14px 12px 0;
   border-bottom: 1px solid var(--rule);
   color: var(--text);
   font-size: clamp(15px, 1.35vw, 20px);
@@ -2808,33 +2813,18 @@ html.has-open-dossier {
   border-left: 1px solid var(--rule);
 }
 
-.site-footer__routes a > span:last-child {
-  color: var(--muted-text);
-  font-family: var(--font-serif);
-  font-size: 18px;
-  line-height: 1;
-  opacity: 0.46;
-  transform: translate3d(-3px, 3px, 0);
-  transition:
-    color var(--duration-fast) var(--ease-smooth),
-    opacity var(--duration-fast) var(--ease-smooth),
-    transform var(--duration-normal) var(--ease-smooth);
-}
-
-.site-footer__routes a:is(:hover, :focus-visible) > span:last-child {
-  color: var(--text);
-  opacity: 1;
-  transform: translate3d(0, 0, 0);
-}
-
 .site-footer__motion {
-  grid-column: 2;
+  grid-column: 3;
+  grid-row: 1 / span 2;
+  align-self: end;
+  justify-self: end;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 24px;
-  min-height: 58px;
-  padding-top: 12px;
+  width: min(100%, 520px);
+  min-height: 64px;
+  padding: 0;
   color: var(--muted-text);
   font-size: 13px;
 }
@@ -2848,10 +2838,11 @@ html.has-open-dossier {
   display: grid;
   grid-template-columns:
     var(--footer-meta-column)
-    minmax(0, var(--footer-legal-column));
+    minmax(0, var(--footer-legal-column))
+    var(--footer-rail-column);
   column-gap: var(--footer-column-gap);
-  width: var(--footer-signature-width);
-  margin: clamp(18px, 1.6vw, 26px) 0 0;
+  width: 100%;
+  margin: clamp(10px, 1svh, 16px) 0 0;
   padding: 0;
   align-items: start;
 }
@@ -2884,8 +2875,8 @@ html.has-open-dossier {
 
 .site-footer__disclaimer {
   position: relative;
-  grid-column: 2;
-  max-width: none;
+  grid-column: 2 / 4;
+  max-width: 940px;
   color: var(--muted-text);
   font-size: 16px;
   line-height: 1.18;
@@ -3035,6 +3026,8 @@ html.has-open-dossier {
     --footer-meta-column: 96px;
     --footer-column-gap: 24px;
     --footer-signature-width: 100%;
+    height: auto;
+    min-height: auto;
     padding-top: 120px;
   }
 
@@ -3046,6 +3039,16 @@ html.has-open-dossier {
   .site-footer__stage {
     grid-template-columns: var(--footer-meta-column) minmax(0, 1fr);
     column-gap: var(--footer-column-gap);
+  }
+
+  .site-footer__motion {
+    grid-column: 2;
+    grid-row: auto;
+    padding-left: 0;
+  }
+
+  .site-footer__disclaimer {
+    grid-column: 2;
   }
 
   .editorial-block {
@@ -3399,6 +3402,7 @@ html.has-open-dossier {
   }
 
   .site-footer {
+    height: auto;
     margin-top: clamp(42px, 10vw, 64px);
     padding-top: clamp(52px, 15vw, 76px);
     min-height: auto;

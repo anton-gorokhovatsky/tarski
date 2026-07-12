@@ -395,6 +395,16 @@ test('motion preference is available on desktop and shares one state', async ({ 
     return Math.abs(label.top - arrow.top);
   });
   expect(ctaAlignment).toBeLessThanOrEqual(3);
+
+  const footerGeometry = await page.locator('.site-footer').evaluate((element) => ({
+    height: element.getBoundingClientRect().height,
+    scrollHeight: element.scrollHeight,
+    viewportHeight: window.innerHeight,
+    routeDecorationCount: element.querySelectorAll('.site-footer__routes [aria-hidden="true"]').length,
+  }));
+  expect(footerGeometry.height).toBeLessThanOrEqual(footerGeometry.viewportHeight);
+  expect(footerGeometry.scrollHeight).toBeLessThanOrEqual(footerGeometry.viewportHeight + 1);
+  expect(footerGeometry.routeDecorationCount).toBe(0);
 });
 
 test('main mobile menu launches the existing daylight widget', async ({ page }) => {
