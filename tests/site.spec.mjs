@@ -174,10 +174,13 @@ test('mobile menu and service panel preserve state, Escape, and focus return', a
       compactBackdrop: getComputedStyle(menuRoot.querySelector('.mobile-island-surface')).backdropFilter,
       compactBackground: getComputedStyle(menuRoot.querySelector('.mobile-island-surface')).backgroundImage,
       compactFilter: getComputedStyle(menuRoot.querySelector('.mobile-island-surface')).filter,
+      compactDepthFilter: getComputedStyle(menuRoot.querySelector('.mobile-island-depth')).filter,
       compactPseudoContent: getComputedStyle(menuRoot.querySelector('.mobile-island-surface'), '::before').content,
       expandedBackdrop: getComputedStyle(menuRoot, '::after').backdropFilter,
       expandedBackground: getComputedStyle(menuRoot, '::after').backgroundImage,
       expandedFilter: getComputedStyle(menuRoot, '::after').filter,
+      serviceDepthFilter: getComputedStyle(menuRoot.querySelector('.mobile-service-depth')).filter,
+      menuDepthFilter: getComputedStyle(menuRoot.querySelector('.mobile-menu-expanded-depth')).filter,
       height: serviceRoot.getBoundingClientRect().height,
       serviceMaterialTransform: getComputedStyle(menuRoot, '::after').transform,
       menuBackdrop: getComputedStyle(expandedMenu).backdropFilter,
@@ -187,6 +190,9 @@ test('mobile menu and service panel preserve state, Escape, and focus return', a
   expect(serviceSurface.expandedBackdrop).toBe(serviceSurface.compactBackdrop);
   expect(serviceSurface.compactBackground).toBe(serviceSurface.expandedBackground);
   expect(serviceSurface.compactFilter).toBe(serviceSurface.expandedFilter);
+  expect(serviceSurface.compactDepthFilter).toBe(serviceSurface.serviceDepthFilter);
+  expect(serviceSurface.compactDepthFilter).toBe(serviceSurface.menuDepthFilter);
+  expect(serviceSurface.compactDepthFilter).toContain('drop-shadow');
   expect(serviceSurface.compactPseudoContent).toBe('none');
   expect(serviceSurface.compactBackground.match(/linear-gradient/g)).toHaveLength(1);
   expect(serviceSurface.compactBackground).toContain('0.98');
@@ -392,9 +398,14 @@ test('motion preference is available on desktop and shares one state', async ({ 
   const ctaAlignment = await page.locator('.site-footer__cta').evaluate((element) => {
     const label = element.querySelector('[data-footer-cta-label]').getBoundingClientRect();
     const arrow = element.querySelector('.site-footer__cta-arrow').getBoundingClientRect();
-    return Math.abs(label.top - arrow.top);
+    return {
+      top: Math.abs(label.top - arrow.top),
+      gap: arrow.left - label.right,
+    };
   });
-  expect(ctaAlignment).toBeLessThanOrEqual(3);
+  expect(ctaAlignment.top).toBeLessThanOrEqual(3);
+  expect(ctaAlignment.gap).toBeGreaterThanOrEqual(12);
+  expect(ctaAlignment.gap).toBeLessThanOrEqual(24);
 
   const footerGeometry = await page.locator('.site-footer').evaluate((element) => ({
     height: element.getBoundingClientRect().height,

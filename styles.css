@@ -2761,7 +2761,7 @@ html.has-open-dossier {
   grid-column: 2 / 4;
   display: flex;
   align-items: flex-start;
-  justify-content: space-between;
+  justify-content: flex-start;
   gap: 20px;
   min-width: 0;
   padding: 0 0 clamp(14px, 1.5svh, 20px);
@@ -3750,7 +3750,7 @@ html.has-open-dossier {
     --island-motion-content-fade: 260ms;
     --island-motion-panel-content: 260ms;
     --island-motion-panel-content-delay: 300ms;
-    --island-motion-compact-return-delay: 360ms;
+    --island-motion-compact-return-delay: 220ms;
     --island-motion-handoff-duration: 260ms;
     --island-motion-menu-compact-in-delay: 80ms;
     --island-motion-menu-compact-in-duration: 120ms;
@@ -3775,12 +3775,11 @@ html.has-open-dossier {
     --island-depth-filter:
       drop-shadow(0 8px 14px var(--island-contact-shadow))
       drop-shadow(0 22px 40px var(--island-surface-shadow));
-    --island-surface-filter:
+    --island-edge-filter:
       drop-shadow(calc(-1 * var(--island-edge-width)) 0 0 var(--island-edge-highlight))
       drop-shadow(0 calc(-1 * var(--island-edge-width)) 0 var(--island-edge-highlight))
       drop-shadow(var(--island-edge-width) 0 0 var(--island-edge-shadow))
-      drop-shadow(0 var(--island-edge-width) 0 var(--island-edge-shadow))
-      var(--island-depth-filter);
+      drop-shadow(0 var(--island-edge-width) 0 var(--island-edge-shadow));
     /* JS-facing aliases for dynamic shell measurements. */
     --mobile-control-size: var(--island-control-size);
     --mobile-island-shell-width: var(--island-compact-width);
@@ -3857,7 +3856,6 @@ html.has-open-dossier {
     background: var(--island-glass-bg);
     backdrop-filter: var(--island-glass-backdrop);
     -webkit-backdrop-filter: var(--island-glass-backdrop);
-    filter: var(--island-surface-filter);
   }
 
   /*
@@ -3865,25 +3863,44 @@ html.has-open-dossier {
    * sampling and the contour effect on that same element avoids the filtered
    * ancestor that breaks matte blur in iOS Safari.
    */
+  .mobile-island-depth,
   .mobile-island-surface {
     position: absolute;
     inset: 0;
-    z-index: 0;
     width: var(--island-cluster-width);
     height: var(--island-cluster-height);
     pointer-events: none;
-    background-size: 100% 92px;
-    background-repeat: repeat-y;
-    -webkit-clip-path: var(--mobile-island-clip);
-    clip-path: var(--mobile-island-clip);
     opacity: 1;
     transition: opacity 220ms var(--island-motion-ease);
     will-change: opacity;
   }
 
-  /* The service surface stays full-size; only its reveal mask expands from the locale dot. */
-  .mobile-floating-menu::after {
+  .mobile-island-depth {
+    z-index: 0;
+    filter: var(--island-depth-filter);
+  }
+
+  .mobile-island-depth::before {
     content: "";
+    position: absolute;
+    inset: 0;
+    background: #000;
+    -webkit-clip-path: var(--mobile-island-clip);
+    clip-path: var(--mobile-island-clip);
+  }
+
+  .mobile-island-surface {
+    z-index: 1;
+    background-size: 100% 92px;
+    background-repeat: repeat-y;
+    -webkit-clip-path: var(--mobile-island-clip);
+    clip-path: var(--mobile-island-clip);
+    filter: var(--island-edge-filter);
+  }
+
+  /* The service and daylight states keep depth outside the clipped material. */
+  .mobile-service-depth,
+  .mobile-floating-menu::after {
     position: absolute;
     left: calc(50% - 105.5px);
     top: var(--island-lens-service-y);
@@ -3895,8 +3912,37 @@ html.has-open-dossier {
     border-radius: 999px;
     box-shadow: none;
     opacity: 0;
+    transition:
+      opacity 140ms var(--island-motion-ease),
+      left 520ms var(--island-motion-ease),
+      top 520ms var(--island-motion-ease),
+      width 520ms var(--island-motion-ease),
+      height 520ms var(--island-motion-ease),
+      border-radius 520ms var(--island-motion-ease);
+    will-change: opacity, left, top, width, height;
+  }
+
+  .mobile-service-depth {
+    filter: var(--island-depth-filter);
+  }
+
+  .mobile-service-depth::before,
+  .mobile-floating-menu::after {
+    content: "";
     -webkit-clip-path: circle(26px at calc(50% + 43px) 50%);
     clip-path: circle(26px at calc(50% + 43px) 50%);
+  }
+
+  .mobile-service-depth::before {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: #000;
+    transition: clip-path var(--mobile-service-motion) var(--island-motion-ease);
+  }
+
+  .mobile-floating-menu::after {
+    filter: var(--island-edge-filter);
     transition:
       opacity 140ms var(--island-motion-ease),
       clip-path var(--mobile-service-motion) var(--island-motion-ease),
@@ -3905,7 +3951,6 @@ html.has-open-dossier {
       width 520ms var(--island-motion-ease),
       height 520ms var(--island-motion-ease),
       border-radius 520ms var(--island-motion-ease);
-    will-change: opacity, clip-path, left, top, width, height;
   }
 
   .mobile-floating-menu.is-visible {
@@ -4008,52 +4053,99 @@ html.has-open-dossier {
     transform: none;
   }
 
-  .mobile-floating-menu.is-menu-open .mobile-island-surface {
+  .mobile-floating-menu.is-menu-open :is(.mobile-island-depth, .mobile-island-surface) {
     opacity: 0;
     transition-delay: 140ms;
   }
 
-  .mobile-floating-menu.is-menu-closing .mobile-island-surface {
+  .mobile-floating-menu.is-menu-closing :is(.mobile-island-depth, .mobile-island-surface) {
     opacity: 1;
     transition-duration: var(--island-motion-menu-compact-in-duration);
     transition-delay: var(--island-motion-menu-compact-in-delay);
   }
 
-  .mobile-floating-menu.is-service-open .mobile-island-surface {
+  .mobile-floating-menu.is-service-open :is(.mobile-island-depth, .mobile-island-surface) {
     opacity: 0;
     transition-delay: 120ms;
   }
 
-  .mobile-floating-menu.is-service-closing .mobile-island-surface {
+  .mobile-floating-menu.is-service-closing :is(.mobile-island-depth, .mobile-island-surface) {
     opacity: 1;
     transition-duration: var(--island-motion-handoff-duration);
     transition-delay: var(--island-motion-compact-return-delay);
   }
 
+  .mobile-floating-menu.is-service-open .mobile-service-depth,
   .mobile-floating-menu.is-service-open::after {
     opacity: 1;
-    -webkit-clip-path: circle(150% at calc(50% + 43px) 50%);
-    clip-path: circle(150% at calc(50% + 43px) 50%);
-    transition-delay: 70ms, 70ms;
   }
 
+  .mobile-floating-menu.is-service-open .mobile-service-depth::before,
+  .mobile-floating-menu.is-service-open::after {
+    -webkit-clip-path: circle(150% at calc(50% + 43px) 50%);
+    clip-path: circle(150% at calc(50% + 43px) 50%);
+  }
+
+  .mobile-floating-menu.is-service-open .mobile-service-depth,
+  .mobile-floating-menu.is-service-open::after {
+    transition-delay: 70ms, 0ms, 0ms, 0ms, 0ms, 0ms, 0ms;
+  }
+
+  .mobile-floating-menu.is-service-open .mobile-service-depth::before {
+    transition-delay: 70ms;
+  }
+
+  .mobile-floating-menu.is-service-open::after {
+    transition-delay: 70ms, 70ms, 0ms, 0ms, 0ms, 0ms, 0ms;
+  }
+
+  .mobile-floating-menu.is-daylight-open .mobile-service-depth,
   .mobile-floating-menu.is-daylight-open::after {
     left: calc(50% - (var(--island-daylight-width) / 2));
     top: var(--island-daylight-top);
     width: var(--island-daylight-width);
     height: var(--island-daylight-height);
     border-radius: 32px;
+    transition-delay: 0ms;
+  }
+
+  .mobile-floating-menu.is-daylight-open .mobile-service-depth::before,
+  .mobile-floating-menu.is-daylight-open::after {
     -webkit-clip-path: inset(0 round 32px);
     clip-path: inset(0 round 32px);
+  }
+
+  .mobile-floating-menu.is-service-closing .mobile-service-depth,
+  .mobile-floating-menu.is-service-closing::after {
+    opacity: 0;
+  }
+
+  .mobile-floating-menu.is-service-closing .mobile-service-depth::before,
+  .mobile-floating-menu.is-service-closing::after {
+    -webkit-clip-path: circle(26px at calc(50% + 43px) 50%);
+    clip-path: circle(26px at calc(50% + 43px) 50%);
+  }
+
+  .mobile-floating-menu.is-service-closing .mobile-service-depth,
+  .mobile-floating-menu.is-service-closing::after {
+    transition-delay: 0ms;
+  }
+
+  .mobile-floating-menu.is-service-closing .mobile-service-depth::before {
+    transition-duration: var(--mobile-service-motion);
     transition-delay: 0ms;
   }
 
   .mobile-floating-menu.is-service-closing::after {
-    opacity: 0;
-    -webkit-clip-path: circle(26px at calc(50% + 43px) 50%);
-    clip-path: circle(26px at calc(50% + 43px) 50%);
-    transition-duration: var(--island-motion-handoff-duration), var(--mobile-service-motion);
-    transition-delay: var(--island-motion-compact-return-delay), 0ms;
+    transition-duration:
+      var(--island-motion-handoff-duration),
+      var(--mobile-service-motion),
+      520ms,
+      520ms,
+      520ms,
+      520ms,
+      520ms;
+    transition-delay: 0ms;
   }
 
   .mobile-menu-toggle,
@@ -4915,7 +5007,7 @@ html.has-open-dossier {
     box-shadow:
       0 0 0 var(--island-edge-width) var(--island-edge-shadow),
       var(--island-glass-shadow);
-    filter: var(--island-surface-filter);
+    filter: var(--island-edge-filter);
     backdrop-filter: var(--island-glass-backdrop);
     -webkit-backdrop-filter: var(--island-glass-backdrop);
     color: var(--mobile-pill-text);
@@ -4943,6 +5035,30 @@ html.has-open-dossier {
     scrollbar-width: none;
   }
 
+  .mobile-menu-expanded-depth {
+    position: absolute;
+    left: calc(50% - var(--island-menu-half-width));
+    top: 0;
+    z-index: 3;
+    width: var(--mobile-menu-expanded-width);
+    height: min(var(--mobile-menu-expanded-height), calc(100dvh - 24px - env(safe-area-inset-bottom)));
+    max-width: var(--mobile-island-max-width);
+    max-height: calc(100dvh - 24px - env(safe-area-inset-bottom));
+    border-radius: var(--corner-panel-mobile);
+    filter: var(--island-depth-filter);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 180ms var(--island-motion-ease);
+  }
+
+  .mobile-menu-expanded-depth::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: #000;
+  }
+
   /* Material lives on the stable, untransformed panel so it composites like the service capsule. */
   .mobile-menu-expanded::before {
     content: none;
@@ -4968,6 +5084,11 @@ html.has-open-dossier {
     transform: none;
   }
 
+  .mobile-floating-menu.is-visible .mobile-menu-expanded-depth {
+    top: auto;
+    bottom: 0;
+  }
+
   .mobile-menu-expanded[hidden] {
     display: none;
   }
@@ -4979,6 +5100,11 @@ html.has-open-dossier {
     -webkit-clip-path: inset(0 round var(--corner-panel-mobile));
     clip-path: inset(0 round var(--corner-panel-mobile));
     transition-delay: 0ms, 40ms;
+  }
+
+  .mobile-floating-menu.is-menu-open .mobile-menu-expanded-depth {
+    opacity: 1;
+    transition-delay: 440ms;
   }
 
   .mobile-floating-menu.is-menu-open .mobile-menu-expanded > * {
@@ -5004,6 +5130,11 @@ html.has-open-dossier {
     );
     transition-duration: var(--island-motion-menu-panel-out-duration), var(--mobile-island-morph);
     transition-delay: var(--island-motion-menu-panel-out-delay), 0ms;
+  }
+
+  .mobile-floating-menu.is-menu-closing .mobile-menu-expanded-depth {
+    opacity: 0;
+    transition-delay: 0ms;
   }
 
   .mobile-floating-menu.is-menu-closing .mobile-menu-expanded > * {
