@@ -391,7 +391,7 @@ test('motion preference is available on desktop and shares one state', async ({ 
 
   const ctaAlignment = await page.locator('.site-footer__cta').evaluate((element) => {
     const label = element.querySelector('[data-footer-cta-label]').getBoundingClientRect();
-    const arrow = element.querySelector('span:last-child').getBoundingClientRect();
+    const arrow = element.querySelector('.site-footer__cta-arrow').getBoundingClientRect();
     return Math.abs(label.top - arrow.top);
   });
   expect(ctaAlignment).toBeLessThanOrEqual(3);
@@ -406,13 +406,17 @@ test('motion preference is available on desktop and shares one state', async ({ 
   expect(footerGeometry.scrollHeight).toBeLessThanOrEqual(footerGeometry.viewportHeight + 1);
   expect(footerGeometry.routeDecorationCount).toBe(0);
 
-  const motionLabelGap = await page.locator('.site-footer__motion').evaluate((element) => {
+  const motionAlignment = await page.locator('.site-footer__motion').evaluate((element) => {
     const label = element.querySelector('[data-motion-label]').getBoundingClientRect();
     const control = element.querySelector('.footer-motion-panel').getBoundingClientRect();
-    return control.left - label.right;
+    const routes = document.querySelector('.site-footer__routes').getBoundingClientRect();
+    return {
+      labelLeft: Math.abs(label.left - routes.left),
+      controlRight: Math.abs(control.right - routes.right),
+    };
   });
-  expect(motionLabelGap).toBeGreaterThanOrEqual(12);
-  expect(motionLabelGap).toBeLessThanOrEqual(20);
+  expect(motionAlignment.labelLeft).toBeLessThanOrEqual(1);
+  expect(motionAlignment.controlRight).toBeLessThanOrEqual(1);
 
   const desktopLensMaterial = await page.locator('.main-nav').evaluate((element) => {
     const style = getComputedStyle(element, '::after');
