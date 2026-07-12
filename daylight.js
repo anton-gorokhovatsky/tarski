@@ -35,6 +35,7 @@
     element.setAttribute('aria-label', value);
   };
   let closeTimer = null;
+  let openFrame = null;
   let markerFrame = null;
   let weatherRequest = null;
   let cachedWeather = null;
@@ -199,6 +200,8 @@
 
   const setOpen = (isOpen, options = {}) => {
     window.clearTimeout(closeTimer);
+    window.cancelAnimationFrame(openFrame);
+    openFrame = null;
 
     if (isOpen) {
       updateViewportInset();
@@ -207,9 +210,16 @@
       syncWidget({ animateMarker: true });
       loadWeather();
       toggle.setAttribute('aria-expanded', 'true');
-      menu.classList.add('is-daylight-open');
-      service.classList.add('is-daylight-open');
-      window.requestAnimationFrame(() => widget.classList.add('is-visible'));
+      menu.classList.remove('is-daylight-closing');
+      menu.classList.add('is-daylight-transitioning');
+      menu.getBoundingClientRect();
+      openFrame = window.requestAnimationFrame(() => {
+        openFrame = null;
+        if (toggle.getAttribute('aria-expanded') !== 'true') return;
+        menu.classList.add('is-daylight-open');
+        service.classList.add('is-daylight-open');
+        widget.classList.add('is-visible');
+      });
       syncToggleLabel();
       if (options.focusToggle) {
         window.setTimeout(() => focusWithoutScroll(toggle), 80);
@@ -221,6 +231,8 @@
     markerFrame = null;
     widget.classList.remove('is-marker-arriving');
     toggle.setAttribute('aria-expanded', 'false');
+    menu.classList.remove('is-daylight-transitioning');
+    menu.classList.add('is-daylight-closing');
     menu.classList.remove('is-daylight-open');
     service.classList.remove('is-daylight-open');
     widget.classList.remove('is-visible');
@@ -229,6 +241,7 @@
 
     closeTimer = window.setTimeout(() => {
       if (toggle.getAttribute('aria-expanded') === 'true') return;
+      menu.classList.remove('is-daylight-closing');
       widget.hidden = true;
     }, 540);
 
@@ -283,4 +296,3 @@
   syncToggleLabel();
   setOpen(false);
 })();
-

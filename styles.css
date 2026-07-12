@@ -3748,14 +3748,14 @@ html.has-open-dossier {
     --island-motion-morph: 620ms;
     --island-motion-service: 620ms;
     --island-motion-content-fade: 260ms;
-    --island-motion-panel-content: 260ms;
-    --island-motion-panel-content-delay: 300ms;
-    --island-motion-compact-return-delay: 220ms;
+    --island-motion-panel-content: 300ms;
+    --island-motion-panel-content-delay: 120ms;
+    --island-motion-compact-return-delay: 120ms;
     --island-motion-handoff-duration: 260ms;
-    --island-motion-menu-compact-in-delay: 80ms;
-    --island-motion-menu-compact-in-duration: 120ms;
-    --island-motion-menu-panel-out-delay: 220ms;
-    --island-motion-menu-panel-out-duration: 240ms;
+    --island-motion-menu-compact-in-delay: 180ms;
+    --island-motion-menu-compact-in-duration: 240ms;
+    --island-motion-menu-panel-out-delay: 100ms;
+    --island-motion-menu-panel-out-duration: 360ms;
     --island-motion-content-shift: 520ms;
     --island-motion-content-collapse: 0ms;
     --island-motion-collapse-delay: 0ms;
@@ -3768,10 +3768,7 @@ html.has-open-dossier {
     --island-edge-shadow: rgba(0, 0, 0, 0.22);
     --island-contact-shadow: rgba(0, 0, 0, 0.1);
     --island-surface-shadow: rgba(0, 0, 0, 0.16);
-    --island-glass-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.28),
-      0 8px 14px var(--island-contact-shadow),
-      0 22px 40px var(--island-surface-shadow);
+    --island-glass-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28);
     --island-depth-filter:
       drop-shadow(0 8px 14px var(--island-contact-shadow))
       drop-shadow(0 22px 40px var(--island-surface-shadow));
@@ -4002,10 +3999,10 @@ html.has-open-dossier {
   }
 
   :root[data-effective-theme="light"] .mobile-floating-menu {
-    --island-edge-highlight: rgba(255, 255, 255, 0.68);
-    --island-edge-shadow: rgba(0, 0, 0, 0.18);
-    --island-contact-shadow: rgba(0, 0, 0, 0.11);
-    --island-surface-shadow: rgba(0, 0, 0, 0.16);
+    --island-edge-highlight: rgba(255, 255, 255, 0.34);
+    --island-edge-shadow: rgba(0, 0, 0, 0.055);
+    --island-contact-shadow: rgba(0, 0, 0, 0.028);
+    --island-surface-shadow: rgba(0, 0, 0, 0.05);
   }
 
   :root[data-effective-theme="dark"] .mobile-floating-menu {
@@ -4053,26 +4050,52 @@ html.has-open-dossier {
     transform: none;
   }
 
-  .mobile-floating-menu.is-menu-open :is(.mobile-island-depth, .mobile-island-surface) {
+  .mobile-floating-menu.is-menu-open .mobile-island-depth {
     opacity: 0;
-    transition-delay: 140ms;
+    transition-duration: 100ms;
+    transition-delay: 80ms;
   }
 
-  .mobile-floating-menu.is-menu-closing :is(.mobile-island-depth, .mobile-island-surface) {
+  .mobile-floating-menu.is-menu-open .mobile-island-surface {
+    opacity: 0;
+    transition-duration: 220ms;
+    transition-delay: 100ms;
+  }
+
+  .mobile-floating-menu.is-menu-closing .mobile-island-surface {
     opacity: 1;
     transition-duration: var(--island-motion-menu-compact-in-duration);
     transition-delay: var(--island-motion-menu-compact-in-delay);
   }
 
-  .mobile-floating-menu.is-service-open :is(.mobile-island-depth, .mobile-island-surface) {
-    opacity: 0;
-    transition-delay: 120ms;
+  .mobile-floating-menu.is-menu-closing .mobile-island-depth {
+    opacity: 1;
+    transition-duration: 180ms;
+    transition-delay: 320ms;
   }
 
-  .mobile-floating-menu.is-service-closing :is(.mobile-island-depth, .mobile-island-surface) {
+  .mobile-floating-menu.is-service-open .mobile-island-depth {
+    opacity: 0;
+    transition-duration: 100ms;
+    transition-delay: 60ms;
+  }
+
+  .mobile-floating-menu.is-service-open .mobile-island-surface {
+    opacity: 0;
+    transition-duration: 220ms;
+    transition-delay: 80ms;
+  }
+
+  .mobile-floating-menu.is-service-closing .mobile-island-surface {
     opacity: 1;
     transition-duration: var(--island-motion-handoff-duration);
     transition-delay: var(--island-motion-compact-return-delay);
+  }
+
+  .mobile-floating-menu.is-service-closing .mobile-island-depth {
+    opacity: 1;
+    transition-duration: 180ms;
+    transition-delay: 280ms;
   }
 
   .mobile-floating-menu.is-service-open .mobile-service-depth,
@@ -4086,9 +4109,9 @@ html.has-open-dossier {
     clip-path: circle(150% at calc(50% + 43px) 50%);
   }
 
-  .mobile-floating-menu.is-service-open .mobile-service-depth,
-  .mobile-floating-menu.is-service-open::after {
-    transition-delay: 70ms, 0ms, 0ms, 0ms, 0ms, 0ms, 0ms;
+  .mobile-floating-menu.is-service-open .mobile-service-depth {
+    transition-duration: 180ms, 520ms, 520ms, 520ms, 520ms, 520ms;
+    transition-delay: 200ms, 0ms, 0ms, 0ms, 0ms, 0ms;
   }
 
   .mobile-floating-menu.is-service-open .mobile-service-depth::before {
@@ -4096,6 +4119,7 @@ html.has-open-dossier {
   }
 
   .mobile-floating-menu.is-service-open::after {
+    transition-duration: 140ms, var(--mobile-service-motion), 520ms, 520ms, 520ms, 520ms, 520ms;
     transition-delay: 70ms, 70ms, 0ms, 0ms, 0ms, 0ms, 0ms;
   }
 
@@ -4115,6 +4139,31 @@ html.has-open-dossier {
     clip-path: inset(0 round 32px);
   }
 
+  /*
+   * Normalise the service circle to an identical capsule before changing its
+   * dimensions. This keeps the circle-to-inset handoff invisible and prevents
+   * an intermediate round card while the daylight shell grows or contracts.
+   */
+  .mobile-floating-menu:is(.is-daylight-transitioning, .is-daylight-closing) .mobile-service-depth::before,
+  .mobile-floating-menu:is(.is-daylight-transitioning, .is-daylight-closing)::after {
+    -webkit-clip-path: inset(0 round 32px);
+    clip-path: inset(0 round 32px);
+    transition-duration: 0ms;
+  }
+
+  .mobile-floating-menu:is(.is-daylight-transitioning, .is-daylight-closing) .mobile-service-depth,
+  .mobile-floating-menu:is(.is-daylight-transitioning, .is-daylight-closing)::after {
+    border-radius: 32px;
+  }
+
+  .mobile-floating-menu:is(.is-daylight-transitioning, .is-daylight-closing) .mobile-service-depth {
+    transition-duration: 140ms, 520ms, 520ms, 520ms, 520ms, 0ms;
+  }
+
+  .mobile-floating-menu:is(.is-daylight-transitioning, .is-daylight-closing)::after {
+    transition-duration: 140ms, 0ms, 520ms, 520ms, 520ms, 520ms, 0ms;
+  }
+
   .mobile-floating-menu.is-service-closing .mobile-service-depth,
   .mobile-floating-menu.is-service-closing::after {
     opacity: 0;
@@ -4126,8 +4175,8 @@ html.has-open-dossier {
     clip-path: circle(26px at calc(50% + 43px) 50%);
   }
 
-  .mobile-floating-menu.is-service-closing .mobile-service-depth,
-  .mobile-floating-menu.is-service-closing::after {
+  .mobile-floating-menu.is-service-closing .mobile-service-depth {
+    transition-duration: 100ms, 520ms, 520ms, 520ms, 520ms, 520ms;
     transition-delay: 0ms;
   }
 
@@ -4138,14 +4187,14 @@ html.has-open-dossier {
 
   .mobile-floating-menu.is-service-closing::after {
     transition-duration:
-      var(--island-motion-handoff-duration),
+      220ms,
       var(--mobile-service-motion),
       520ms,
       520ms,
       520ms,
       520ms,
       520ms;
-    transition-delay: 0ms;
+    transition-delay: 60ms, 0ms, 0ms, 0ms, 0ms, 0ms, 0ms;
   }
 
   .mobile-menu-toggle,
@@ -4556,7 +4605,7 @@ html.has-open-dossier {
     opacity: 1;
     pointer-events: auto;
     transform: translate3d(0, 0, 0);
-    transition-delay: 220ms;
+    transition-delay: 100ms;
   }
 
   .mobile-service.is-daylight-open .mobile-service-panel {
@@ -4591,6 +4640,8 @@ html.has-open-dossier {
 
   .mobile-service.is-closing .mobile-service-panel {
     pointer-events: none;
+    transition-duration: 200ms, 360ms;
+    transition-delay: 0ms;
   }
 
   .mobile-service.is-closing .mobile-service-toggle {
@@ -4637,7 +4688,7 @@ html.has-open-dossier {
     pointer-events: none;
     transform: translate3d(0, 10px, 0);
     transition:
-      opacity 240ms var(--island-motion-ease),
+      opacity 360ms var(--island-motion-ease),
       transform 420ms var(--island-motion-ease);
     will-change: opacity, transform;
   }
@@ -4650,7 +4701,7 @@ html.has-open-dossier {
     opacity: 1;
     pointer-events: auto;
     transform: translate3d(0, 0, 0);
-    transition-delay: 180ms;
+    transition-delay: 100ms;
   }
 
   .daylight-widget__meta {
@@ -5036,6 +5087,9 @@ html.has-open-dossier {
   }
 
   .mobile-menu-expanded-depth {
+    --mobile-menu-compact-top: var(--island-lens-menu-y);
+    --mobile-menu-compact-side: calc((100% - var(--island-lens-menu-width)) / 2);
+    --mobile-menu-compact-bottom: calc(100% - var(--mobile-menu-compact-top) - var(--island-lens-menu-height));
     position: absolute;
     left: calc(50% - var(--island-menu-half-width));
     top: 0;
@@ -5049,6 +5103,7 @@ html.has-open-dossier {
     opacity: 0;
     pointer-events: none;
     transition: opacity 180ms var(--island-motion-ease);
+    will-change: opacity;
   }
 
   .mobile-menu-expanded-depth::before {
@@ -5057,6 +5112,22 @@ html.has-open-dossier {
     inset: 0;
     border-radius: inherit;
     background: #000;
+    -webkit-clip-path: inset(
+      var(--mobile-menu-compact-top)
+      var(--mobile-menu-compact-side)
+      var(--mobile-menu-compact-bottom)
+      var(--mobile-menu-compact-side)
+      round var(--corner-panel-mobile)
+    );
+    clip-path: inset(
+      var(--mobile-menu-compact-top)
+      var(--mobile-menu-compact-side)
+      var(--mobile-menu-compact-bottom)
+      var(--mobile-menu-compact-side)
+      round var(--corner-panel-mobile)
+    );
+    transition: clip-path var(--mobile-island-morph) var(--island-motion-ease);
+    will-change: clip-path;
   }
 
   /* Material lives on the stable, untransformed panel so it composites like the service capsule. */
@@ -5085,6 +5156,7 @@ html.has-open-dossier {
   }
 
   .mobile-floating-menu.is-visible .mobile-menu-expanded-depth {
+    --mobile-menu-compact-top: calc(100% - (var(--island-cluster-height) - var(--island-lens-menu-y)));
     top: auto;
     bottom: 0;
   }
@@ -5104,7 +5176,14 @@ html.has-open-dossier {
 
   .mobile-floating-menu.is-menu-open .mobile-menu-expanded-depth {
     opacity: 1;
-    transition-delay: 440ms;
+    transition-duration: 220ms;
+    transition-delay: 180ms;
+  }
+
+  .mobile-floating-menu.is-menu-open .mobile-menu-expanded-depth::before {
+    -webkit-clip-path: inset(0 round var(--corner-panel-mobile));
+    clip-path: inset(0 round var(--corner-panel-mobile));
+    transition-delay: 40ms;
   }
 
   .mobile-floating-menu.is-menu-open .mobile-menu-expanded > * {
@@ -5134,6 +5213,25 @@ html.has-open-dossier {
 
   .mobile-floating-menu.is-menu-closing .mobile-menu-expanded-depth {
     opacity: 0;
+    transition-duration: 100ms;
+    transition-delay: 0ms;
+  }
+
+  .mobile-floating-menu.is-menu-closing .mobile-menu-expanded-depth::before {
+    -webkit-clip-path: inset(
+      var(--mobile-menu-compact-top)
+      var(--mobile-menu-compact-side)
+      var(--mobile-menu-compact-bottom)
+      var(--mobile-menu-compact-side)
+      round var(--corner-panel-mobile)
+    );
+    clip-path: inset(
+      var(--mobile-menu-compact-top)
+      var(--mobile-menu-compact-side)
+      var(--mobile-menu-compact-bottom)
+      var(--mobile-menu-compact-side)
+      round var(--corner-panel-mobile)
+    );
     transition-delay: 0ms;
   }
 

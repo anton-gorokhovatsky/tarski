@@ -222,6 +222,19 @@ test('daylight widget expands the service material and keeps theme modes accessi
   await serviceToggle.click();
   await daylightToggle.click();
   await expect(daylightToggle).toHaveAttribute('aria-expanded', 'true');
+  await expect(page.locator('[data-mobile-menu]')).toHaveClass(/is-daylight-transitioning/);
+  const daylightHandoff = await page.locator('[data-mobile-menu]').evaluate((element) => {
+    const material = getComputedStyle(element, '::after');
+    const depthMask = getComputedStyle(element.querySelector('.mobile-service-depth'), '::before');
+    return {
+      materialRadius: parseFloat(material.borderRadius),
+      materialClip: material.clipPath,
+      depthClip: depthMask.clipPath
+    };
+  });
+  expect(daylightHandoff.materialRadius).toBeLessThanOrEqual(36);
+  expect(daylightHandoff.materialClip).toContain('inset');
+  expect(daylightHandoff.depthClip).toContain('inset');
   await expect(widget).toHaveAttribute('aria-hidden', 'false');
   await expect(widget).toBeVisible();
   await expect(widget.locator('time')).toHaveCount(3);
