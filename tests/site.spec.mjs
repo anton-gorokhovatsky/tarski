@@ -234,6 +234,7 @@ test('daylight widget expands the service material and keeps theme modes accessi
     const motionRect = widgetElement.querySelector('.daylight-widget__motion').getBoundingClientRect();
     const modesElement = widgetElement.querySelector('.daylight-widget__modes');
     const motionElement = widgetElement.querySelector('.daylight-widget__motion-options');
+    const motionTrackRect = motionElement.getBoundingClientRect();
     const modeButtonCenters = Array.from(modesElement.querySelectorAll('button'))
       .map((button) => {
         const rect = button.getBoundingClientRect();
@@ -262,8 +263,11 @@ test('daylight widget expands the service material and keeps theme modes accessi
       motionInsetLeft: motionRect.left - serviceRect.left,
       motionInsetRight: serviceRect.right - motionRect.right,
       modesPadding: parseFloat(getComputedStyle(modesElement).paddingLeft),
+      themeTrackHeight: modesRect.height,
+      motionTrackHeight: motionTrackRect.height,
       modeSliderTop: parseFloat(modeSliderStyle.top),
       modeSliderHeight: parseFloat(modeSliderStyle.height),
+      motionSliderHeight: parseFloat(motionSliderStyle.height),
       themeSliderBackground: modeSliderStyle.backgroundColor,
       motionSliderBackground: motionSliderStyle.backgroundColor,
       themeSliderBorder: modeSliderStyle.borderColor,
@@ -300,9 +304,11 @@ test('daylight widget expands the service material and keeps theme modes accessi
   expect(expandedGeometry.motionInsetLeft).toBeCloseTo(28, 0);
   expect(expandedGeometry.motionInsetRight).toBeCloseTo(28, 0);
   expect(expandedGeometry.modesPadding).toBeCloseTo(4, 1);
+  expect(expandedGeometry.motionTrackHeight).toBeCloseTo(expandedGeometry.themeTrackHeight, 1);
   expect(expandedGeometry.modeSliderTop).toBeCloseTo(4, 1);
   expect(expandedGeometry.modeSliderHeight).toBeGreaterThanOrEqual(30);
   expect(expandedGeometry.modeSliderHeight).toBeLessThanOrEqual(32);
+  expect(expandedGeometry.motionSliderHeight).toBeCloseTo(expandedGeometry.modeSliderHeight, 1);
   expect(expandedGeometry.motionSliderBackground).toBe(expandedGeometry.themeSliderBackground);
   expect(expandedGeometry.motionSliderBorder).toBe(expandedGeometry.themeSliderBorder);
   expect(expandedGeometry.motionSliderShadow).toBe(expandedGeometry.themeSliderShadow);
