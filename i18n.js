@@ -64,6 +64,25 @@
         daylightDay: 'Световой день',
         daylightNight: 'Ночь',
         weatherCredit: 'Погода: Open-Meteo',
+        motionLabel: 'Движение',
+        motionMode: 'Интенсивность движения',
+        motionSystem: 'Системный',
+        motionCalm: 'Спокойный',
+        footerParticipation: {
+          eyebrow: 'участие',
+          cta: 'Написать нам',
+          routesLabel: 'Способы участия',
+          routes: {
+            project: 'Предложить проект',
+            partner: 'Стать партнёром',
+            question: 'Задать вопрос'
+          },
+          subjects: {
+            project: 'Tarski — предложение проекта',
+            partner: 'Tarski — партнёрство',
+            question: 'Tarski — общий вопрос'
+          }
+        },
         weather: {
           clear: 'Ясно',
           partlyCloudy: 'Переменная облачность',
@@ -150,6 +169,25 @@
         daylightDay: 'Daylight',
         daylightNight: 'Night',
         weatherCredit: 'Weather: Open-Meteo',
+        motionLabel: 'Motion',
+        motionMode: 'Motion intensity',
+        motionSystem: 'System',
+        motionCalm: 'Calm',
+        footerParticipation: {
+          eyebrow: 'participation',
+          cta: 'Contact us',
+          routesLabel: 'Ways to participate',
+          routes: {
+            project: 'Propose a project',
+            partner: 'Become a partner',
+            question: 'Ask a question'
+          },
+          subjects: {
+            project: 'Tarski — project proposal',
+            partner: 'Tarski — partnership',
+            question: 'Tarski — general question'
+          }
+        },
         weather: {
           clear: 'Clear',
           partlyCloudy: 'Partly cloudy',
@@ -334,6 +372,25 @@
         daylightDay: '昼',
         daylightNight: '夜',
         weatherCredit: '天気：Open-Meteo',
+        motionLabel: '動き',
+        motionMode: 'モーションの強さ',
+        motionSystem: 'システム',
+        motionCalm: '穏やか',
+        footerParticipation: {
+          eyebrow: '参加',
+          cta: 'お問い合わせ',
+          routesLabel: '参加方法',
+          routes: {
+            project: 'プロジェクトを提案',
+            partner: 'パートナーになる',
+            question: '質問する'
+          },
+          subjects: {
+            project: 'Tarski — プロジェクトの提案',
+            partner: 'Tarski — パートナーシップ',
+            question: 'Tarski — お問い合わせ'
+          }
+        },
         weather: {
           clear: '晴れ',
           partlyCloudy: '晴れ時々曇り',
@@ -689,6 +746,10 @@
     setText(document.querySelector('[data-theme-mode-group] [data-theme-mode="auto"]'), data.ui.themeAuto);
     setText(document.querySelector('[data-theme-mode-group] [data-theme-mode="light"]'), data.ui.themeLightShort);
     setText(document.querySelector('[data-theme-mode-group] [data-theme-mode="dark"]'), data.ui.themeDarkShort);
+    setText(document.querySelector('[data-motion-label]'), data.ui.motionLabel);
+    setAttr(document.querySelector('[data-motion-mode-group]'), 'aria-label', data.ui.motionMode);
+    setText(document.querySelector('[data-motion-mode="system"]'), data.ui.motionSystem);
+    setText(document.querySelector('[data-motion-mode="calm"]'), data.ui.motionCalm);
     document.querySelectorAll('[data-daylight-toggle], [data-daylight-launcher]').forEach((toggle) => {
       const isOpen = toggle.getAttribute('aria-expanded') === 'true';
       const label = isOpen ? data.ui.themeSettingsClose : data.ui.themeSettingsOpen;
@@ -715,6 +776,19 @@
     setAttr(document.querySelector('.artist-dossier__scrim'), 'aria-label', data.ui.closeDetails);
     setAttr(document.querySelector('.artist-dossier__close'), 'aria-label', data.ui.closeDetails);
     setText(document.querySelector('.site-footer__privacy'), data.ui.privacy);
+    const footerParticipation = data.ui.footerParticipation || {};
+    setText(document.querySelector('[data-footer-eyebrow]'), footerParticipation.eyebrow);
+    setText(document.querySelector('[data-footer-cta-label]'), footerParticipation.cta);
+    setAttr(document.querySelector('[data-footer-routes]'), 'aria-label', footerParticipation.routesLabel);
+    document.querySelectorAll('[data-footer-route]').forEach((link) => {
+      const route = link.dataset.footerRoute;
+      setText(link.querySelector('span'), footerParticipation.routes?.[route]);
+      const subject = footerParticipation.subjects?.[route];
+      if (subject) setAttr(link, 'href', `mailto:tarski.fund@gmail.com?subject=${encodeURIComponent(subject)}`);
+    });
+    const footerCta = document.querySelector('[data-footer-cta]');
+    const generalSubject = footerParticipation.subjects?.question;
+    if (generalSubject) setAttr(footerCta, 'href', `mailto:tarski.fund@gmail.com?subject=${encodeURIComponent(generalSubject)}`);
     setAttr(
       document.querySelector('.site-footer__privacy'),
       'href',

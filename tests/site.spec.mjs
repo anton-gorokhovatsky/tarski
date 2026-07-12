@@ -8,7 +8,9 @@ const languages = {
     auto: 'Авто',
     day: 'День',
     night: 'Ночь',
-    weather: 'Ясно'
+    weather: 'Ясно',
+    footerCta: 'Написать нам',
+    footerRoutes: ['Предложить проект', 'Стать партнёром', 'Задать вопрос']
   },
   en: {
     privacyTitle: /Analytics/,
@@ -17,7 +19,9 @@ const languages = {
     auto: 'Auto',
     day: 'Day',
     night: 'Night',
-    weather: 'Clear'
+    weather: 'Clear',
+    footerCta: 'Contact us',
+    footerRoutes: ['Propose a project', 'Become a partner', 'Ask a question']
   },
   ja: {
     privacyTitle: /アクセス解析/,
@@ -26,7 +30,9 @@ const languages = {
     auto: '自動',
     day: '昼',
     night: '夜',
-    weather: '晴れ'
+    weather: '晴れ',
+    footerCta: 'お問い合わせ',
+    footerRoutes: ['プロジェクトを提案', 'パートナーになる', '質問する']
   }
 };
 
@@ -105,6 +111,10 @@ for (const [language, copy] of Object.entries(languages)) {
     }
 
     await expect(page.locator('[data-language-option][title]')).toHaveCount(0);
+
+    await expect(page.locator('[data-footer-cta-label]')).toHaveText(copy.footerCta);
+    await expect(page.locator('[data-footer-route] > span:first-child')).toHaveText(copy.footerRoutes);
+    await expect(page.locator('[data-footer-route]')).toHaveCount(3);
   });
 
   test(`${language}: privacy page is localized and canonical`, async ({ page }) => {
@@ -221,6 +231,7 @@ test('daylight widget expands the service material and keeps theme modes accessi
     const metaRect = widgetElement.querySelector('.daylight-widget__meta').getBoundingClientRect();
     const weatherRect = widgetElement.querySelector('.daylight-widget__weather').getBoundingClientRect();
     const modesRect = widgetElement.querySelector('.daylight-widget__modes').getBoundingClientRect();
+    const motionRect = widgetElement.querySelector('.daylight-widget__motion').getBoundingClientRect();
     const modesElement = widgetElement.querySelector('.daylight-widget__modes');
     const modeButtonCenters = Array.from(modesElement.querySelectorAll('button'))
       .map((button) => {
@@ -246,6 +257,8 @@ test('daylight widget expands the service material and keeps theme modes accessi
       weatherInsetRight: serviceRect.right - weatherRect.right,
       modesInsetLeft: modesRect.left - serviceRect.left,
       modesInsetRight: serviceRect.right - modesRect.right,
+      motionInsetLeft: motionRect.left - serviceRect.left,
+      motionInsetRight: serviceRect.right - motionRect.right,
       modesPadding: parseFloat(getComputedStyle(modesElement).paddingLeft),
       modeSliderTop: parseFloat(modeSliderStyle.top),
       modeSliderHeight: parseFloat(modeSliderStyle.height),
@@ -260,8 +273,8 @@ test('daylight widget expands the service material and keeps theme modes accessi
       temperatureFontSize: parseFloat(getComputedStyle(widgetElement.querySelector('[data-weather-temperature]')).fontSize)
     };
   });
-  expect(expandedGeometry.height).toBeGreaterThanOrEqual(316);
-  expect(expandedGeometry.height).toBeLessThanOrEqual(324);
+  expect(expandedGeometry.height).toBeGreaterThanOrEqual(372);
+  expect(expandedGeometry.height).toBeLessThanOrEqual(380);
   expect(expandedGeometry.menuHasWidgetState).toBe(true);
   expect(expandedGeometry.ghostShadowContent).toBe('none');
   expect(expandedGeometry.widgetInsetLeft).toBeCloseTo(28, 0);
@@ -276,6 +289,8 @@ test('daylight widget expands the service material and keeps theme modes accessi
   expect(expandedGeometry.weatherInsetRight).toBeCloseTo(28, 0);
   expect(expandedGeometry.modesInsetLeft).toBeCloseTo(28, 0);
   expect(expandedGeometry.modesInsetRight).toBeCloseTo(28, 0);
+  expect(expandedGeometry.motionInsetLeft).toBeCloseTo(28, 0);
+  expect(expandedGeometry.motionInsetRight).toBeCloseTo(28, 0);
   expect(expandedGeometry.modesPadding).toBeCloseTo(4, 1);
   expect(expandedGeometry.modeSliderTop).toBeCloseTo(4, 1);
   expect(expandedGeometry.modeSliderHeight).toBeGreaterThanOrEqual(30);
@@ -287,6 +302,15 @@ test('daylight widget expands the service material and keeps theme modes accessi
   expect(expandedGeometry.statusFont).toContain('Arial');
   expect(expandedGeometry.temperatureFont).toContain('Arial');
   expect(expandedGeometry.temperatureFontSize).toBeCloseTo(22, 0);
+
+  const motionSystem = widget.locator('[data-motion-mode="system"]');
+  const motionCalm = widget.locator('[data-motion-mode="calm"]');
+  await expect(motionSystem).toHaveAttribute('aria-pressed', 'true');
+  await motionCalm.click();
+  await expect(page.locator('html')).toHaveAttribute('data-motion-preference', 'calm');
+  await expect(page.locator('html')).toHaveAttribute('data-effective-motion', 'calm');
+  await expect(motionCalm).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.locator('.cursor-trail-canvas')).toHaveCount(0);
 
   const darkMode = widget.locator('[data-theme-mode="dark"]');
   const autoMode = widget.locator('[data-theme-mode="auto"]');
