@@ -412,11 +412,14 @@ test('motion preference is available on desktop and shares one state', async ({ 
     const routes = document.querySelector('.site-footer__routes').getBoundingClientRect();
     return {
       labelLeft: Math.abs(label.left - routes.left),
-      controlRight: Math.abs(control.right - routes.right),
+      rowRight: Math.abs(element.getBoundingClientRect().right - routes.right),
+      labelControlGap: control.left - label.right,
     };
   });
   expect(motionAlignment.labelLeft).toBeLessThanOrEqual(1);
-  expect(motionAlignment.controlRight).toBeLessThanOrEqual(1);
+  expect(motionAlignment.rowRight).toBeLessThanOrEqual(1);
+  expect(motionAlignment.labelControlGap).toBeGreaterThanOrEqual(12);
+  expect(motionAlignment.labelControlGap).toBeLessThanOrEqual(20);
 
   const desktopLensMaterial = await page.locator('.main-nav').evaluate((element) => {
     const style = getComputedStyle(element, '::after');
