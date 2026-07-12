@@ -377,13 +377,13 @@ const getMobileServiceMotionDuration = (element) => {
   const syncWeather = (fallbackStatus) => {
     if (!cachedWeather) {
       status.textContent = fallbackStatus;
-      temperatureLabel.textContent = '—\u00A0°C';
+      temperatureLabel.textContent = '—\u202F°C';
       return;
     }
 
     const weatherKey = getWeatherKey(cachedWeather.code);
     status.textContent = getLabel(`ui.weather.${weatherKey}`, weatherFallbacks[weatherKey]);
-    temperatureLabel.textContent = `${Math.round(cachedWeather.temperature)}\u00A0°C`;
+    temperatureLabel.textContent = `${Math.round(cachedWeather.temperature)}\u202F°C`;
   };
 
   const loadWeather = async () => {

@@ -81,7 +81,7 @@ for (const [language, copy] of Object.entries(languages)) {
     await expect(widget.locator('[data-theme-mode="light"]')).toHaveText(copy.day);
     await expect(widget.locator('[data-theme-mode="dark"]')).toHaveText(copy.night);
     await expect(widget.locator('[data-daylight-status]')).toHaveText(copy.weather);
-    await expect(widget.locator('[data-weather-temperature]')).toHaveText('13\u00A0°C');
+    await expect(widget.locator('[data-weather-temperature]')).toHaveText('13\u202F°C');
     await page.waitForTimeout(560);
 
     const widgetBounds = await widget.evaluate((element) => {
@@ -217,6 +217,7 @@ test('daylight widget expands the service material and keeps theme modes accessi
     const serviceRect = element.getBoundingClientRect();
     const widgetRect = widgetElement.getBoundingClientRect();
     const chartRect = widgetElement.querySelector('.daylight-widget__chart').getBoundingClientRect();
+    const chartSvg = widgetElement.querySelector('.daylight-widget__chart svg');
     const metaRect = widgetElement.querySelector('.daylight-widget__meta').getBoundingClientRect();
     const weatherRect = widgetElement.querySelector('.daylight-widget__weather').getBoundingClientRect();
     const modesRect = widgetElement.querySelector('.daylight-widget__modes').getBoundingClientRect();
@@ -238,6 +239,7 @@ test('daylight widget expands the service material and keeps theme modes accessi
       widgetInsetBottom: serviceRect.bottom - widgetRect.bottom,
       chartInsetLeft: chartRect.left - serviceRect.left,
       chartInsetRight: serviceRect.right - chartRect.right,
+      chartPreserveAspectRatio: chartSvg.getAttribute('preserveAspectRatio'),
       metaInsetLeft: metaRect.left - serviceRect.left,
       metaInsetRight: serviceRect.right - metaRect.right,
       weatherInsetLeft: weatherRect.left - serviceRect.left,
@@ -252,18 +254,22 @@ test('daylight widget expands the service material and keeps theme modes accessi
       axisTop: widgetElement.querySelector('.daylight-widget__axis').getBoundingClientRect().top,
       chartBottomToWeather: widgetElement.querySelector('.daylight-widget__weather').getBoundingClientRect().top
         - widgetElement.querySelector('.daylight-widget__chart').getBoundingClientRect().bottom,
-      timeFont: getComputedStyle(widgetElement.querySelector('time')).fontFamily
+      timeFont: getComputedStyle(widgetElement.querySelector('time')).fontFamily,
+      statusFont: getComputedStyle(widgetElement.querySelector('[data-daylight-status]')).fontFamily,
+      temperatureFont: getComputedStyle(widgetElement.querySelector('[data-weather-temperature]')).fontFamily,
+      temperatureFontSize: parseFloat(getComputedStyle(widgetElement.querySelector('[data-weather-temperature]')).fontSize)
     };
   });
-  expect(expandedGeometry.height).toBeGreaterThanOrEqual(304);
-  expect(expandedGeometry.height).toBeLessThanOrEqual(312);
+  expect(expandedGeometry.height).toBeGreaterThanOrEqual(316);
+  expect(expandedGeometry.height).toBeLessThanOrEqual(324);
   expect(expandedGeometry.menuHasWidgetState).toBe(true);
   expect(expandedGeometry.ghostShadowContent).toBe('none');
   expect(expandedGeometry.widgetInsetLeft).toBeCloseTo(28, 0);
   expect(expandedGeometry.widgetInsetRight).toBeCloseTo(28, 0);
-  expect(expandedGeometry.widgetInsetBottom).toBeGreaterThanOrEqual(12);
+  expect(expandedGeometry.widgetInsetBottom).toBeGreaterThanOrEqual(24);
   expect(expandedGeometry.chartInsetLeft).toBeCloseTo(0, 1);
   expect(expandedGeometry.chartInsetRight).toBeCloseTo(0, 1);
+  expect(expandedGeometry.chartPreserveAspectRatio).toBe('none');
   expect(expandedGeometry.metaInsetLeft).toBeCloseTo(28, 0);
   expect(expandedGeometry.metaInsetRight).toBeCloseTo(28, 0);
   expect(expandedGeometry.weatherInsetLeft).toBeCloseTo(28, 0);
@@ -278,6 +284,9 @@ test('daylight widget expands the service material and keeps theme modes accessi
   expect(expandedGeometry.chartBottom).toBeLessThanOrEqual(expandedGeometry.axisTop);
   expect(expandedGeometry.chartBottomToWeather).toBeGreaterThanOrEqual(15);
   expect(expandedGeometry.timeFont).toContain('Arial');
+  expect(expandedGeometry.statusFont).toContain('Arial');
+  expect(expandedGeometry.temperatureFont).toContain('Arial');
+  expect(expandedGeometry.temperatureFontSize).toBeCloseTo(22, 0);
 
   const darkMode = widget.locator('[data-theme-mode="dark"]');
   const autoMode = widget.locator('[data-theme-mode="auto"]');
@@ -285,6 +294,23 @@ test('daylight widget expands the service material and keeps theme modes accessi
   await expect(page.locator('html')).toHaveAttribute('data-effective-theme', 'dark');
   await expect(darkMode).toHaveAttribute('aria-pressed', 'true');
   await expect(widget.locator('[data-theme-mode-group]')).toHaveCSS('--theme-mode-index', '2');
+  await page.waitForTimeout(1000);
+  const sliderEndGaps = await widget.locator('[data-theme-mode-group]').evaluate((element) => {
+    const style = getComputedStyle(element, '::before');
+    const matrixValues = style.transform === 'none'
+      ? []
+      : style.transform.replace('matrix(', '').replace(')', '').split(',').map(Number);
+    const translateX = matrixValues.length === 6 ? matrixValues[4] : 0;
+    const left = parseFloat(style.left) + translateX;
+    const outerWidth = parseFloat(style.width)
+      + parseFloat(style.borderLeftWidth)
+      + parseFloat(style.borderRightWidth);
+    return {
+      left: parseFloat(style.left),
+      right: element.getBoundingClientRect().width - left - outerWidth
+    };
+  });
+  expect(Math.abs(sliderEndGaps.left - sliderEndGaps.right)).toBeLessThanOrEqual(0.25);
   await autoMode.click();
   await expect(page.locator('html')).toHaveAttribute('data-theme-preference', 'auto');
   await expect(autoMode).toHaveAttribute('aria-pressed', 'true');

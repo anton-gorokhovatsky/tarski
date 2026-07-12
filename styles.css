@@ -3504,7 +3504,7 @@ html.has-open-dossier {
     --island-service-gap: 12px;
     --island-service-toggle-size: 32px;
     --island-daylight-width: min(332px, calc(100vw - 24px));
-    --island-daylight-height: 308px;
+    --island-daylight-height: 320px;
     --island-daylight-top: 8px;
     --island-daylight-overflow-y: calc(
       var(--island-daylight-top)
@@ -4186,6 +4186,7 @@ html.has-open-dossier {
   }
 
   .mobile-service.is-daylight-open .mobile-service-toggle {
+    left: calc(100% - 48px);
     top: 10px;
   }
 
@@ -4235,8 +4236,8 @@ html.has-open-dossier {
   }
 
   .mobile-service.is-daylight-open .mobile-service-panel {
-    left: 28px;
-    width: calc(100% - 86px);
+    left: 30px;
+    width: calc(100% - 90px);
     height: 72px;
     justify-content: space-between;
   }
@@ -4334,7 +4335,7 @@ html.has-open-dossier {
     justify-content: space-between;
     min-height: 20px;
     color: color-mix(in srgb, currentColor 74%, transparent);
-    font-family: var(--font-serif-display);
+    font-family: Arial, Helvetica, sans-serif;
     font-size: 14px;
     line-height: 1.1;
     letter-spacing: 0.01em;
@@ -4422,7 +4423,7 @@ html.has-open-dossier {
     justify-content: space-between;
     padding: 0 var(--daylight-content-inset);
     color: color-mix(in srgb, currentColor 50%, transparent);
-    font-family: var(--font-serif-display);
+    font-family: Arial, Helvetica, sans-serif;
     font-size: 12px;
     font-style: normal;
     font-variant-numeric: tabular-nums;
@@ -4444,12 +4445,13 @@ html.has-open-dossier {
   }
 
   .daylight-widget__weather strong {
-    font-family: var(--font-serif-display);
-    font-size: 28px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 22px;
     font-style: normal;
     font-variant-numeric: lining-nums tabular-nums;
+    letter-spacing: 0;
     font-weight: 400;
-    line-height: 32px;
+    line-height: 28px;
   }
 
   .daylight-widget__modes {
@@ -4471,19 +4473,23 @@ html.has-open-dossier {
   .daylight-widget__modes::before {
     content: "";
     position: absolute;
-    left: 4px;
+    box-sizing: border-box;
+    left: 5px;
     top: 4px;
     z-index: 0;
-    width: calc((100% - 8px) / 3);
+    width: calc((100% - 9px) / 3);
     height: calc(100% - 8px);
     border: 0.5px solid color-mix(in srgb, currentColor 30%, transparent);
     border-radius: 999px;
     background: color-mix(in srgb, currentColor 10%, transparent);
     box-shadow:
       inset 0 1px 0 color-mix(in srgb, #fff 20%, transparent),
-      0 3px 9px color-mix(in srgb, #000 12%, transparent);
+      0 2px 6px color-mix(in srgb, #000 10%, transparent);
     transform: translate3d(
-      calc(var(--theme-mode-index) * 100%),
+      calc(
+        (var(--theme-mode-index) * 100%)
+        - (var(--theme-mode-index) * 0.5px)
+      ),
       0,
       0
     );
