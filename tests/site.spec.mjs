@@ -219,7 +219,7 @@ test('daylight widget expands the service material and keeps theme modes accessi
   await expect(widget).toHaveAttribute('aria-hidden', 'false');
   await expect(widget).toBeVisible();
   await expect(widget.locator('time')).toHaveCount(3);
-  await page.waitForTimeout(700);
+  await page.waitForTimeout(900);
 
   const expandedGeometry = await serviceRoot.evaluate((element) => {
     const menu = element.closest('[data-mobile-menu]');
@@ -405,6 +405,21 @@ test('motion preference is available on desktop and shares one state', async ({ 
   expect(footerGeometry.height).toBeLessThanOrEqual(footerGeometry.viewportHeight);
   expect(footerGeometry.scrollHeight).toBeLessThanOrEqual(footerGeometry.viewportHeight + 1);
   expect(footerGeometry.routeDecorationCount).toBe(0);
+
+  const motionLabelGap = await page.locator('.site-footer__motion').evaluate((element) => {
+    const label = element.querySelector('[data-motion-label]').getBoundingClientRect();
+    const control = element.querySelector('.footer-motion-panel').getBoundingClientRect();
+    return control.left - label.right;
+  });
+  expect(motionLabelGap).toBeGreaterThanOrEqual(12);
+  expect(motionLabelGap).toBeLessThanOrEqual(20);
+
+  const desktopLensMaterial = await page.locator('.main-nav').evaluate((element) => {
+    const style = getComputedStyle(element, '::after');
+    return { filter: style.filter, shadow: style.boxShadow };
+  });
+  expect(desktopLensMaterial.filter).toContain('drop-shadow');
+  expect(desktopLensMaterial.shadow).not.toBe('none');
 });
 
 test('main mobile menu launches the existing daylight widget', async ({ page }) => {
