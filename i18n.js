@@ -746,10 +746,18 @@
     setText(document.querySelector('[data-theme-mode-group] [data-theme-mode="auto"]'), data.ui.themeAuto);
     setText(document.querySelector('[data-theme-mode-group] [data-theme-mode="light"]'), data.ui.themeLightShort);
     setText(document.querySelector('[data-theme-mode-group] [data-theme-mode="dark"]'), data.ui.themeDarkShort);
-    setText(document.querySelector('[data-motion-label]'), data.ui.motionLabel);
-    setAttr(document.querySelector('[data-motion-mode-group]'), 'aria-label', data.ui.motionMode);
-    setText(document.querySelector('[data-motion-mode="system"]'), data.ui.motionSystem);
-    setText(document.querySelector('[data-motion-mode="calm"]'), data.ui.motionCalm);
+    document.querySelectorAll('[data-motion-label]').forEach((label) => {
+      setText(label, data.ui.motionLabel);
+    });
+    document.querySelectorAll('[data-motion-mode-group]').forEach((group) => {
+      setAttr(group, 'aria-label', data.ui.motionMode);
+    });
+    document.querySelectorAll('[data-motion-mode="system"]').forEach((control) => {
+      setText(control, data.ui.motionSystem);
+    });
+    document.querySelectorAll('[data-motion-mode="calm"]').forEach((control) => {
+      setText(control, data.ui.motionCalm);
+    });
     document.querySelectorAll('[data-daylight-toggle], [data-daylight-launcher]').forEach((toggle) => {
       const isOpen = toggle.getAttribute('aria-expanded') === 'true';
       const label = isOpen ? data.ui.themeSettingsClose : data.ui.themeSettingsOpen;

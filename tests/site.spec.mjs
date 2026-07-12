@@ -233,12 +233,14 @@ test('daylight widget expands the service material and keeps theme modes accessi
     const modesRect = widgetElement.querySelector('.daylight-widget__modes').getBoundingClientRect();
     const motionRect = widgetElement.querySelector('.daylight-widget__motion').getBoundingClientRect();
     const modesElement = widgetElement.querySelector('.daylight-widget__modes');
+    const motionElement = widgetElement.querySelector('.daylight-widget__motion-options');
     const modeButtonCenters = Array.from(modesElement.querySelectorAll('button'))
       .map((button) => {
         const rect = button.getBoundingClientRect();
         return rect.top + rect.height / 2;
       });
     const modeSliderStyle = getComputedStyle(modesElement, '::before');
+    const motionSliderStyle = getComputedStyle(motionElement, '::before');
 
     return {
       height: serviceRect.height,
@@ -262,6 +264,12 @@ test('daylight widget expands the service material and keeps theme modes accessi
       modesPadding: parseFloat(getComputedStyle(modesElement).paddingLeft),
       modeSliderTop: parseFloat(modeSliderStyle.top),
       modeSliderHeight: parseFloat(modeSliderStyle.height),
+      themeSliderBackground: modeSliderStyle.backgroundColor,
+      motionSliderBackground: motionSliderStyle.backgroundColor,
+      themeSliderBorder: modeSliderStyle.borderColor,
+      motionSliderBorder: motionSliderStyle.borderColor,
+      themeSliderShadow: modeSliderStyle.boxShadow,
+      motionSliderShadow: motionSliderStyle.boxShadow,
       modeButtonCenterDelta: Math.max(...modeButtonCenters) - Math.min(...modeButtonCenters),
       chartBottom: widgetElement.querySelector('svg').getBoundingClientRect().bottom,
       axisTop: widgetElement.querySelector('.daylight-widget__axis').getBoundingClientRect().top,
@@ -295,6 +303,9 @@ test('daylight widget expands the service material and keeps theme modes accessi
   expect(expandedGeometry.modeSliderTop).toBeCloseTo(4, 1);
   expect(expandedGeometry.modeSliderHeight).toBeGreaterThanOrEqual(30);
   expect(expandedGeometry.modeSliderHeight).toBeLessThanOrEqual(32);
+  expect(expandedGeometry.motionSliderBackground).toBe(expandedGeometry.themeSliderBackground);
+  expect(expandedGeometry.motionSliderBorder).toBe(expandedGeometry.themeSliderBorder);
+  expect(expandedGeometry.motionSliderShadow).toBe(expandedGeometry.themeSliderShadow);
   expect(expandedGeometry.modeButtonCenterDelta).toBeLessThanOrEqual(0.1);
   expect(expandedGeometry.chartBottom).toBeLessThanOrEqual(expandedGeometry.axisTop);
   expect(expandedGeometry.chartBottomToWeather).toBeGreaterThanOrEqual(15);
@@ -355,6 +366,29 @@ test('daylight widget expands the service material and keeps theme modes accessi
   await expect(serviceToggle).toHaveAttribute('aria-expanded', 'true');
   await page.keyboard.press('Escape');
   await expect(serviceToggle).toHaveAttribute('aria-expanded', 'false');
+});
+
+test('motion preference is available on desktop and shares one state', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.goto('/?lang=ru');
+
+  const desktopGroup = page.locator('.footer-motion-panel');
+  const calm = desktopGroup.locator('[data-motion-mode="calm"]');
+  await desktopGroup.scrollIntoViewIfNeeded();
+  await expect(desktopGroup).toBeVisible();
+  await expect(calm).toHaveText('Спокойный');
+  await calm.click();
+
+  await expect(page.locator('html')).toHaveAttribute('data-motion-preference', 'calm');
+  await expect(calm).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.locator('[data-daylight-widget] [data-motion-mode="calm"]')).toHaveAttribute('aria-pressed', 'true');
+
+  const ctaAlignment = await page.locator('.site-footer__cta').evaluate((element) => {
+    const label = element.querySelector('[data-footer-cta-label]').getBoundingClientRect();
+    const arrow = element.querySelector('span:last-child').getBoundingClientRect();
+    return Math.abs(label.top - arrow.top);
+  });
+  expect(ctaAlignment).toBeLessThanOrEqual(3);
 });
 
 test('main mobile menu launches the existing daylight widget', async ({ page }) => {

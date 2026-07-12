@@ -2,6 +2,7 @@
   const storageKey = 'tarski-motion';
   const systemQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
   const controls = Array.from(document.querySelectorAll('[data-motion-mode]'));
+  const groups = Array.from(document.querySelectorAll('[data-motion-mode-group]'));
 
   const readPreference = () => {
     try {
@@ -20,6 +21,9 @@
     document.documentElement.dataset.effectiveMotion = effective;
     controls.forEach((control) => {
       control.setAttribute('aria-pressed', String(control.dataset.motionMode === preference));
+    });
+    groups.forEach((group) => {
+      group.style.setProperty('--motion-mode-index', preference === 'calm' ? '1' : '0');
     });
 
     if (announce) {
