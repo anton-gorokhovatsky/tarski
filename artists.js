@@ -20,6 +20,7 @@
       button.classList.toggle('is-active', isActive);
       button.setAttribute('aria-pressed', String(isActive));
     });
+    switcher.style.setProperty('--artists-view-index', nextView === 'list' ? '1' : '0');
 
     window.dispatchEvent(new CustomEvent('tarski:artistsviewchange', {
       detail: { view: nextView }

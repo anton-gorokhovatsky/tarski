@@ -1431,6 +1431,7 @@ li::before {
 
 /* 5. Artists cloud, list view and cards */
 .artists-view-switch {
+  --artists-view-index: 0;
   --artists-switch-color: var(--page-bg);
   --artists-switch-tint: 0%;
   --gutter-color: var(--artists-switch-color);
@@ -1438,16 +1439,22 @@ li::before {
   --artists-switch-tone: var(--gutter-tone);
   position: relative;
   z-index: 3;
-  display: inline-flex;
-  gap: 2px;
-  align-items: center;
+  isolation: isolate;
+  display: inline-grid;
+  grid-template-columns: repeat(2, minmax(76px, 1fr));
+  gap: 0;
+  align-items: stretch;
+  box-sizing: border-box;
+  height: 40px;
   margin: -24px 0 44px;
-  padding: 3px;
-  border-radius: 17px;
+  padding: 4px;
+  border: 0.5px solid color-mix(in srgb, currentColor 14%, transparent);
+  border-radius: 999px;
   corner-shape: squircle;
   background: var(--gutter-bg);
   box-shadow: var(--gutter-shadow);
   color: var(--muted-text);
+  overflow: hidden;
   backdrop-filter: var(--gutter-backdrop-filter);
   -webkit-backdrop-filter: var(--gutter-backdrop-filter);
   transition:
@@ -1457,6 +1464,27 @@ li::before {
     backdrop-filter var(--duration-fast) var(--ease-smooth);
 }
 
+.artists-view-switch::before {
+  content: "";
+  position: absolute;
+  box-sizing: border-box;
+  left: 4px;
+  top: 4px;
+  z-index: 0;
+  width: calc((100% - 8px) / 2);
+  height: calc(100% - 8px);
+  border: 0.5px solid color-mix(in srgb, currentColor 30%, transparent);
+  border-radius: 999px;
+  background: var(--gutter-active-bg);
+  box-shadow: var(--gutter-active-shadow);
+  transform: translate3d(calc(var(--artists-view-index) * 100%), 0, 0);
+  transition:
+    transform 560ms cubic-bezier(0.16, 1, 0.3, 1),
+    background 280ms var(--ease-smooth),
+    border-color 280ms var(--ease-smooth),
+    box-shadow 280ms var(--ease-smooth);
+}
+
 .artists-view-switch[hidden] {
   display: none;
 }
@@ -1464,11 +1492,13 @@ li::before {
 .artists-view-switch__button {
   -webkit-appearance: none;
   appearance: none;
+  position: relative;
+  z-index: 1;
   min-width: 76px;
-  min-height: 32px;
-  padding: 5px 15px 6px;
+  min-height: 100%;
+  padding: 1px 15px 0;
   border: 0;
-  border-radius: 14px;
+  border-radius: 999px;
   corner-shape: squircle;
   background: transparent;
   color: inherit;
@@ -1478,7 +1508,6 @@ li::before {
   letter-spacing: 0;
   cursor: pointer;
   transition:
-    background-color var(--duration-fast) var(--ease-smooth),
     color var(--duration-fast) var(--ease-smooth),
     opacity var(--duration-fast) var(--ease-smooth),
     transform var(--duration-fast) var(--ease-smooth);
@@ -1494,9 +1523,9 @@ li::before {
 }
 
 .artists-view-switch__button.is-active {
-  background: var(--gutter-active-bg);
+  background: transparent;
   color: var(--text);
-  box-shadow: var(--gutter-active-shadow);
+  box-shadow: none;
 }
 
 .artists-view-switch__button:active {

@@ -565,8 +565,18 @@ test('artist names remain headings with one keyboard trigger each', async ({ pag
   await expect(page.locator('.artist-card__detail-trigger')).toHaveCount(7);
   await expect(page.locator('.artist-card__image[role="button"], .artist-card__image[tabindex]')).toHaveCount(0);
 
+  const viewSwitch = page.locator('[data-artists-view-switch]');
+  await expect(viewSwitch).toHaveCSS('height', '40px');
   const listView = page.locator('[data-artists-view-option="list"]');
   await listView.click();
+  await expect.poll(() => viewSwitch.evaluate((element) => (
+    element.style.getPropertyValue('--artists-view-index')
+  ))).toBe('1');
+  await expect.poll(() => viewSwitch.evaluate((element) => {
+    const transform = getComputedStyle(element, '::before').transform;
+    const values = transform.match(/matrix\(([^)]+)\)/)?.[1].split(',').map(Number) || [];
+    return values[4] || 0;
+  })).toBeGreaterThan(60);
   const trigger = page.locator('#artist-anastasia-dahl .artist-card__detail-trigger');
   await trigger.click();
   await expect(page.locator('#artist-dossier-panel')).toBeVisible();
