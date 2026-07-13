@@ -70,12 +70,19 @@
     if (!cachedWeather) {
       status.textContent = fallbackStatus;
       temperatureLabel.textContent = '—\u202F°C';
+      delete widget.dataset.weatherKey;
+      delete widget.dataset.weatherTemperature;
       return;
     }
 
     const weatherKey = getWeatherKey(cachedWeather.code);
     status.textContent = getLabel(`ui.weather.${weatherKey}`, weatherFallbacks[weatherKey]);
     temperatureLabel.textContent = `${Math.round(cachedWeather.temperature)}\u202F°C`;
+    widget.dataset.weatherKey = weatherKey;
+    widget.dataset.weatherTemperature = String(cachedWeather.temperature);
+    window.dispatchEvent(new CustomEvent('tarski:weatherchange', {
+      detail: { weatherKey, temperature: cachedWeather.temperature }
+    }));
   };
 
   const loadWeather = async () => {

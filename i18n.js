@@ -68,6 +68,28 @@
         motionMode: 'Интенсивность движения',
         motionSystem: 'Системный',
         motionCalm: 'Спокойный',
+        empathy: {
+          question: 'Как вы сегодня?',
+          privacy: 'Ответ останется только на этом устройстве.',
+          optionsLabel: 'Самочувствие сегодня',
+          options: {
+            calm: 'Спокойно',
+            tired: 'Усталость',
+            tense: 'Напряжение',
+            curious: 'Любопытно',
+            skip: 'Пропустить'
+          },
+          feedback: {
+            calm: 'Спасибо. Оставляем обычный ритм.',
+            tired: 'Спасибо. Сделали движение спокойнее.',
+            tense: 'Спасибо. Сделали движение спокойнее.',
+            curious: 'Спасибо. Исследуйте в своем ритме.',
+            skip: 'Хорошо. Ничего не меняем.',
+            restored: 'Вернули системный ритм.'
+          },
+          undo: 'Вернуть ритм',
+          settings: 'К настройкам'
+        },
         footerParticipation: {
           eyebrow: 'участие',
           cta: 'Написать нам',
@@ -93,6 +115,12 @@
           showers: 'Ливни',
           snow: 'Снег',
           thunderstorm: 'Гроза'
+        },
+        weatherCare: {
+          umbrella: 'Если собираетесь выходить, зонт может пригодиться.',
+          heat: 'Вода, тень и SPF сегодня будут кстати.',
+          warm: 'Возможно, стоит одеться чуть теплее.',
+          walk: 'Хороший день, чтобы немного пройтись.'
         },
         serviceSettings: 'Настройки сайта',
         serviceOpen: 'Открыть настройки сайта',
@@ -173,6 +201,28 @@
         motionMode: 'Motion intensity',
         motionSystem: 'System',
         motionCalm: 'Calm',
+        empathy: {
+          question: 'How are you today?',
+          privacy: 'Your answer stays on this device.',
+          optionsLabel: 'How you feel today',
+          options: {
+            calm: 'Calm',
+            tired: 'Tired',
+            tense: 'Tense',
+            curious: 'Curious',
+            skip: 'Skip'
+          },
+          feedback: {
+            calm: 'Thank you. We will keep the usual rhythm.',
+            tired: 'Thank you. We made the motion calmer.',
+            tense: 'Thank you. We made the motion calmer.',
+            curious: 'Thank you. Explore at your own pace.',
+            skip: 'All right. Nothing will change.',
+            restored: 'The system rhythm is back.'
+          },
+          undo: 'Restore rhythm',
+          settings: 'Open settings'
+        },
         footerParticipation: {
           eyebrow: 'participation',
           cta: 'Contact us',
@@ -198,6 +248,12 @@
           showers: 'Showers',
           snow: 'Snow',
           thunderstorm: 'Thunderstorm'
+        },
+        weatherCare: {
+          umbrella: 'If you are heading out, an umbrella may come in handy.',
+          heat: 'Water, shade, and SPF may be useful today.',
+          warm: 'You may want to dress a little warmer.',
+          walk: 'A good day for a short walk.'
         },
         serviceSettings: 'Site settings',
         serviceOpen: 'Open site settings',
@@ -376,6 +432,28 @@
         motionMode: 'モーションの強さ',
         motionSystem: 'システム',
         motionCalm: '穏やか',
+        empathy: {
+          question: '今日はどんな調子ですか？',
+          privacy: '回答はこの端末にだけ残ります。',
+          optionsLabel: '今日の調子',
+          options: {
+            calm: '穏やか',
+            tired: '疲れている',
+            tense: '緊張している',
+            curious: '好奇心がある',
+            skip: 'スキップ'
+          },
+          feedback: {
+            calm: 'ありがとうございます。いつものリズムを保ちます。',
+            tired: 'ありがとうございます。動きを穏やかにしました。',
+            tense: 'ありがとうございます。動きを穏やかにしました。',
+            curious: 'ありがとうございます。ご自分のペースで探索してください。',
+            skip: 'わかりました。何も変えません。',
+            restored: 'システムのリズムに戻しました。'
+          },
+          undo: '元に戻す',
+          settings: '設定へ'
+        },
         footerParticipation: {
           eyebrow: '参加',
           cta: 'お問い合わせ',
@@ -401,6 +479,12 @@
           showers: 'にわか雨',
           snow: '雪',
           thunderstorm: '雷雨'
+        },
+        weatherCare: {
+          umbrella: '外出するなら、傘が役立ちそうです。',
+          heat: '今日は水分と日陰、日焼け止めが役立ちそうです。',
+          warm: '少し暖かい服装がよさそうです。',
+          walk: '少し歩くのによさそうな日です。'
         },
         serviceSettings: 'サイト設定',
         serviceOpen: 'サイト設定を開く',
@@ -758,6 +842,15 @@
     document.querySelectorAll('[data-motion-mode="calm"]').forEach((control) => {
       setText(control, data.ui.motionCalm);
     });
+    const empathy = data.ui.empathy || {};
+    setText(document.querySelector('[data-empathy-question]'), empathy.question);
+    setText(document.querySelector('[data-empathy-privacy]'), empathy.privacy);
+    setAttr(document.querySelector('[data-empathy-options]'), 'aria-label', empathy.optionsLabel);
+    document.querySelectorAll('[data-empathy-answer]').forEach((control) => {
+      setText(control, empathy.options?.[control.dataset.empathyAnswer]);
+    });
+    setText(document.querySelector('[data-empathy-undo]'), empathy.undo);
+    setText(document.querySelector('[data-empathy-show-settings]'), empathy.settings);
     document.querySelectorAll('[data-daylight-toggle], [data-daylight-launcher]').forEach((toggle) => {
       const isOpen = toggle.getAttribute('aria-expanded') === 'true';
       const label = isOpen ? data.ui.themeSettingsClose : data.ui.themeSettingsOpen;

@@ -578,6 +578,92 @@ a:hover {
   pointer-events: none;
 }
 
+/*
+ * Paper Water is an optical overlay, not a second material implementation.
+ * The original matte lens remains the fallback and supplies the live backdrop;
+ * this child uses the exact same desktop contour above it.
+ */
+.nav-water-material {
+  position: absolute;
+  left: var(--nav-lens-x);
+  top: var(--nav-lens-y);
+  z-index: 1;
+  width: var(--nav-lens-width);
+  height: var(--nav-lens-height);
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+  -webkit-mask: var(--nav-lens-shape) center / 100% 100% no-repeat;
+  mask: var(--nav-lens-shape) center / 100% 100% no-repeat;
+  mask-mode: alpha;
+  transform: rotate(var(--nav-lens-rotation)) scaleX(-1);
+  transform-origin: 52% 54%;
+  transition: opacity var(--duration-fast) var(--ease-smooth);
+}
+
+.nav-water-material[data-water-active="true"] {
+  opacity: var(--water-material-opacity, 0.82);
+}
+
+[data-water-surface] > canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  opacity: 0;
+  pointer-events: none;
+  mix-blend-mode: soft-light;
+  transition: opacity 260ms var(--ease-smooth);
+}
+
+[data-water-surface][data-water-active="true"] > canvas {
+  opacity: var(--water-material-opacity, 0.82);
+}
+
+:root[data-effective-theme="dark"] [data-water-surface] > canvas {
+  mix-blend-mode: screen;
+}
+
+:root[data-effective-theme="light"] [data-water-surface] {
+  --water-material-opacity: 0.54;
+}
+
+:root[data-effective-theme="light"] [data-water-surface="desktop-nav"] {
+  --water-material-opacity: 0.38;
+}
+
+:root[data-effective-theme="light"] [data-water-surface="mobile-service"] {
+  --water-material-opacity: 0.44;
+}
+
+:root[data-effective-theme="light"] [data-water-surface="mobile-menu"] {
+  --water-material-opacity: 0.4;
+}
+
+:root[data-effective-theme="dark"] [data-water-surface] {
+  --water-material-opacity: 0.1;
+}
+
+:root[data-effective-theme="dark"] [data-water-surface="mobile-compact"] {
+  --water-material-opacity: 0.18;
+}
+
+:root[data-effective-theme="dark"] [data-water-surface="mobile-service"] {
+  --water-material-opacity: 0.08;
+}
+
+:root[data-effective-theme="dark"] [data-water-surface="mobile-menu"] {
+  --water-material-opacity: 0.06;
+}
+
+:root[data-water-material="fallback"] [data-water-surface] > canvas,
+[data-water-surface][data-water-fallback] > canvas {
+  display: none;
+}
+
 .main-nav::before,
 .main-nav .nav-label::before {
   content: "";
@@ -1442,11 +1528,12 @@ li::before {
   padding: 4px;
   border: 0.5px solid color-mix(in srgb, currentColor 14%, transparent);
   border-radius: 999px;
-  corner-shape: squircle;
   background: var(--gutter-bg);
   box-shadow: var(--gutter-shadow);
   color: var(--muted-text);
-  overflow: hidden;
+  overflow: clip;
+  -webkit-clip-path: inset(0 round 999px);
+  clip-path: inset(0 round 999px);
   backdrop-filter: var(--gutter-backdrop-filter);
   -webkit-backdrop-filter: var(--gutter-backdrop-filter);
   transition:
@@ -1491,7 +1578,6 @@ li::before {
   padding: 1px 15px 0;
   border: 0;
   border-radius: 999px;
-  corner-shape: squircle;
   background: transparent;
   color: inherit;
   font: inherit;
@@ -3946,7 +4032,7 @@ html.has-open-dossier {
 
   /* Compact contours and expanded service states share one material recipe. */
   .mobile-island-surface,
-  .mobile-floating-menu::after {
+  .mobile-service-surface {
     background: var(--island-glass-bg);
     backdrop-filter: var(--island-glass-backdrop);
     -webkit-backdrop-filter: var(--island-glass-backdrop);
@@ -3994,7 +4080,7 @@ html.has-open-dossier {
 
   /* The service and daylight states keep depth outside the clipped material. */
   .mobile-service-depth,
-  .mobile-floating-menu::after {
+  .mobile-service-surface {
     position: absolute;
     left: calc(50% - 105.5px);
     top: var(--island-lens-service-y);
@@ -4021,8 +4107,7 @@ html.has-open-dossier {
   }
 
   .mobile-service-depth::before,
-  .mobile-floating-menu::after {
-    content: "";
+  .mobile-service-surface {
     -webkit-clip-path: circle(26px at calc(50% + 43px) 50%);
     clip-path: circle(26px at calc(50% + 43px) 50%);
   }
@@ -4035,7 +4120,9 @@ html.has-open-dossier {
     transition: clip-path var(--mobile-service-motion) var(--island-motion-ease);
   }
 
-  .mobile-floating-menu::after {
+  .mobile-service-surface {
+    z-index: 1;
+    overflow: hidden;
     filter: var(--island-edge-filter);
     transition:
       opacity 140ms var(--island-motion-ease),
@@ -4196,12 +4283,12 @@ html.has-open-dossier {
   }
 
   .mobile-floating-menu.is-service-open .mobile-service-depth,
-  .mobile-floating-menu.is-service-open::after {
+  .mobile-floating-menu.is-service-open .mobile-service-surface {
     opacity: 1;
   }
 
   .mobile-floating-menu.is-service-open .mobile-service-depth::before,
-  .mobile-floating-menu.is-service-open::after {
+  .mobile-floating-menu.is-service-open .mobile-service-surface {
     -webkit-clip-path: circle(150% at calc(50% + 43px) 50%);
     clip-path: circle(150% at calc(50% + 43px) 50%);
   }
@@ -4215,13 +4302,13 @@ html.has-open-dossier {
     transition-delay: 70ms;
   }
 
-  .mobile-floating-menu.is-service-open::after {
+  .mobile-floating-menu.is-service-open .mobile-service-surface {
     transition-duration: 140ms, var(--mobile-service-motion), 520ms, 520ms, 520ms, 520ms, 520ms;
     transition-delay: 70ms, 70ms, 0ms, 0ms, 0ms, 0ms, 0ms;
   }
 
   .mobile-floating-menu.is-daylight-open .mobile-service-depth,
-  .mobile-floating-menu.is-daylight-open::after {
+  .mobile-floating-menu.is-daylight-open .mobile-service-surface {
     left: calc(50% - (var(--island-daylight-width) / 2));
     top: var(--island-daylight-top);
     width: var(--island-daylight-width);
@@ -4231,7 +4318,7 @@ html.has-open-dossier {
   }
 
   .mobile-floating-menu.is-daylight-open .mobile-service-depth::before,
-  .mobile-floating-menu.is-daylight-open::after {
+  .mobile-floating-menu.is-daylight-open .mobile-service-surface {
     -webkit-clip-path: inset(0 round 32px);
     clip-path: inset(0 round 32px);
   }
@@ -4242,14 +4329,14 @@ html.has-open-dossier {
    * an intermediate round card while the daylight shell grows or contracts.
    */
   .mobile-floating-menu:is(.is-daylight-transitioning, .is-daylight-closing) .mobile-service-depth::before,
-  .mobile-floating-menu:is(.is-daylight-transitioning, .is-daylight-closing)::after {
+  .mobile-floating-menu:is(.is-daylight-transitioning, .is-daylight-closing) .mobile-service-surface {
     -webkit-clip-path: inset(0 round 32px);
     clip-path: inset(0 round 32px);
     transition-duration: 0ms;
   }
 
   .mobile-floating-menu:is(.is-daylight-transitioning, .is-daylight-closing) .mobile-service-depth,
-  .mobile-floating-menu:is(.is-daylight-transitioning, .is-daylight-closing)::after {
+  .mobile-floating-menu:is(.is-daylight-transitioning, .is-daylight-closing) .mobile-service-surface {
     border-radius: 32px;
   }
 
@@ -4257,17 +4344,17 @@ html.has-open-dossier {
     transition-duration: 140ms, 520ms, 520ms, 520ms, 520ms, 0ms;
   }
 
-  .mobile-floating-menu:is(.is-daylight-transitioning, .is-daylight-closing)::after {
+  .mobile-floating-menu:is(.is-daylight-transitioning, .is-daylight-closing) .mobile-service-surface {
     transition-duration: 140ms, 0ms, 520ms, 520ms, 520ms, 520ms, 0ms;
   }
 
   .mobile-floating-menu.is-service-closing .mobile-service-depth,
-  .mobile-floating-menu.is-service-closing::after {
+  .mobile-floating-menu.is-service-closing .mobile-service-surface {
     opacity: 0;
   }
 
   .mobile-floating-menu.is-service-closing .mobile-service-depth::before,
-  .mobile-floating-menu.is-service-closing::after {
+  .mobile-floating-menu.is-service-closing .mobile-service-surface {
     -webkit-clip-path: circle(26px at calc(50% + 43px) 50%);
     clip-path: circle(26px at calc(50% + 43px) 50%);
   }
@@ -4282,7 +4369,7 @@ html.has-open-dossier {
     transition-delay: 0ms;
   }
 
-  .mobile-floating-menu.is-service-closing::after {
+  .mobile-floating-menu.is-service-closing .mobile-service-surface {
     transition-duration:
       220ms,
       var(--mobile-service-motion),
@@ -4914,8 +5001,9 @@ html.has-open-dossier {
   .daylight-widget__weather {
     display: flex;
     align-items: baseline;
-    justify-content: flex-start;
-    min-height: 32px;
+    justify-content: space-between;
+    gap: 18px;
+    height: 32px;
     margin-top: 16px;
     color: color-mix(in srgb, currentColor 84%, transparent);
   }
@@ -4930,6 +5018,189 @@ html.has-open-dossier {
     line-height: 28px;
   }
 
+  .daylight-widget__weather-care {
+    block-size: 2.5em;
+    max-width: 152px;
+    overflow: hidden;
+    color: color-mix(in srgb, currentColor 58%, transparent);
+    font-family: var(--font-sans);
+    font-size: 10.5px;
+    line-height: 1.25;
+    text-align: right;
+    text-wrap: balance;
+  }
+
+  .daylight-widget__weather-care[hidden] {
+    display: none;
+  }
+
+  .daylight-widget__lower {
+    position: relative;
+    display: grid;
+    min-height: 104px;
+    margin-top: 12px;
+  }
+
+  .daylight-widget__settings,
+  .daylight-widget__empathy {
+    grid-area: 1 / 1;
+    transition:
+      opacity 260ms var(--island-motion-ease),
+      transform 420ms var(--island-motion-ease);
+  }
+
+  .daylight-widget__settings {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+
+  .daylight-widget__empathy {
+    align-self: stretch;
+    min-width: 0;
+    color: var(--mobile-pill-text);
+    opacity: 0;
+    pointer-events: none;
+    transform: translate3d(0, 8px, 0);
+  }
+
+  .daylight-widget__empathy[hidden] {
+    display: none;
+  }
+
+  .daylight-widget:is(.is-empathy-question, .is-empathy-feedback) .daylight-widget__settings {
+    opacity: 0;
+    pointer-events: none;
+    transform: translate3d(0, -8px, 0);
+  }
+
+  .daylight-widget:is(.is-empathy-question, .is-empathy-feedback) .daylight-widget__empathy {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translate3d(0, 0, 0);
+  }
+
+  .daylight-widget__empathy-copy {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    min-height: 24px;
+  }
+
+  .daylight-widget__empathy-copy p,
+  .daylight-widget__empathy-feedback p {
+    margin: 0;
+  }
+
+  .daylight-widget__empathy-copy p {
+    flex: 0 0 auto;
+    font-family: var(--font-serif-display);
+    font-size: 16px;
+    font-style: italic;
+    line-height: 1.15;
+  }
+
+  :root[data-language="ja"] .daylight-widget__empathy-copy p {
+    font-style: normal;
+  }
+
+  .daylight-widget__empathy-copy span {
+    max-width: 132px;
+    color: color-mix(in srgb, currentColor 56%, transparent);
+    font-size: 9.5px;
+    line-height: 1.2;
+    text-align: right;
+    text-wrap: balance;
+  }
+
+  .daylight-widget__empathy-options {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+    margin-top: 8px;
+  }
+
+  .daylight-widget__empathy-options button,
+  .daylight-widget__empathy-actions button {
+    min-width: 0;
+    min-height: 32px;
+    padding: 1px 8px 0;
+    border: 0.5px solid color-mix(in srgb, currentColor 15%, transparent);
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--page-bg) 12%, transparent);
+    box-shadow: inset 0 1px 0 color-mix(in srgb, #fff 13%, transparent);
+    color: color-mix(in srgb, currentColor 72%, transparent);
+    cursor: pointer;
+    font: inherit;
+    font-family: var(--font-sans);
+    font-size: 10.5px;
+    line-height: 1;
+    transition:
+      color var(--duration-fast) var(--ease-smooth),
+      background 280ms var(--island-motion-ease),
+      border-color 280ms var(--island-motion-ease),
+      box-shadow 280ms var(--island-motion-ease),
+      transform var(--duration-fast) var(--ease-smooth);
+  }
+
+  .daylight-widget__empathy-options button:nth-child(4) {
+    grid-column: span 2;
+  }
+
+  .daylight-widget__empathy-options button:hover,
+  .daylight-widget__empathy-options button:focus-visible,
+  .daylight-widget__empathy-actions button:hover,
+  .daylight-widget__empathy-actions button:focus-visible {
+    border-color: color-mix(in srgb, currentColor 30%, transparent);
+    background: color-mix(in srgb, currentColor 9%, transparent);
+    color: currentColor;
+    outline: 0;
+    box-shadow:
+      inset 0 1px 0 color-mix(in srgb, #fff 18%, transparent),
+      0 2px 6px color-mix(in srgb, #000 8%, transparent);
+  }
+
+  .daylight-widget__empathy-options button:active,
+  .daylight-widget__empathy-actions button:active {
+    transform: scale(0.985);
+  }
+
+  .daylight-widget__empathy-feedback {
+    display: grid;
+    grid-template-rows: 37.5px 32px;
+    align-content: center;
+    row-gap: 12px;
+    min-height: 100px;
+  }
+
+  .daylight-widget__empathy-feedback[hidden] {
+    display: none;
+  }
+
+  .daylight-widget__empathy-feedback p {
+    block-size: 37.5px;
+    max-width: 24em;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 15px;
+    line-height: 1.25;
+    text-wrap: balance;
+  }
+
+  .daylight-widget__empathy-actions {
+    display: flex;
+    gap: 6px;
+    block-size: 32px;
+  }
+
+  .daylight-widget__empathy-actions button {
+    flex: 1 1 0;
+    block-size: 32px;
+  }
+
+  .daylight-widget__empathy-actions button[hidden] {
+    display: none;
+  }
+
   .daylight-widget__modes {
     --theme-mode-index: 0;
     position: relative;
@@ -4938,7 +5209,7 @@ html.has-open-dossier {
     grid-template-columns: repeat(3, 1fr);
     gap: 0;
     height: 40px;
-    margin-top: 12px;
+    margin-top: 0;
     padding: 4px;
     border: 0.5px solid color-mix(in srgb, currentColor 14%, transparent);
     border-radius: 999px;
@@ -5236,7 +5507,7 @@ html.has-open-dossier {
     content: none;
   }
 
-  .mobile-menu-expanded > * {
+  .mobile-menu-expanded > :not(canvas) {
     position: relative;
     z-index: 1;
     opacity: 0;
@@ -5287,7 +5558,7 @@ html.has-open-dossier {
     transition-delay: 40ms;
   }
 
-  .mobile-floating-menu.is-menu-open .mobile-menu-expanded > * {
+  .mobile-floating-menu.is-menu-open .mobile-menu-expanded > :not(canvas) {
     opacity: 1;
     transition-delay: var(--island-motion-panel-content-delay);
   }
@@ -5336,7 +5607,7 @@ html.has-open-dossier {
     transition-delay: 0ms;
   }
 
-  .mobile-floating-menu.is-menu-closing .mobile-menu-expanded > * {
+  .mobile-floating-menu.is-menu-closing .mobile-menu-expanded > :not(canvas) {
     opacity: 0;
     transition-delay: 0ms;
     transition-duration: 220ms;
@@ -5530,7 +5801,7 @@ html.has-open-dossier {
 
   @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
     .mobile-island-surface,
-    .mobile-floating-menu::after,
+    .mobile-service-surface,
     .mobile-menu-expanded,
     .mobile-menu-toggle::before,
     .mobile-mail-pill::before,

@@ -170,19 +170,20 @@ test('mobile menu and service panel preserve state, Escape, and focus return', a
     const menuRoot = document.querySelector('[data-mobile-menu]');
     const serviceRoot = document.querySelector('[data-mobile-service]');
     const expandedMenu = document.querySelector('#mobile-menu-expanded');
+    const serviceMaterial = menuRoot.querySelector('.mobile-service-surface');
     return {
       compactBackdrop: getComputedStyle(menuRoot.querySelector('.mobile-island-surface')).backdropFilter,
       compactBackground: getComputedStyle(menuRoot.querySelector('.mobile-island-surface')).backgroundImage,
       compactFilter: getComputedStyle(menuRoot.querySelector('.mobile-island-surface')).filter,
       compactDepthFilter: getComputedStyle(menuRoot.querySelector('.mobile-island-depth')).filter,
       compactPseudoContent: getComputedStyle(menuRoot.querySelector('.mobile-island-surface'), '::before').content,
-      expandedBackdrop: getComputedStyle(menuRoot, '::after').backdropFilter,
-      expandedBackground: getComputedStyle(menuRoot, '::after').backgroundImage,
-      expandedFilter: getComputedStyle(menuRoot, '::after').filter,
+      expandedBackdrop: getComputedStyle(serviceMaterial).backdropFilter,
+      expandedBackground: getComputedStyle(serviceMaterial).backgroundImage,
+      expandedFilter: getComputedStyle(serviceMaterial).filter,
       serviceDepthFilter: getComputedStyle(menuRoot.querySelector('.mobile-service-depth')).filter,
       menuDepthFilter: getComputedStyle(menuRoot.querySelector('.mobile-menu-expanded-depth')).filter,
       height: serviceRoot.getBoundingClientRect().height,
-      serviceMaterialTransform: getComputedStyle(menuRoot, '::after').transform,
+      serviceMaterialTransform: getComputedStyle(serviceMaterial).transform,
       menuBackdrop: getComputedStyle(expandedMenu).backdropFilter,
       menuMaterialTransform: getComputedStyle(expandedMenu).transform
     };
@@ -210,6 +211,45 @@ test('mobile menu and service panel preserve state, Escape, and focus return', a
   await expect.poll(() => serviceToggle.evaluate((element) => getComputedStyle(element).outlineStyle)).not.toBe('none');
 });
 
+test('menu surfaces share one Water preset and retain the matte CSS fallback', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/?lang=ru');
+
+  const waterSourceResponse = await page.request.get('/water-material.js');
+  const waterSource = await waterSourceResponse.text();
+  expect(waterSource.match(/u_highlights:\s*0/g)?.length).toBeGreaterThanOrEqual(2);
+
+  const surfaces = page.locator('[data-water-surface]');
+  await expect(surfaces).toHaveCount(4);
+  await expect.poll(() => surfaces.evaluateAll((elements) => (
+    elements.every((element) => element.dataset.waterPreset === 'tarski-menu-water-v1')
+  ))).toBe(true);
+  await expect.poll(() => page.locator('html').getAttribute('data-water-material')).toMatch(/active|fallback/);
+
+  const materialState = await page.evaluate(() => {
+    const compact = document.querySelector('.mobile-island-surface');
+    const service = document.querySelector('.mobile-service-surface');
+    const expanded = document.querySelector('.mobile-menu-expanded');
+    return {
+      compactBackground: getComputedStyle(compact).backgroundImage,
+      serviceBackground: getComputedStyle(service).backgroundImage,
+      expandedBackground: getComputedStyle(expanded).backgroundImage,
+      compactBackdrop: getComputedStyle(compact).backdropFilter,
+      serviceBackdrop: getComputedStyle(service).backdropFilter,
+      expandedBackdrop: getComputedStyle(expanded).backdropFilter,
+      shaderState: document.documentElement.dataset.waterMaterial
+    };
+  });
+
+  expect(materialState.compactBackground).toBe(materialState.serviceBackground);
+  expect(materialState.compactBackground).toBe(materialState.expandedBackground);
+  expect(materialState.compactBackdrop).toBe(materialState.serviceBackdrop);
+  expect(materialState.compactBackdrop).toBe(materialState.expandedBackdrop);
+  if (materialState.shaderState === 'active') {
+    await expect(surfaces.locator('canvas')).toHaveCount(4);
+  }
+});
+
 test('daylight widget expands the service material and keeps theme modes accessible', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/?lang=ru');
@@ -227,7 +267,7 @@ test('daylight widget expands the service material and keeps theme modes accessi
   await expect(daylightToggle).toHaveAttribute('aria-expanded', 'true');
   await expect(page.locator('[data-mobile-menu]')).toHaveClass(/is-daylight-transitioning/);
   const daylightHandoff = await page.locator('[data-mobile-menu]').evaluate((element) => {
-    const material = getComputedStyle(element, '::after');
+    const material = getComputedStyle(element.querySelector('.mobile-service-surface'));
     const depthMask = getComputedStyle(element.querySelector('.mobile-service-depth'), '::before');
     return {
       materialRadius: parseFloat(material.borderRadius),
@@ -241,6 +281,11 @@ test('daylight widget expands the service material and keeps theme modes accessi
   await expect(widget).toHaveAttribute('aria-hidden', 'false');
   await expect(widget).toBeVisible();
   await expect(widget.locator('time')).toHaveCount(3);
+  await expect(widget.locator('[data-empathy-panel]')).toBeVisible();
+  await widget.locator('[data-empathy-answer="skip"]').click();
+  await expect(widget.locator('[data-empathy-feedback]')).toBeVisible();
+  await widget.locator('[data-empathy-show-settings]').click();
+  await expect(widget.locator('[data-empathy-panel]')).toBeHidden();
   await page.waitForTimeout(900);
 
   const expandedGeometry = await serviceRoot.evaluate((element) => {
@@ -268,7 +313,7 @@ test('daylight widget expands the service material and keeps theme modes accessi
     return {
       height: serviceRect.height,
       menuHasWidgetState: menu.classList.contains('is-daylight-open'),
-      materialRadius: getComputedStyle(menu, '::after').borderRadius,
+      materialRadius: getComputedStyle(menu.querySelector('.mobile-service-surface')).borderRadius,
       ghostShadowContent: getComputedStyle(element, '::after').content,
       widgetInsetLeft: widgetRect.left - serviceRect.left,
       widgetInsetRight: serviceRect.right - widgetRect.right,
@@ -394,6 +439,83 @@ test('daylight widget expands the service material and keeps theme modes accessi
   await expect(serviceToggle).toHaveAttribute('aria-expanded', 'true');
   await page.keyboard.press('Escape');
   await expect(serviceToggle).toHaveAttribute('aria-expanded', 'false');
+});
+
+test('daily empathy check-in stays local and exposes reversible motion adaptation', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/?lang=ru');
+
+  await page.locator('[data-mobile-service-toggle]').click();
+  await page.locator('[data-daylight-toggle]').click();
+  const widget = page.locator('[data-daylight-widget]');
+  const panel = widget.locator('[data-empathy-panel]');
+  await expect(panel).toBeVisible();
+  await expect(widget.locator('[data-empathy-settings]')).toHaveAttribute('inert', '');
+  await expect(panel.locator('[data-empathy-question]')).toHaveText('Как вы сегодня?');
+  await expect(panel.locator('[data-empathy-privacy]')).toContainText('этом устройстве');
+
+  await panel.locator('[data-empathy-answer="tired"]').click();
+  await expect(page.locator('html')).toHaveAttribute('data-motion-preference', 'system');
+  await expect(page.locator('html')).toHaveAttribute('data-effective-motion', 'calm');
+  await expect(panel.locator('[data-empathy-feedback-text]')).toContainText('движение спокойнее');
+  await expect.poll(() => panel.locator('[data-empathy-feedback-text]').evaluate((element) => (
+    getComputedStyle(element).fontFamily
+  ))).toContain('Arial');
+  const storedCheckIn = await page.evaluate(() => JSON.parse(localStorage.getItem('tarski-empathy-v1')));
+  expect(storedCheckIn.answer).toBe('tired');
+  expect(storedCheckIn.motionAdapted).toBe(true);
+  await expect(panel).toHaveClass(/ym-hide-content/);
+  await expect(panel).toHaveClass(/ym-disable-clickmap/);
+
+  const feedbackActionGeometry = async () => panel.locator('[data-empathy-actions]').evaluate((element) => {
+    const rect = element.getBoundingClientRect();
+    const widget = element.closest('[data-daylight-widget]');
+    const widgetRect = widget.getBoundingClientRect();
+    const panelRect = element.closest('[data-empathy-panel]').getBoundingClientRect();
+    const copyRect = element.previousElementSibling.getBoundingClientRect();
+    const buttons = [...element.querySelectorAll('button')].map((button) => {
+      const buttonRect = button.getBoundingClientRect();
+      return { top: buttonRect.top, height: buttonRect.height };
+    });
+    return {
+      top: rect.top - widgetRect.top,
+      widgetHeight: widgetRect.height,
+      panelTop: panelRect.top - widgetRect.top,
+      panelHeight: panelRect.height,
+      copyTop: copyRect.top - widgetRect.top,
+      copyHeight: copyRect.height,
+      buttons
+    };
+  });
+  const ruGeometry = await feedbackActionGeometry();
+  await page.locator('[data-mobile-service-panel] [data-language-option="en"]').click();
+  await expect(panel.locator('[data-empathy-feedback-text]')).toContainText('motion calmer');
+  const enGeometry = await feedbackActionGeometry();
+  await page.locator('[data-mobile-service-panel] [data-language-option="ja"]').click();
+  const jaGeometry = await feedbackActionGeometry();
+  for (const geometry of [enGeometry, jaGeometry]) {
+    expect(Math.abs(geometry.top - ruGeometry.top)).toBeLessThanOrEqual(1);
+    expect(geometry.buttons.map(({ height }) => height)).toEqual(ruGeometry.buttons.map(({ height }) => height));
+  }
+  await page.locator('[data-mobile-service-panel] [data-language-option="ru"]').click();
+
+  await panel.locator('[data-empathy-undo]').click();
+  await expect(page.locator('html')).toHaveAttribute('data-effective-motion', 'full');
+  await expect(panel.locator('[data-empathy-feedback-text]')).toContainText('системный ритм');
+  await panel.locator('[data-empathy-show-settings]').click();
+  await expect(panel).toBeHidden();
+  await expect(widget.locator('[data-empathy-settings]')).not.toHaveAttribute('inert', '');
+  await expect(widget.locator('[data-theme-mode="auto"]')).toBeFocused();
+
+  await page.evaluate(() => {
+    const daylight = document.querySelector('[data-daylight-widget]');
+    daylight.dataset.weatherKey = 'rain';
+    daylight.dataset.weatherTemperature = '18';
+    window.dispatchEvent(new CustomEvent('tarski:weatherchange', {
+      detail: { weatherKey: 'rain', temperature: 18 }
+    }));
+  });
+  await expect(widget.locator('[data-weather-care]')).toContainText('зонт может пригодиться');
 });
 
 test('motion preference is available on desktop and shares one state', async ({ page }) => {
@@ -589,14 +711,30 @@ test('mobile archipelago enters vertically at both scroll placements', async ({ 
 test('artist names remain headings with one keyboard trigger each', async ({ page }) => {
   await page.goto('/?lang=ru#artists');
 
+  await expect(page.locator('main h1')).toHaveCount(1);
+  await expect(page.locator('#artists-title')).toHaveJSProperty('tagName', 'H2');
   const cards = page.locator('.artist-card');
   await expect(cards).toHaveCount(7);
   await expect(page.locator('.artist-card__name')).toHaveCount(7);
+  expect(await page.locator('.artist-card__name').evaluateAll((headings) => (
+    headings.every((heading) => heading.tagName === 'H3')
+  ))).toBe(true);
   await expect(page.locator('.artist-card__detail-trigger')).toHaveCount(7);
   await expect(page.locator('.artist-card__image[role="button"], .artist-card__image[tabindex]')).toHaveCount(0);
 
   const viewSwitch = page.locator('[data-artists-view-switch]');
   await expect(viewSwitch).toHaveCSS('height', '40px');
+  const trackGeometry = await viewSwitch.evaluate((element) => {
+    const rect = element.getBoundingClientRect();
+    const style = getComputedStyle(element);
+    return {
+      radius: parseFloat(style.borderTopLeftRadius),
+      clip: style.clipPath,
+      height: rect.height
+    };
+  });
+  expect(trackGeometry.radius).toBeGreaterThanOrEqual(trackGeometry.height / 2);
+  expect(trackGeometry.clip).toContain('round 999px');
   const listView = page.locator('[data-artists-view-option="list"]');
   await listView.click();
   await expect.poll(() => viewSwitch.evaluate((element) => (
