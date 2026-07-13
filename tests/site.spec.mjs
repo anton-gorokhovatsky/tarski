@@ -135,13 +135,17 @@ for (const [language, copy] of Object.entries(languages)) {
 
 test('mobile menu and service panel preserve state, Escape, and focus return', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
+  await page.addInitScript(() => window.localStorage.setItem('tarski-theme', 'light'));
   await page.goto('/?lang=ru');
 
   const menuToggle = page.locator('[data-mobile-menu-toggle]');
+  const menuRoot = page.locator('[data-mobile-menu]');
   const menu = page.locator('#mobile-menu-expanded');
   await menuToggle.click();
   await expect(menuToggle).toHaveAttribute('aria-expanded', 'true');
   await expect(menu).toHaveAttribute('aria-hidden', 'false');
+  await expect(menuRoot).toHaveClass(/is-menu-settled/);
+  expect(await menu.evaluate((element) => getComputedStyle(element).clipPath)).toBe('none');
   await page.keyboard.press('Escape');
   await expect(menuToggle).toHaveAttribute('aria-expanded', 'false');
   await expect(menuToggle).toBeFocused();
@@ -176,12 +180,17 @@ test('mobile menu and service panel preserve state, Escape, and focus return', a
       compactBackground: getComputedStyle(menuRoot.querySelector('.mobile-island-surface')).backgroundImage,
       compactFilter: getComputedStyle(menuRoot.querySelector('.mobile-island-surface')).filter,
       compactDepthFilter: getComputedStyle(menuRoot.querySelector('.mobile-island-depth')).filter,
+      compactDepthFill: getComputedStyle(menuRoot.querySelector('.mobile-island-depth'), '::before').backgroundColor,
       compactPseudoContent: getComputedStyle(menuRoot.querySelector('.mobile-island-surface'), '::before').content,
       expandedBackdrop: getComputedStyle(serviceMaterial).backdropFilter,
       expandedBackground: getComputedStyle(serviceMaterial).backgroundImage,
       expandedFilter: getComputedStyle(serviceMaterial).filter,
       serviceDepthFilter: getComputedStyle(menuRoot.querySelector('.mobile-service-depth')).filter,
+      serviceDepthFill: getComputedStyle(menuRoot.querySelector('.mobile-service-depth'), '::before').backgroundColor,
       menuDepthFilter: getComputedStyle(menuRoot.querySelector('.mobile-menu-expanded-depth')).filter,
+      menuDepthFill: getComputedStyle(menuRoot.querySelector('.mobile-menu-expanded-depth'), '::before').backgroundColor,
+      pageBackground: getComputedStyle(document.body).backgroundColor,
+      menuBorderWidth: getComputedStyle(expandedMenu).borderTopWidth,
       height: serviceRoot.getBoundingClientRect().height,
       serviceMaterialTransform: getComputedStyle(serviceMaterial).transform,
       menuBackdrop: getComputedStyle(expandedMenu).backdropFilter,
@@ -194,9 +203,15 @@ test('mobile menu and service panel preserve state, Escape, and focus return', a
   expect(serviceSurface.compactDepthFilter).toBe(serviceSurface.serviceDepthFilter);
   expect(serviceSurface.compactDepthFilter).toBe(serviceSurface.menuDepthFilter);
   expect(serviceSurface.compactDepthFilter).toContain('drop-shadow');
+  expect(serviceSurface.serviceDepthFill).toBe(serviceSurface.compactDepthFill);
+  expect(serviceSurface.menuDepthFill).toBe(serviceSurface.compactDepthFill);
+  expect(serviceSurface.compactDepthFill).toMatch(/^rgba\(/);
+  expect(Number(serviceSurface.compactDepthFill.match(/[\d.]+(?=\)$)/)?.[0])).toBeLessThanOrEqual(0.1);
+  expect(serviceSurface.menuBorderWidth).toBe('0px');
   expect(serviceSurface.compactPseudoContent).toBe('none');
   expect(serviceSurface.compactBackground.match(/linear-gradient/g)).toHaveLength(1);
-  expect(serviceSurface.compactBackground).toContain('0.98');
+  expect(serviceSurface.compactBackground).toContain('0.58');
+  expect(serviceSurface.compactBackground).toContain('0.34');
   expect(serviceSurface.menuBackdrop).toBe(serviceSurface.compactBackdrop);
   expect(serviceSurface.height).toBeGreaterThanOrEqual(50);
   expect(serviceSurface.height).toBeLessThanOrEqual(54);
@@ -211,43 +226,37 @@ test('mobile menu and service panel preserve state, Escape, and focus return', a
   await expect.poll(() => serviceToggle.evaluate((element) => getComputedStyle(element).outlineStyle)).not.toBe('none');
 });
 
-test('menu surfaces share one Water preset and retain the matte CSS fallback', async ({ page }) => {
+test('menu surfaces share one live matte material without redundant shader canvases', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/?lang=ru');
 
-  const waterSourceResponse = await page.request.get('/water-material.js');
-  const waterSource = await waterSourceResponse.text();
-  expect(waterSource.match(/u_highlights:\s*0/g)?.length).toBeGreaterThanOrEqual(2);
-
-  const surfaces = page.locator('[data-water-surface]');
-  await expect(surfaces).toHaveCount(4);
-  await expect.poll(() => surfaces.evaluateAll((elements) => (
-    elements.every((element) => element.dataset.waterPreset === 'tarski-menu-water-v1')
-  ))).toBe(true);
-  await expect.poll(() => page.locator('html').getAttribute('data-water-material')).toMatch(/active|fallback/);
+  await expect(page.locator('[data-water-surface]')).toHaveCount(0);
+  await expect(page.locator('script[src*="water-material"]')).toHaveCount(0);
+  await expect(page.locator('canvas:not(.cursor-trail-canvas)')).toHaveCount(0);
 
   const materialState = await page.evaluate(() => {
     const compact = document.querySelector('.mobile-island-surface');
     const service = document.querySelector('.mobile-service-surface');
     const expanded = document.querySelector('.mobile-menu-expanded');
+    const desktop = document.querySelector('.main-nav');
     return {
       compactBackground: getComputedStyle(compact).backgroundImage,
       serviceBackground: getComputedStyle(service).backgroundImage,
       expandedBackground: getComputedStyle(expanded).backgroundImage,
+      desktopBackground: getComputedStyle(desktop, '::after').backgroundImage,
       compactBackdrop: getComputedStyle(compact).backdropFilter,
       serviceBackdrop: getComputedStyle(service).backdropFilter,
       expandedBackdrop: getComputedStyle(expanded).backdropFilter,
-      shaderState: document.documentElement.dataset.waterMaterial
+      desktopBackdrop: getComputedStyle(desktop, '::after').backdropFilter
     };
   });
 
   expect(materialState.compactBackground).toBe(materialState.serviceBackground);
   expect(materialState.compactBackground).toBe(materialState.expandedBackground);
+  expect(materialState.compactBackground).toBe(materialState.desktopBackground);
   expect(materialState.compactBackdrop).toBe(materialState.serviceBackdrop);
   expect(materialState.compactBackdrop).toBe(materialState.expandedBackdrop);
-  if (materialState.shaderState === 'active') {
-    await expect(surfaces.locator('canvas')).toHaveCount(4);
-  }
+  expect(materialState.compactBackdrop).toBe(materialState.desktopBackdrop);
 });
 
 test('daylight widget expands the service material and keeps theme modes accessible', async ({ page }) => {
@@ -329,6 +338,7 @@ test('daylight widget expands the service material and keeps theme modes accessi
       modesInsetRight: serviceRect.right - modesRect.right,
       motionInsetLeft: motionRect.left - serviceRect.left,
       motionInsetRight: serviceRect.right - motionRect.right,
+      motionBottomGap: serviceRect.bottom - motionRect.bottom,
       modesPadding: parseFloat(getComputedStyle(modesElement).paddingLeft),
       themeTrackHeight: modesRect.height,
       motionTrackHeight: motionTrackRect.height,
@@ -352,13 +362,14 @@ test('daylight widget expands the service material and keeps theme modes accessi
       temperatureFontSize: parseFloat(getComputedStyle(widgetElement.querySelector('[data-weather-temperature]')).fontSize)
     };
   });
-  expect(expandedGeometry.height).toBeGreaterThanOrEqual(372);
-  expect(expandedGeometry.height).toBeLessThanOrEqual(380);
+  expect(expandedGeometry.height).toBeGreaterThanOrEqual(374);
+  expect(expandedGeometry.height).toBeLessThanOrEqual(378);
   expect(expandedGeometry.menuHasWidgetState).toBe(true);
   expect(expandedGeometry.ghostShadowContent).toBe('none');
   expect(expandedGeometry.widgetInsetLeft).toBeCloseTo(28, 0);
   expect(expandedGeometry.widgetInsetRight).toBeCloseTo(28, 0);
-  expect(expandedGeometry.widgetInsetBottom).toBeGreaterThanOrEqual(24);
+  expect(expandedGeometry.widgetInsetBottom).toBeGreaterThanOrEqual(10);
+  expect(expandedGeometry.widgetInsetBottom).toBeLessThanOrEqual(14);
   expect(expandedGeometry.chartInsetLeft).toBeCloseTo(0, 1);
   expect(expandedGeometry.chartInsetRight).toBeCloseTo(0, 1);
   expect(expandedGeometry.chartPreserveAspectRatio).toBe('none');
@@ -370,6 +381,8 @@ test('daylight widget expands the service material and keeps theme modes accessi
   expect(expandedGeometry.modesInsetRight).toBeCloseTo(28, 0);
   expect(expandedGeometry.motionInsetLeft).toBeCloseTo(28, 0);
   expect(expandedGeometry.motionInsetRight).toBeCloseTo(28, 0);
+  expect(expandedGeometry.motionBottomGap).toBeGreaterThanOrEqual(18);
+  expect(expandedGeometry.motionBottomGap).toBeLessThanOrEqual(22);
   expect(expandedGeometry.modesPadding).toBeCloseTo(4, 1);
   expect(expandedGeometry.motionTrackHeight).toBeCloseTo(expandedGeometry.themeTrackHeight, 1);
   expect(expandedGeometry.modeSliderTop).toBeCloseTo(4, 1);
@@ -402,6 +415,12 @@ test('daylight widget expands the service material and keeps theme modes accessi
   await expect(page.locator('html')).toHaveAttribute('data-effective-theme', 'dark');
   await expect(darkMode).toHaveAttribute('aria-pressed', 'true');
   await expect(widget.locator('[data-theme-mode-group]')).toHaveCSS('--theme-mode-index', '2');
+  const darkEdgeState = await serviceRoot.evaluate((element) => ({
+    compactFilter: getComputedStyle(element.closest('[data-mobile-menu]').querySelector('.mobile-island-surface')).filter,
+    compactDepthFill: getComputedStyle(element.closest('[data-mobile-menu]').querySelector('.mobile-island-depth'), '::before').backgroundColor
+  }));
+  expect(darkEdgeState.compactFilter).not.toBe('none');
+  expect(darkEdgeState.compactDepthFill).toBe('rgba(0, 0, 0, 0.09)');
   await page.waitForTimeout(1000);
   const sliderEndGaps = await widget.locator('[data-theme-mode-group]').evaluate((element) => {
     const style = getComputedStyle(element, '::before');
@@ -453,6 +472,38 @@ test('daily empathy check-in stays local and exposes reversible motion adaptatio
   await expect(widget.locator('[data-empathy-settings]')).toHaveAttribute('inert', '');
   await expect(panel.locator('[data-empathy-question]')).toHaveText('Как вы сегодня?');
   await expect(panel.locator('[data-empathy-privacy]')).toContainText('этом устройстве');
+
+  const questionGeometry = async () => panel.locator('[data-empathy-question-state]').evaluate((element) => {
+    const rect = element.getBoundingClientRect();
+    const question = element.querySelector('[data-empathy-question]');
+    const options = element.querySelector('[data-empathy-options]');
+    const optionsRect = options.getBoundingClientRect();
+    const buttons = [...options.querySelectorAll('button')].map((button) => {
+      const buttonRect = button.getBoundingClientRect();
+      return { top: buttonRect.top - rect.top, height: buttonRect.height };
+    });
+    return {
+      height: rect.height,
+      questionFont: getComputedStyle(question).fontFamily,
+      optionsTop: optionsRect.top - rect.top,
+      bottomGap: rect.bottom - optionsRect.bottom,
+      buttons
+    };
+  });
+  const ruQuestionGeometry = await questionGeometry();
+  expect(ruQuestionGeometry.questionFont).toContain('Arial');
+  expect(ruQuestionGeometry.bottomGap).toBeGreaterThanOrEqual(11);
+  await page.locator('[data-mobile-service-panel] [data-language-option="en"]').click();
+  const enQuestionGeometry = await questionGeometry();
+  await page.locator('[data-mobile-service-panel] [data-language-option="ja"]').click();
+  const jaQuestionGeometry = await questionGeometry();
+  for (const geometry of [enQuestionGeometry, jaQuestionGeometry]) {
+    expect(geometry.height).toBeCloseTo(ruQuestionGeometry.height, 1);
+    expect(geometry.optionsTop).toBeCloseTo(ruQuestionGeometry.optionsTop, 1);
+    expect(geometry.bottomGap).toBeCloseTo(ruQuestionGeometry.bottomGap, 1);
+    expect(geometry.buttons.map(({ height }) => height)).toEqual(ruQuestionGeometry.buttons.map(({ height }) => height));
+  }
+  await page.locator('[data-mobile-service-panel] [data-language-option="ru"]').click();
 
   await panel.locator('[data-empathy-answer="tired"]').click();
   await expect(page.locator('html')).toHaveAttribute('data-motion-preference', 'system');

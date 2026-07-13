@@ -218,6 +218,7 @@
   let closeTimer = null;
   let openFrame = null;
   let focusTimer = null;
+  let settleTimer = null;
   let activeTrigger = null;
 
   const prefersReducedMotion = () => prefersCalmMotion();
@@ -244,6 +245,7 @@
     if (isOpen) {
       window.clearTimeout(closeTimer);
       window.clearTimeout(focusTimer);
+      window.clearTimeout(settleTimer);
       window.cancelAnimationFrame(openFrame);
       activeTrigger = document.activeElement instanceof HTMLElement ? document.activeElement : toggle;
       window.dispatchEvent(new CustomEvent('tarski:mobilemenuopen'));
@@ -262,6 +264,12 @@
         menu.classList.add('is-menu-open');
         drawer.classList.add('is-open');
         window.dispatchEvent(new CustomEvent('tarski:mobileislandresize'));
+        settleTimer = window.setTimeout(() => {
+          settleTimer = null;
+          if (menu.classList.contains('is-menu-open')) {
+            menu.classList.add('is-menu-settled');
+          }
+        }, prefersReducedMotion() ? 0 : getMobileIslandMotionDuration(menu));
         if (options.focus) {
           focusTimer = window.setTimeout(() => {
             focusTimer = null;
@@ -285,6 +293,7 @@
 
     window.clearTimeout(closeTimer);
     window.clearTimeout(focusTimer);
+    window.clearTimeout(settleTimer);
     window.cancelAnimationFrame(openFrame);
     openFrame = null;
     focusTimer = null;
@@ -293,7 +302,7 @@
 
     drawer.classList.remove('is-open');
     menu.classList.add('is-menu-closing');
-    menu.classList.remove('is-menu-open');
+    menu.classList.remove('is-menu-open', 'is-menu-settled');
     panel.setAttribute('aria-hidden', 'true');
     syncToggleState(false);
     setModalBackgroundInert(false);
