@@ -203,8 +203,11 @@ test('mobile menu and service panel preserve state, Escape, and focus return', a
   expect(serviceSurface.menuMaterialTransform).toBe('none');
   await page.keyboard.press('Escape');
   await expect(serviceToggle).toHaveAttribute('aria-expanded', 'false');
+  await expect(serviceRoot).toHaveClass(/is-closing/);
+  expect(await serviceToggle.evaluate((element) => getComputedStyle(element).outlineStyle)).toBe('none');
   await expect(serviceToggle).toBeFocused();
   await expect(servicePanel).toBeHidden();
+  await expect.poll(() => serviceToggle.evaluate((element) => getComputedStyle(element).outlineStyle)).not.toBe('none');
 });
 
 test('daylight widget expands the service material and keeps theme modes accessible', async ({ page }) => {
@@ -429,6 +432,33 @@ test('motion preference is available on desktop and shares one state', async ({ 
   expect(footerGeometry.height).toBeLessThanOrEqual(footerGeometry.viewportHeight);
   expect(footerGeometry.scrollHeight).toBeLessThanOrEqual(footerGeometry.viewportHeight + 1);
   expect(footerGeometry.routeDecorationCount).toBe(0);
+
+  const footerRows = await page.locator('.site-footer').evaluate((element) => ({
+    routes: element.querySelector('.site-footer__routes').getBoundingClientRect().height,
+    motion: element.querySelector('.site-footer__motion').getBoundingClientRect().height,
+  }));
+  expect(Math.abs(footerRows.routes - footerRows.motion)).toBeLessThanOrEqual(0.5);
+
+  const firstRoute = page.locator('[data-footer-route]').first();
+  const routeBackground = async () => firstRoute.evaluate((element) => getComputedStyle(element).backgroundColor);
+  const routeBackgroundDefault = await routeBackground();
+  await firstRoute.hover();
+  await expect.poll(routeBackground).not.toBe(routeBackgroundDefault);
+
+  const systemMotion = desktopGroup.locator('[data-motion-mode="system"]');
+  const motionColor = async () => systemMotion.evaluate((element) => getComputedStyle(element).color);
+  const motionColorDefault = await motionColor();
+  await systemMotion.hover();
+  await expect.poll(motionColor).not.toBe(motionColorDefault);
+  await page.mouse.down();
+  await expect.poll(() => systemMotion.evaluate((element) => getComputedStyle(element).transform)).not.toBe('none');
+  await page.mouse.up();
+
+  const footerMetaLink = page.locator('.site-footer__privacy');
+  await footerMetaLink.focus();
+  await page.keyboard.press('Tab');
+  await page.keyboard.press('Shift+Tab');
+  await expect.poll(() => footerMetaLink.evaluate((element) => getComputedStyle(element).boxShadow)).not.toBe('none');
 
   const motionAlignment = await page.locator('.site-footer__motion').evaluate((element) => {
     const label = element.querySelector('[data-motion-label]').getBoundingClientRect();
