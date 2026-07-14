@@ -4988,6 +4988,10 @@ html.has-open-dossier {
     padding-bottom: 12px;
   }
 
+  .daylight-widget__empathy-question[hidden] {
+    display: none;
+  }
+
   .daylight-widget__empathy-copy p,
   .daylight-widget__empathy-feedback p {
     margin: 0;

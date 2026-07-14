@@ -508,6 +508,8 @@ test('daily empathy check-in stays local and exposes reversible motion adaptatio
   await panel.locator('[data-empathy-answer="tired"]').click();
   await expect(page.locator('html')).toHaveAttribute('data-motion-preference', 'system');
   await expect(page.locator('html')).toHaveAttribute('data-effective-motion', 'calm');
+  await expect(panel.locator('[data-empathy-question-state]')).toBeHidden();
+  await expect(panel.locator('[data-empathy-feedback]')).toBeVisible();
   await expect(panel.locator('[data-empathy-feedback-text]')).toContainText('движение спокойнее');
   await expect.poll(() => panel.locator('[data-empathy-feedback-text]').evaluate((element) => (
     getComputedStyle(element).fontFamily
@@ -523,6 +525,7 @@ test('daily empathy check-in stays local and exposes reversible motion adaptatio
     const widget = element.closest('[data-daylight-widget]');
     const widgetRect = widget.getBoundingClientRect();
     const panelRect = element.closest('[data-empathy-panel]').getBoundingClientRect();
+    const surfaceRect = document.querySelector('.mobile-service-surface').getBoundingClientRect();
     const copyRect = element.previousElementSibling.getBoundingClientRect();
     const buttons = [...element.querySelectorAll('button')].map((button) => {
       const buttonRect = button.getBoundingClientRect();
@@ -533,12 +536,18 @@ test('daily empathy check-in stays local and exposes reversible motion adaptatio
       widgetHeight: widgetRect.height,
       panelTop: panelRect.top - widgetRect.top,
       panelHeight: panelRect.height,
+      surfaceTop: surfaceRect.top,
+      surfaceBottom: surfaceRect.bottom,
+      feedbackTop: copyRect.top,
+      actionsBottom: rect.bottom,
       copyTop: copyRect.top - widgetRect.top,
       copyHeight: copyRect.height,
       buttons
     };
   });
   const ruGeometry = await feedbackActionGeometry();
+  expect(ruGeometry.feedbackTop).toBeGreaterThanOrEqual(ruGeometry.surfaceTop);
+  expect(ruGeometry.actionsBottom).toBeLessThanOrEqual(ruGeometry.surfaceBottom);
   await page.locator('[data-mobile-service-panel] [data-language-option="en"]').click();
   await expect(panel.locator('[data-empathy-feedback-text]')).toContainText('motion calmer');
   const enGeometry = await feedbackActionGeometry();
