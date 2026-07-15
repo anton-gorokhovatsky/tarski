@@ -83,7 +83,7 @@ for (const [date, expectedQuestion] of dates) {
     expect(geometry.copyBottom).toBeLessThanOrEqual(geometry.optionsTop);
     expect(geometry.optionsBottom).toBeLessThanOrEqual(geometry.panelBottom);
     expect(geometry.buttonHeights.every((height) => height === 32)).toBe(true);
-    expect(geometry.buttonTextAlignments.every((alignment) => ['left', 'start'].includes(alignment))).toBe(true);
+    expect(geometry.buttonTextAlignments.every((alignment) => alignment === 'center')).toBe(true);
     expect(Math.max(...geometry.buttonWidths) - Math.min(...geometry.buttonWidths)).toBeLessThanOrEqual(1);
     expect(Math.abs(geometry.secondRowInsetLeft - geometry.secondRowInsetRight)).toBeLessThanOrEqual(1);
     expect(geometry.secondRowInsetLeft).toBeGreaterThan(0);
@@ -113,7 +113,11 @@ test('every answer produces one clear, reversible response', async ({ page }) =>
     await expect(page.locator('html')).toHaveAttribute('data-effective-motion', motion);
     if (canUndo) await expect(widget.locator('[data-empathy-undo]')).toBeVisible();
     else await expect(widget.locator('[data-empathy-undo]')).toBeHidden();
-    await expect(widget.locator('[data-empathy-show-settings]')).toBeFocused();
+    await expect(widget.locator('[data-empathy-feedback]')).toBeFocused();
+    await expect(widget.locator('[data-empathy-settings]')).toBeVisible();
+    await expect(widget.locator('[data-empathy-settings]')).not.toHaveAttribute('inert', '');
+    await expect(widget.locator(`[data-motion-mode="${canUndo ? 'calm' : 'system'}"]`)).toHaveAttribute('aria-pressed', 'true');
+    await expect(widget.locator('[data-theme-mode="auto"]')).toHaveAttribute('aria-pressed', 'true');
   }
 });
 

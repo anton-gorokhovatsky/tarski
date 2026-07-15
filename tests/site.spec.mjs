@@ -300,16 +300,8 @@ test('daylight widget expands the service material and keeps theme modes accessi
   await expect(widget.locator('[data-empathy-panel]')).toBeVisible();
   await widget.locator('[data-empathy-answer="skip"]').click();
   await expect(widget.locator('[data-empathy-feedback]')).toBeVisible();
-  await widget.locator('[data-empathy-show-settings]').click();
-  const siteSettings = page.locator('[data-site-settings]');
-  await expect(siteSettings).toHaveClass(/is-open/);
-  await expect(siteSettings).toHaveAttribute('aria-hidden', 'false');
-  await siteSettings.locator('.site-settings__close').click();
-  await expect(siteSettings).toBeHidden();
-  await expect(serviceToggle).toHaveAttribute('aria-expanded', 'false');
-  await serviceToggle.click();
-  await daylightToggle.click();
-  await expect(widget.locator('[data-empathy-panel]')).toBeHidden();
+  await expect(widget.locator('[data-empathy-panel]')).toBeVisible();
+  await expect(widget.locator('[data-empathy-settings]')).toBeVisible();
   await expect(widget.locator('[data-empathy-settings]')).not.toHaveAttribute('inert', '');
   await page.waitForTimeout(900);
 
@@ -585,12 +577,10 @@ test('daily empathy check-in stays local and exposes reversible motion adaptatio
   await panel.locator('[data-empathy-undo]').click();
   await expect(page.locator('html')).toHaveAttribute('data-effective-motion', 'full');
   await expect(panel.locator('[data-empathy-feedback-text]')).toContainText('прежние настройки');
-  await panel.locator('[data-empathy-show-settings]').click();
-  await expect(panel).toBeHidden();
+  await expect(panel).toBeVisible();
+  await expect(widget.locator('[data-empathy-settings]')).toBeVisible();
   await expect(widget.locator('[data-empathy-settings]')).not.toHaveAttribute('inert', '');
-  const siteSettings = page.locator('[data-site-settings]');
-  await expect(siteSettings).toHaveClass(/is-open/);
-  await expect(siteSettings.locator('[data-site-settings-panel]')).toBeFocused();
+  await expect(widget.locator('[data-motion-mode="system"]')).toHaveAttribute('aria-pressed', 'true');
 
   await page.evaluate(() => {
     const daylight = document.querySelector('[data-daylight-widget]');
@@ -601,6 +591,47 @@ test('daily empathy check-in stays local and exposes reversible motion adaptatio
     }));
   });
   await expect(widget.locator('[data-weather-care]')).toContainText('зонт может пригодиться');
+});
+
+test('text controls stay vertically centered across mobile and desktop settings', async ({ page }) => {
+  const measureVisibleTextControls = async (selector) => page.locator(selector).evaluateAll((controls) => (
+    controls.flatMap((control) => {
+      if (!control.getClientRects().length || !control.textContent.trim()) return [];
+      const range = document.createRange();
+      range.selectNodeContents(control);
+      const labelRect = range.getBoundingClientRect();
+      if (!labelRect.width || !labelRect.height) return [];
+      const rect = control.getBoundingClientRect();
+      const style = getComputedStyle(control);
+      return [{
+        label: control.textContent.trim(),
+        paddingDelta: Math.abs(parseFloat(style.paddingTop) - parseFloat(style.paddingBottom)),
+        centerDelta: Math.abs(
+          (rect.top + rect.height / 2)
+          - (labelRect.top + labelRect.height / 2)
+        )
+      }];
+    })
+  ));
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/?lang=ru&empathy=preview');
+  await page.locator('[data-mobile-service-toggle]').click();
+  await page.locator('[data-daylight-toggle]').click();
+  await page.locator('[data-daylight-widget] [data-empathy-answer="tired"]').click();
+  const mobileControls = await measureVisibleTextControls('[data-mobile-menu] button');
+  expect(mobileControls.length).toBeGreaterThan(10);
+
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.goto('/?lang=ru&empathy=preview');
+  await page.locator('.nav-settings-toggle').click();
+  const desktopControls = await measureVisibleTextControls('[data-site-settings] button, .artists-view-switch__button');
+  expect(desktopControls.length).toBeGreaterThan(10);
+
+  for (const control of [...mobileControls, ...desktopControls]) {
+    expect(control.paddingDelta, `${control.label}: vertical padding`).toBeLessThanOrEqual(0.01);
+    expect(control.centerDelta, `${control.label}: optical center`).toBeLessThanOrEqual(1);
+  }
 });
 
 test('motion preference is available on desktop and shares one state', async ({ page }) => {
@@ -740,8 +771,8 @@ test('motion preference is available on desktop and shares one state', async ({ 
   ));
   answerAlignment.forEach((alignment) => {
     expect(alignment.display).toBe('grid');
-    expect(alignment.placeItems).toBe('center start');
-    expect(['left', 'start']).toContain(alignment.textAlign);
+    expect(alignment.placeItems).toBe('center');
+    expect(alignment.textAlign).toBe('center');
   });
 
   const desktopGroup = siteSettings.locator('[data-motion-mode-group]');

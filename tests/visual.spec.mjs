@@ -148,13 +148,28 @@ for (const language of languages) {
         date: '2026-07-15T12:00:00+03:00',
         empathyAnswer: null
       });
-      await page.goto(`/?lang=${language}&review=visual-empathy&empathy=preview`);
+      await page.goto(`/?lang=${language}&review=visual-empathy`);
       await settlePage(page);
 
       await page.locator('[data-mobile-service-toggle]').click();
       await page.locator('[data-daylight-toggle]').click();
       await expect(page.locator('[data-empathy-panel]')).toBeVisible();
       await snapshot(page, `mobile-${language}-${theme}-empathy.png`);
+
+      await page.locator('[data-daylight-widget] [data-empathy-answer="tired"]').click();
+      await expect(page.locator('[data-daylight-widget] [data-empathy-feedback]')).toBeVisible();
+      await expect(page.locator('[data-empathy-settings]')).toBeVisible();
+      await snapshot(page, `mobile-${language}-${theme}-empathy-feedback.png`);
+
+      await page.evaluate(() => window.localStorage.removeItem('tarski-empathy-v1'));
+      await page.reload();
+      await settlePage(page);
+      await page.locator('[data-mobile-service-toggle]').click();
+      await page.locator('[data-daylight-toggle]').click();
+      await page.locator('[data-daylight-widget] [data-empathy-answer="calm"]').click();
+      await expect(page.locator('[data-daylight-widget] [data-empathy-undo]')).toBeHidden();
+      await expect(page.locator('[data-empathy-settings]')).toBeVisible();
+      await snapshot(page, `mobile-${language}-${theme}-empathy-feedback-neutral.png`);
     });
   }
 }

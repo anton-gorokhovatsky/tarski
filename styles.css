@@ -1463,9 +1463,11 @@ li::before {
   appearance: none;
   position: relative;
   z-index: 1;
+  display: grid;
+  place-items: center;
   min-width: 76px;
   min-height: 100%;
-  padding: 1px 15px 0;
+  padding: 0 15px;
   border: 0;
   border-radius: 999px;
   background: transparent;
@@ -4016,6 +4018,10 @@ html.has-open-dossier {
     );
   }
 
+  .mobile-floating-menu:has(.daylight-widget.is-empathy-feedback) {
+    --island-daylight-height: 464px;
+  }
+
   @supports (-webkit-touch-callout: none) {
     @media (hover: none) and (pointer: coarse) {
       .mobile-floating-menu.is-visible.is-daylight-open {
@@ -4746,7 +4752,7 @@ html.has-open-dossier {
     top: 84px;
     z-index: 2;
     width: calc(100% - (var(--daylight-content-inset) * 2));
-    height: 280px;
+    height: calc(var(--island-daylight-height) - 104px);
     color: var(--mobile-pill-text);
     opacity: 0;
     pointer-events: none;
@@ -4943,13 +4949,29 @@ html.has-open-dossier {
     display: none;
   }
 
-  .daylight-widget:is(.is-empathy-question, .is-empathy-feedback) .daylight-widget__settings {
+  .daylight-widget.is-empathy-question .daylight-widget__settings {
     opacity: 0;
     pointer-events: none;
     transform: translate3d(0, -8px, 0);
   }
 
   .daylight-widget:is(.is-empathy-question, .is-empathy-feedback) .daylight-widget__empathy {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translate3d(0, 0, 0);
+  }
+
+  .daylight-widget.is-empathy-feedback .daylight-widget__lower {
+    grid-template-rows: minmax(68px, auto) auto;
+    gap: 12px;
+  }
+
+  .daylight-widget.is-empathy-feedback .daylight-widget__empathy {
+    grid-area: 1 / 1;
+  }
+
+  .daylight-widget.is-empathy-feedback .daylight-widget__settings {
+    grid-area: 2 / 1;
     opacity: 1;
     pointer-events: auto;
     transform: translate3d(0, 0, 0);
@@ -5000,7 +5022,7 @@ html.has-open-dossier {
   .daylight-widget__empathy-actions button {
     min-width: 0;
     min-height: 32px;
-    padding: 1px 8px 0;
+    padding: 0 8px;
     border: 0.5px solid color-mix(in srgb, currentColor 15%, transparent);
     border-radius: 999px;
     background: color-mix(in srgb, var(--page-bg) 12%, transparent);
@@ -5028,11 +5050,11 @@ html.has-open-dossier {
   }
 
   .daylight-widget__empathy-options button:nth-child(4) {
-    grid-column: 1 / span 2;
+    grid-column: 2 / span 2;
   }
 
   .daylight-widget__empathy-options button:nth-child(5) {
-    grid-column: 3 / span 2;
+    grid-column: 4 / span 2;
   }
 
   .daylight-widget__empathy-options button:hover,
@@ -5055,14 +5077,18 @@ html.has-open-dossier {
 
   .daylight-widget__empathy-feedback {
     display: grid;
-    grid-template-rows: 68px 32px;
-    align-content: center;
-    row-gap: 8px;
-    min-height: 108px;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: start;
+    column-gap: 8px;
+    min-height: 68px;
   }
 
   .daylight-widget__empathy-feedback[hidden] {
     display: none;
+  }
+
+  .daylight-widget__empathy-feedback:focus {
+    outline: none;
   }
 
   .daylight-widget__empathy-feedback-copy {
@@ -5093,8 +5119,12 @@ html.has-open-dossier {
     block-size: 32px;
   }
 
+  .daylight-widget__empathy-actions[hidden] {
+    display: none;
+  }
+
   .daylight-widget__empathy-actions button {
-    flex: 1 1 0;
+    min-width: 84px;
     block-size: 32px;
   }
 
@@ -5155,7 +5185,7 @@ html.has-open-dossier {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 1px 8px 0;
+    padding: 0 8px;
     border: 0;
     border-radius: 999px;
     background: transparent;
@@ -5272,11 +5302,14 @@ html.has-open-dossier {
   }
 
   .daylight-widget__motion-options button {
+    display: grid;
+    place-items: center;
     min-height: 0;
-    padding: 1px 8px 0;
+    padding: 0 8px;
     font-family: var(--font-sans);
     font-size: 12px;
     line-height: 1;
+    text-align: center;
   }
 
   .mobile-menu-drawer {
