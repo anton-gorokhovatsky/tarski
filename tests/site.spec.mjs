@@ -312,6 +312,9 @@ test('daylight widget expands the service material and keeps theme modes accessi
     const widgetRect = widgetElement.getBoundingClientRect();
     const chartRect = widgetElement.querySelector('.daylight-widget__chart').getBoundingClientRect();
     const chartSvg = widgetElement.querySelector('.daylight-widget__chart svg');
+    const chartMarkerRects = Array.from(chartSvg.querySelectorAll(
+      '[data-daylight-marker], [data-daylight-marker-halo]'
+    )).map((marker) => marker.getBoundingClientRect());
     const metaRect = widgetElement.querySelector('.daylight-widget__meta').getBoundingClientRect();
     const weatherRect = widgetElement.querySelector('.daylight-widget__weather').getBoundingClientRect();
     const modesRect = widgetElement.querySelector('.daylight-widget__modes').getBoundingClientRect();
@@ -339,6 +342,7 @@ test('daylight widget expands the service material and keeps theme modes accessi
       chartInsetLeft: chartRect.left - serviceRect.left,
       chartInsetRight: serviceRect.right - chartRect.right,
       chartPreserveAspectRatio: chartSvg.getAttribute('preserveAspectRatio'),
+      chartMarkerAspectDeltas: chartMarkerRects.map((rect) => Math.abs(rect.width - rect.height)),
       metaInsetLeft: metaRect.left - serviceRect.left,
       metaInsetRight: serviceRect.right - metaRect.right,
       weatherInsetLeft: weatherRect.left - serviceRect.left,
@@ -380,7 +384,8 @@ test('daylight widget expands the service material and keeps theme modes accessi
   expect(expandedGeometry.widgetInsetBottom).toBeLessThanOrEqual(22);
   expect(expandedGeometry.chartInsetLeft).toBeCloseTo(0, 1);
   expect(expandedGeometry.chartInsetRight).toBeCloseTo(0, 1);
-  expect(expandedGeometry.chartPreserveAspectRatio).toBe('none');
+  expect(expandedGeometry.chartPreserveAspectRatio).toBe('xMidYMid slice');
+  expect(expandedGeometry.chartMarkerAspectDeltas.every((delta) => delta <= 0.5)).toBe(true);
   expect(expandedGeometry.metaInsetLeft).toBeCloseTo(28, 0);
   expect(expandedGeometry.metaInsetRight).toBeCloseTo(28, 0);
   expect(expandedGeometry.weatherInsetLeft).toBeCloseTo(28, 0);
