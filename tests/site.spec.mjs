@@ -243,6 +243,7 @@ test('menu surfaces share one stable matte material without loading the Water ex
       compactBackground: getComputedStyle(compact).backgroundImage,
       serviceBackground: getComputedStyle(service).backgroundImage,
       expandedBackground: getComputedStyle(expanded).backgroundImage,
+      expandedBackgroundColor: getComputedStyle(expanded).backgroundColor,
       desktopBackground: getComputedStyle(desktop, '::after').backgroundImage,
       compactBackdrop: getComputedStyle(compact).backdropFilter,
       serviceBackdrop: getComputedStyle(service).backdropFilter,
@@ -252,8 +253,9 @@ test('menu surfaces share one stable matte material without loading the Water ex
   });
 
   expect(materialState.compactBackground).toBe(materialState.serviceBackground);
-  expect(materialState.compactBackground).toBe(materialState.expandedBackground);
   expect(materialState.compactBackground).toBe(materialState.desktopBackground);
+  expect(materialState.expandedBackground).toBe('none');
+  expect(materialState.expandedBackgroundColor).not.toBe('rgba(0, 0, 0, 0)');
   expect(materialState.compactBackdrop).toBe(materialState.serviceBackdrop);
   expect(materialState.compactBackdrop).toBe(materialState.expandedBackdrop);
   expect(materialState.compactBackdrop).toBe(materialState.desktopBackdrop);
@@ -281,11 +283,15 @@ test('daylight widget expands the service material and keeps theme modes accessi
     return {
       materialRadius: parseFloat(material.borderRadius),
       materialClip: material.clipPath,
+      materialBackground: material.backgroundImage,
+      materialBackgroundColor: material.backgroundColor,
       depthClip: depthMask.clipPath
     };
   });
   expect(daylightHandoff.materialRadius).toBeLessThanOrEqual(36);
   expect(daylightHandoff.materialClip).toContain('inset');
+  expect(daylightHandoff.materialBackground).toBe('none');
+  expect(daylightHandoff.materialBackgroundColor).not.toBe('rgba(0, 0, 0, 0)');
   expect(daylightHandoff.depthClip).toContain('inset');
   await expect(widget).toHaveAttribute('aria-hidden', 'false');
   await expect(widget).toBeVisible();
@@ -331,6 +337,7 @@ test('daylight widget expands the service material and keeps theme modes accessi
 
     return {
       height: serviceRect.height,
+      tokenHeight: parseFloat(getComputedStyle(menu).getPropertyValue('--island-daylight-height')),
       menuHasWidgetState: menu.classList.contains('is-daylight-open'),
       materialRadius: getComputedStyle(menu.querySelector('.mobile-service-surface')).borderRadius,
       ghostShadowContent: getComputedStyle(element, '::after').content,
@@ -372,14 +379,13 @@ test('daylight widget expands the service material and keeps theme modes accessi
       temperatureFontSize: parseFloat(getComputedStyle(widgetElement.querySelector('[data-weather-temperature]')).fontSize)
     };
   });
-  expect(expandedGeometry.height).toBeGreaterThanOrEqual(374);
-  expect(expandedGeometry.height).toBeLessThanOrEqual(378);
+  expect(expandedGeometry.height).toBeCloseTo(expandedGeometry.tokenHeight, 0);
   expect(expandedGeometry.menuHasWidgetState).toBe(true);
   expect(expandedGeometry.ghostShadowContent).toBe('none');
   expect(expandedGeometry.widgetInsetLeft).toBeCloseTo(28, 0);
   expect(expandedGeometry.widgetInsetRight).toBeCloseTo(28, 0);
-  expect(expandedGeometry.widgetInsetBottom).toBeGreaterThanOrEqual(10);
-  expect(expandedGeometry.widgetInsetBottom).toBeLessThanOrEqual(14);
+  expect(expandedGeometry.widgetInsetBottom).toBeGreaterThanOrEqual(18);
+  expect(expandedGeometry.widgetInsetBottom).toBeLessThanOrEqual(22);
   expect(expandedGeometry.chartInsetLeft).toBeCloseTo(0, 1);
   expect(expandedGeometry.chartInsetRight).toBeCloseTo(0, 1);
   expect(expandedGeometry.chartPreserveAspectRatio).toBe('none');
@@ -391,8 +397,8 @@ test('daylight widget expands the service material and keeps theme modes accessi
   expect(expandedGeometry.modesInsetRight).toBeCloseTo(28, 0);
   expect(expandedGeometry.motionInsetLeft).toBeCloseTo(28, 0);
   expect(expandedGeometry.motionInsetRight).toBeCloseTo(28, 0);
-  expect(expandedGeometry.motionBottomGap).toBeGreaterThanOrEqual(18);
-  expect(expandedGeometry.motionBottomGap).toBeLessThanOrEqual(22);
+  expect(expandedGeometry.motionBottomGap).toBeGreaterThanOrEqual(25);
+  expect(expandedGeometry.motionBottomGap).toBeLessThanOrEqual(29);
   expect(expandedGeometry.modesPadding).toBeCloseTo(4, 1);
   expect(expandedGeometry.motionTrackHeight).toBeCloseTo(expandedGeometry.themeTrackHeight, 1);
   expect(expandedGeometry.modeSliderTop).toBeCloseTo(4, 1);
