@@ -24,6 +24,23 @@
   --rule: rgba(0, 0, 0, 0.14);
   --artist-rule: rgba(0, 0, 0, 0.07);
 
+  /* Spacing scale: 4px structural unit; half-steps are for dense controls only. */
+  --space-0: 0px;
+  --space-0-5: 2px;
+  --space-1: 4px;
+  --space-1-5: 6px;
+  --space-2: 8px;
+  --space-2-5: 10px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 28px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
   /* Artist list rhythm */
   --artist-image-width: 180px;
   --artist-image-height: 244px;
@@ -3782,7 +3799,10 @@ html.has-open-dossier {
     --island-service-gap: 12px;
     --island-service-toggle-size: 32px;
     --island-daylight-width: min(332px, calc(100vw - 24px));
+    --daylight-panel-inset: var(--space-7);
     --island-daylight-height: 384px;
+    --island-daylight-question-height: 450px;
+    --island-daylight-feedback-height: 464px;
     --island-daylight-top: 8px;
     --island-daylight-overflow-y: calc(
       var(--island-daylight-top)
@@ -4019,7 +4039,11 @@ html.has-open-dossier {
   }
 
   .mobile-floating-menu:has(.daylight-widget.is-empathy-feedback) {
-    --island-daylight-height: 464px;
+    --island-daylight-height: var(--island-daylight-feedback-height);
+  }
+
+  .mobile-floating-menu:has(.daylight-widget.is-empathy-question) {
+    --island-daylight-height: var(--island-daylight-question-height);
   }
 
   @supports (-webkit-touch-callout: none) {
@@ -4746,7 +4770,7 @@ html.has-open-dossier {
   }
 
   .daylight-widget {
-    --daylight-content-inset: 28px;
+    --daylight-content-inset: var(--daylight-panel-inset);
     position: absolute;
     left: var(--daylight-content-inset);
     top: 84px;
@@ -4949,21 +4973,35 @@ html.has-open-dossier {
     display: none;
   }
 
-  .daylight-widget.is-empathy-question .daylight-widget__settings {
-    opacity: 0;
-    pointer-events: none;
-    transform: translate3d(0, -8px, 0);
-  }
-
   .daylight-widget:is(.is-empathy-question, .is-empathy-feedback) .daylight-widget__empathy {
     opacity: 1;
     pointer-events: auto;
     transform: translate3d(0, 0, 0);
   }
 
+  .daylight-widget.is-empathy-question .daylight-widget__lower {
+    grid-template-rows: minmax(116px, auto) auto;
+    gap: var(--space-3);
+  }
+
+  .daylight-widget.is-empathy-question .daylight-widget__empathy {
+    grid-area: 1 / 1;
+  }
+
+  .daylight-widget.is-empathy-question .daylight-widget__settings {
+    grid-area: 2 / 1;
+    opacity: 1;
+    pointer-events: auto;
+    transform: translate3d(0, 0, 0);
+  }
+
+  .daylight-widget.is-empathy-question .daylight-widget__motion {
+    display: none;
+  }
+
   .daylight-widget.is-empathy-feedback .daylight-widget__lower {
     grid-template-rows: minmax(68px, auto) auto;
-    gap: 12px;
+    gap: var(--space-3);
   }
 
   .daylight-widget.is-empathy-feedback .daylight-widget__empathy {
@@ -4988,7 +5026,7 @@ html.has-open-dossier {
     box-sizing: border-box;
     display: grid;
     grid-template-rows: 40px 70px;
-    row-gap: 6px;
+    row-gap: var(--space-1-5);
     min-height: 116px;
     padding-bottom: 0;
   }
@@ -5014,7 +5052,7 @@ html.has-open-dossier {
   .daylight-widget__empathy-options {
     display: grid;
     grid-template-columns: repeat(6, minmax(0, 1fr));
-    gap: 6px;
+    gap: var(--space-1-5);
     margin-top: 0;
   }
 
@@ -5045,16 +5083,16 @@ html.has-open-dossier {
     grid-column: span 2;
     display: grid;
     place-items: center;
-    padding-inline: 10px;
+    padding-inline: var(--space-2-5);
     text-align: center;
   }
 
   .daylight-widget__empathy-options button:nth-child(4) {
-    grid-column: 2 / span 2;
+    grid-column: 1 / span 2;
   }
 
   .daylight-widget__empathy-options button:nth-child(5) {
-    grid-column: 4 / span 2;
+    grid-column: 3 / span 2;
   }
 
   .daylight-widget__empathy-options button:hover,

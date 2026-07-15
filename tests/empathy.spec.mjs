@@ -50,10 +50,20 @@ for (const [date, expectedQuestion] of dates) {
 
     const geometry = await widget.locator('[data-empathy-question-state]').evaluate((element) => {
       const panelRect = element.getBoundingClientRect();
+      const serviceRect = element.closest('.mobile-service').getBoundingClientRect();
+      const expectedPanelInset = Number.parseFloat(
+        getComputedStyle(document.documentElement).getPropertyValue('--space-7')
+      );
+      const themeRect = element.closest('[data-daylight-widget]')
+        .querySelector('[data-theme-mode-group]')
+        .getBoundingClientRect();
       const copyRect = element.querySelector('.daylight-widget__empathy-copy').getBoundingClientRect();
       const optionsRect = element.querySelector('[data-empathy-options]').getBoundingClientRect();
       const buttons = [...element.querySelectorAll('[data-empathy-answer]')].map((button) => {
         const rect = button.getBoundingClientRect();
+        const textRange = document.createRange();
+        textRange.selectNodeContents(button);
+        const textRect = textRange.getBoundingClientRect();
         const style = getComputedStyle(button);
         return {
           left: rect.left,
@@ -63,6 +73,9 @@ for (const [date, expectedQuestion] of dates) {
           width: rect.width,
           height: rect.height,
           textAlign: style.textAlign,
+          placeItems: style.placeItems,
+          textCenterOffsetX: ((textRect.left + textRect.right) - (rect.left + rect.right)) / 2,
+          textCenterOffsetY: ((textRect.top + textRect.bottom) - (rect.top + rect.bottom)) / 2,
         };
       });
       return {
@@ -70,9 +83,15 @@ for (const [date, expectedQuestion] of dates) {
         optionsTop: optionsRect.top,
         optionsBottom: optionsRect.bottom,
         panelBottom: panelRect.bottom,
+        expectedPanelInset,
+        horizontalContentInset: themeRect.left - serviceRect.left,
+        bottomContentInset: serviceRect.bottom - themeRect.bottom,
         buttonWidths: buttons.map(({ width }) => width),
         buttonHeights: buttons.map(({ height }) => height),
         buttonTextAlignments: buttons.map(({ textAlign }) => textAlign),
+        buttonPlaceItems: buttons.map(({ placeItems }) => placeItems),
+        textCenterOffsetsX: buttons.map(({ textCenterOffsetX }) => textCenterOffsetX),
+        textCenterOffsetsY: buttons.map(({ textCenterOffsetY }) => textCenterOffsetY),
         secondRowInsetLeft: buttons[3].left - buttons[0].left,
         secondRowInsetRight: buttons[2].right - buttons[4].right,
         buttonsInsideOptions: buttons.every(({ top, bottom }) => (
@@ -82,12 +101,21 @@ for (const [date, expectedQuestion] of dates) {
     });
     expect(geometry.copyBottom).toBeLessThanOrEqual(geometry.optionsTop);
     expect(geometry.optionsBottom).toBeLessThanOrEqual(geometry.panelBottom);
+    expect(geometry.horizontalContentInset).toBeCloseTo(geometry.expectedPanelInset, 1);
+    expect(geometry.bottomContentInset).toBeCloseTo(geometry.horizontalContentInset, 1);
     expect(geometry.buttonHeights.every((height) => height === 32)).toBe(true);
     expect(geometry.buttonTextAlignments.every((alignment) => alignment === 'center')).toBe(true);
+    expect(geometry.buttonPlaceItems.every((alignment) => alignment === 'center')).toBe(true);
+    expect(geometry.textCenterOffsetsX.every((offset) => Math.abs(offset) <= 0.5)).toBe(true);
+    expect(geometry.textCenterOffsetsY.every((offset) => Math.abs(offset) <= 0.5)).toBe(true);
     expect(Math.max(...geometry.buttonWidths) - Math.min(...geometry.buttonWidths)).toBeLessThanOrEqual(1);
-    expect(Math.abs(geometry.secondRowInsetLeft - geometry.secondRowInsetRight)).toBeLessThanOrEqual(1);
-    expect(geometry.secondRowInsetLeft).toBeGreaterThan(0);
+    expect(Math.abs(geometry.secondRowInsetLeft)).toBeLessThanOrEqual(1);
+    expect(geometry.secondRowInsetRight).toBeGreaterThan(0);
     expect(geometry.buttonsInsideOptions).toBe(true);
+
+    await expect(widget.locator('[data-theme-mode-group]')).toBeVisible();
+    await expect(widget.locator('[data-empathy-settings]')).not.toHaveAttribute('inert', '');
+    await expect(widget.locator('[data-motion-mode-group]')).toBeHidden();
 
     await widget.locator('[data-empathy-answer="skip"]').click();
     await expect(widget.locator('[data-empathy-feedback]')).toBeVisible();
@@ -141,13 +169,31 @@ test('desktop Today keeps the same optional check-in and balanced answer geometr
     const optionsRect = element.getBoundingClientRect();
     const buttons = [...element.querySelectorAll('[data-empathy-answer]')].map((button) => {
       const rect = button.getBoundingClientRect();
-      return { left: rect.left, right: rect.right, top: rect.top, width: rect.width, height: rect.height };
+      const textRange = document.createRange();
+      textRange.selectNodeContents(button);
+      const textRect = textRange.getBoundingClientRect();
+      const style = getComputedStyle(button);
+      return {
+        left: rect.left,
+        right: rect.right,
+        top: rect.top,
+        width: rect.width,
+        height: rect.height,
+        textAlign: style.textAlign,
+        placeItems: style.placeItems,
+        textCenterOffsetX: ((textRect.left + textRect.right) - (rect.left + rect.right)) / 2,
+        textCenterOffsetY: ((textRect.top + textRect.bottom) - (rect.top + rect.bottom)) / 2,
+      };
     });
     return {
       optionsLeft: optionsRect.left,
       optionsRight: optionsRect.right,
       widths: buttons.map(({ width }) => width),
       heights: buttons.map(({ height }) => height),
+      textAlignments: buttons.map(({ textAlign }) => textAlign),
+      placeItems: buttons.map(({ placeItems }) => placeItems),
+      textCenterOffsetsX: buttons.map(({ textCenterOffsetX }) => textCenterOffsetX),
+      textCenterOffsetsY: buttons.map(({ textCenterOffsetY }) => textCenterOffsetY),
       secondRowInsetLeft: buttons[3].left - optionsRect.left,
       secondRowInsetRight: optionsRect.right - buttons[4].right,
       rowCount: new Set(buttons.map(({ top }) => Math.round(top))).size
@@ -155,8 +201,12 @@ test('desktop Today keeps the same optional check-in and balanced answer geometr
   });
   expect(Math.max(...geometry.widths) - Math.min(...geometry.widths)).toBeLessThanOrEqual(1);
   expect(Math.max(...geometry.heights) - Math.min(...geometry.heights)).toBeLessThanOrEqual(0.1);
-  expect(Math.abs(geometry.secondRowInsetLeft - geometry.secondRowInsetRight)).toBeLessThanOrEqual(1);
-  expect(geometry.secondRowInsetLeft).toBeGreaterThan(0);
+  expect(geometry.textAlignments.every((alignment) => alignment === 'center')).toBe(true);
+  expect(geometry.placeItems.every((alignment) => alignment === 'center')).toBe(true);
+  expect(geometry.textCenterOffsetsX.every((offset) => Math.abs(offset) <= 0.5)).toBe(true);
+  expect(geometry.textCenterOffsetsY.every((offset) => Math.abs(offset) <= 0.5)).toBe(true);
+  expect(Math.abs(geometry.secondRowInsetLeft)).toBeLessThanOrEqual(1);
+  expect(geometry.secondRowInsetRight).toBeGreaterThan(0);
   expect(geometry.rowCount).toBe(2);
 
   await today.locator('[data-empathy-answer="curious"]').click();

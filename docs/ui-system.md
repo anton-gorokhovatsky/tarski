@@ -14,6 +14,17 @@ The compact archipelago, service capsule, daylight widget and expanded mobile me
 
 The desktop navigation and shared controls use the same `--gutter-*` family for their groove, active capsule, edge, shadow and backdrop. New segmented controls should reuse these tokens instead of defining a parallel visual system.
 
+## Spacing system
+
+Spacing is a global contract, not a value chosen separately for each screenshot. Use the `--space-*` scale in `styles.css` for every new or changed margin, padding, gap and inset.
+
+- Structural spacing uses the 4px scale: 8, 12, 16, 20, 24, 28, 32, 40, 48 and 64px.
+- The 2, 4, 6 and 10px half-steps are reserved for dense control internals, hairline compensation and compact row gaps. They are not page-layout values.
+- A surface defines one semantic edge token and reuses it on all applicable sides. The mobile daylight surface uses `--daylight-panel-inset: var(--space-7)`; its last visible control row must finish at the same inset as its horizontal content.
+- Internal labels may have optical type corrections, but container geometry remains on the spacing scale. Do not move the container to compensate for a font.
+- A value outside the scale requires a nearby code comment explaining the source geometry, safe-area calculation or optical exception. Unexplained literals are a review failure.
+- Review computed geometry, not only declarations: compare outer edges, sibling gaps and the final row against the semantic token at every changed breakpoint.
+
 ## Depth and edges
 
 Depth has three jobs: separate a control from content, clarify the active layer and preserve the object contour. It must not become a black outline in the light theme or a large grey cloud around the object.
