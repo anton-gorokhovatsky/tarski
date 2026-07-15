@@ -146,6 +146,21 @@ test('mobile menu and service panel preserve state, Escape, and focus return', a
   await expect(menu).toHaveAttribute('aria-hidden', 'false');
   await expect(menuRoot).toHaveClass(/is-menu-settled/);
   expect(await menu.evaluate((element) => getComputedStyle(element).clipPath)).toBe('none');
+  await page.evaluate(() => {
+    const root = document.querySelector('[data-mobile-menu]');
+    const panel = document.querySelector('#mobile-menu-expanded');
+    window.__tarskiMenuClosePhases = [];
+    window.__tarskiMenuCloseObserver = new MutationObserver(() => {
+      window.__tarskiMenuClosePhases.push({
+        className: root.className,
+        clipPath: getComputedStyle(panel).clipPath
+      });
+    });
+    window.__tarskiMenuCloseObserver.observe(root, {
+      attributes: true,
+      attributeFilter: ['class']
+    });
+  });
   await page.keyboard.press('Escape');
   await expect(menuToggle).toHaveAttribute('aria-expanded', 'false');
   await expect(menuToggle).toBeFocused();
@@ -162,6 +177,24 @@ test('mobile menu and service panel preserve state, Escape, and focus return', a
   expect(menuClosingFrame.panelMaterialTransform).toBe('none');
   expect(menuClosingFrame.generatedCollapseDot).toBe('none');
   await expect(menu).toBeHidden();
+  const closePhases = await page.evaluate(() => {
+    window.__tarskiMenuCloseObserver.disconnect();
+    return window.__tarskiMenuClosePhases;
+  });
+  const contentOutPhaseIndex = closePhases.findIndex(({ className }) => (
+    className.includes('is-menu-open')
+    && className.includes('is-menu-closing')
+    && !className.includes('is-menu-compacting')
+  ));
+  const compactingPhaseIndex = closePhases.findIndex(({ className }) => (
+    className.includes('is-menu-closing')
+    && className.includes('is-menu-compacting')
+    && !className.includes('is-menu-open')
+  ));
+  expect(contentOutPhaseIndex).toBeGreaterThanOrEqual(0);
+  expect(closePhases[contentOutPhaseIndex].clipPath).not.toBe('none');
+  expect(closePhases[contentOutPhaseIndex].clipPath).toContain('inset(0px');
+  expect(compactingPhaseIndex).toBeGreaterThan(contentOutPhaseIndex);
 
   const serviceToggle = page.locator('[data-mobile-service-toggle]');
   const serviceRoot = page.locator('[data-mobile-service]');
