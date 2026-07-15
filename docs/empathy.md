@@ -8,8 +8,9 @@ The empathy layer creates a brief, optional moment of self-check-in. It is not a
 - The question rotates through localized RU, EN and JA sets without a network request.
 - Answers are Calm, Tired, Tense, Curious and Skip.
 - Tired and Tense temporarily select Calm motion. Calm, Curious and Skip do not alter the interface rhythm.
-- Feedback always explains what changed and offers a way to restore the rhythm or open settings.
-- The question, feedback and controls occupy a stable reserved area so locale wrapping does not move the action row outside the widget.
+- Feedback always explains what changed. On mobile, the theme and motion controls remain visible directly below it; their selected states make the current result explicit without opening another panel.
+- When Tired or Tense temporarily selects Calm motion, a separate Restore action is available next to the feedback. Answers that do not change settings show no redundant action.
+- The question, feedback and inline controls occupy a stable reserved area so locale wrapping does not move controls outside the widget.
 
 ## Local storage and privacy
 
