@@ -63,7 +63,8 @@
     <meta name="twitter:image" content="https://tarski.ru/assets/og-image.png?v=20260704-footer-og" />
     <meta name="twitter:image:alt" content="Tarski — среда связей и вовлекающего искусства" />
     <link rel="icon" href="assets/favicon.svg?v=20260701-caps-favicon" type="image/svg+xml" sizes="any" />
-    <link rel="stylesheet" href="styles.css?v=20260714-empathy-containment-1" />
+    <link rel="stylesheet" href="styles.css?v=20260715-settings-interaction-3" />
+    <link rel="stylesheet" href="settings.css?v=20260715-settings-interaction-4" />
   </head>
   <body>
     <noscript><div><img src="https://mc.yandex.ru/watch/110320853" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
@@ -89,6 +90,14 @@
               </div>
               <button class="theme-toggle" type="button" data-theme-toggle aria-label="Переключить тему" aria-pressed="false" title="Переключить тему">
                 <span class="theme-toggle__icon" aria-hidden="true"></span>
+              </button>
+              <button class="nav-settings-toggle" type="button" data-settings-open>
+                <svg aria-hidden="true" viewBox="0 0 18 18" focusable="false">
+                  <path d="M2 5h14M2 13h14" />
+                  <circle cx="6.25" cy="5" r="1.7" />
+                  <circle cx="11.75" cy="13" r="1.7" />
+                </svg>
+                <span class="visually-hidden" data-settings-open-label>Настройки сайта</span>
               </button>
             </div>
           </div>
@@ -164,7 +173,6 @@
                   <div class="daylight-widget__empathy-question" data-empathy-question-state>
                     <div class="daylight-widget__empathy-copy">
                       <p id="empathy-question" data-empathy-question>Как вы сегодня?</p>
-                      <span data-empathy-privacy>Ответ останется только на этом устройстве.</span>
                     </div>
                     <div class="daylight-widget__empathy-options" data-empathy-options role="group" aria-label="Самочувствие сегодня">
                       <button type="button" data-empathy-answer="calm">Спокойно</button>
@@ -175,7 +183,10 @@
                     </div>
                   </div>
                   <div class="daylight-widget__empathy-feedback" data-empathy-feedback aria-live="polite" hidden>
-                    <p data-empathy-feedback-text></p>
+                    <div class="daylight-widget__empathy-feedback-copy">
+                      <p data-empathy-feedback-text></p>
+                      <p class="daylight-widget__empathy-storage" data-empathy-storage-confirmation hidden>Ответ сохранён только на этом устройстве.</p>
+                    </div>
                     <div class="daylight-widget__empathy-actions" data-empathy-actions>
                       <button type="button" data-empathy-undo>Вернуть ритм</button>
                       <button type="button" data-empathy-show-settings>К настройкам</button>
@@ -495,13 +506,6 @@
             <a href="mailto:tarski.fund@gmail.com?subject=Tarski%20%E2%80%94%20%D0%BF%D0%B0%D1%80%D1%82%D0%BD%D1%91%D1%80%D1%81%D1%82%D0%B2%D0%BE" data-footer-route="partner"><span>Стать партнёром</span></a>
             <a href="mailto:tarski.fund@gmail.com?subject=Tarski%20%E2%80%94%20%D0%BE%D0%B1%D1%89%D0%B8%D0%B9%20%D0%B2%D0%BE%D0%BF%D1%80%D0%BE%D1%81" data-footer-route="question"><span>Задать вопрос</span></a>
           </nav>
-          <div class="site-footer__motion">
-            <span data-motion-label>Движение</span>
-            <div class="footer-motion-panel" data-motion-mode-group role="group" aria-label="Интенсивность движения">
-              <button type="button" data-motion-mode="system" aria-pressed="true">Системный</button>
-              <button type="button" data-motion-mode="calm" aria-pressed="false">Спокойный</button>
-            </div>
-          </div>
         </section>
         <div class="site-footer__texts">
           <div class="site-footer__meta">
@@ -513,6 +517,97 @@
         </div>
       </footer>
     </div>
+
+    <aside class="site-settings" data-site-settings aria-hidden="true" inert hidden>
+      <button class="site-settings__scrim" type="button" data-settings-close aria-label="Закрыть настройки" tabindex="-1"></button>
+      <section class="site-settings__panel" data-site-settings-panel role="dialog" aria-modal="true" aria-labelledby="site-settings-title" tabindex="-1">
+        <header class="site-settings__header">
+          <h2 id="site-settings-title" data-settings-title>Настройки сайта</h2>
+          <button class="site-settings__close" type="button" data-settings-close aria-label="Закрыть настройки"></button>
+        </header>
+        <p class="site-settings__intro" data-settings-intro>Выберите, как сайт будет отвечать вам.</p>
+
+        <section class="site-settings__today" data-settings-today>
+          <div class="site-settings__today-head">
+            <div>
+              <p class="site-settings__today-eyebrow" data-settings-today-title>Сегодня</p>
+              <p class="site-settings__today-weather" data-settings-weather-status>Погода загружается…</p>
+            </div>
+            <strong class="site-settings__today-temperature" data-settings-weather-temperature>—&#8239;°C</strong>
+          </div>
+          <p class="site-settings__today-care" data-settings-weather-care hidden></p>
+          <div class="site-settings__daylight" data-settings-daylight-chart role="group" aria-label="График светового дня">
+            <svg width="232" height="48" viewBox="0 0 232 48" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">
+              <path class="site-settings__daylight-baseline" d="M 0 41.5 H 232" />
+              <path class="site-settings__daylight-curve" d="M 0 46.5 C 36 46.5 54 7 116 7 C 178 7 196 46.5 232 46.5" />
+              <circle class="site-settings__daylight-marker-halo" data-settings-daylight-marker-halo cx="6" cy="41.5" r="6.5" />
+              <circle class="site-settings__daylight-marker" data-settings-daylight-marker cx="6" cy="41.5" r="3.2" />
+            </svg>
+            <div class="site-settings__daylight-axis">
+              <time data-settings-daylight-sunrise datetime="">—:—</time>
+              <time data-settings-daylight-sunset datetime="">—:—</time>
+            </div>
+          </div>
+          <div class="site-settings__empathy ym-hide-content ym-disable-clickmap" data-empathy-surface>
+            <div class="site-settings__empathy-question" data-empathy-question-state>
+              <p data-empathy-question>Как вы сегодня?</p>
+              <div class="site-settings__empathy-options" data-empathy-options role="group" aria-label="Самочувствие сегодня">
+                <button type="button" data-empathy-answer="calm">Спокойно</button>
+                <button type="button" data-empathy-answer="tired">Усталость</button>
+                <button type="button" data-empathy-answer="tense">Напряжение</button>
+                <button type="button" data-empathy-answer="curious">Любопытно</button>
+                <button type="button" data-empathy-answer="skip">Пропустить</button>
+              </div>
+            </div>
+            <div class="site-settings__empathy-feedback" data-empathy-feedback aria-live="polite" tabindex="-1" hidden>
+              <div class="site-settings__empathy-feedback-copy">
+                <p data-empathy-feedback-text></p>
+                <p class="site-settings__empathy-storage" data-empathy-storage-confirmation hidden>Ответ сохранён только на этом устройстве.</p>
+              </div>
+              <button type="button" data-empathy-undo>Вернуть</button>
+            </div>
+          </div>
+        </section>
+
+        <div class="site-settings__rows">
+          <section class="site-settings__row">
+            <div class="site-settings__row-copy">
+              <h3 data-settings-language-title>Язык</h3>
+              <p data-settings-language-note>Выбрать язык интерфейса.</p>
+            </div>
+            <div class="site-settings__segmented site-settings__segmented--three site-settings__segmented--language" data-language-switcher role="group" aria-label="Выбор языка">
+              <button type="button" data-language-option="ru" lang="ru" aria-pressed="true">RU</button>
+              <button type="button" data-language-option="en" lang="en" aria-pressed="false">EN</button>
+              <button type="button" data-language-option="ja" lang="ja" aria-pressed="false">JP</button>
+            </div>
+          </section>
+
+          <section class="site-settings__row">
+            <div class="site-settings__row-copy">
+              <h3 data-settings-theme-title>Тема</h3>
+              <p data-settings-theme-note>Следовать световому дню или выбрать вручную.</p>
+            </div>
+            <div class="site-settings__segmented site-settings__segmented--three" data-theme-mode-group role="group" aria-label="Режим темы">
+              <button type="button" data-theme-mode="auto" aria-pressed="true">Авто</button>
+              <button type="button" data-theme-mode="light" aria-pressed="false">День</button>
+              <button type="button" data-theme-mode="dark" aria-pressed="false">Ночь</button>
+            </div>
+          </section>
+
+          <section class="site-settings__row">
+            <div class="site-settings__row-copy">
+              <h3 data-settings-motion-title>Движение</h3>
+              <p data-settings-motion-note>Обычный ритм или более спокойные переходы.</p>
+            </div>
+            <div class="site-settings__segmented" data-motion-mode-group role="group" aria-label="Интенсивность движения">
+              <button type="button" data-motion-mode="system" aria-pressed="true">Системный</button>
+              <button type="button" data-motion-mode="calm" aria-pressed="false">Спокойный</button>
+            </div>
+          </section>
+
+        </div>
+      </section>
+    </aside>
 
     <aside class="artist-dossier" data-artist-dossier aria-hidden="true" inert>
       <button class="artist-dossier__scrim" type="button" data-artist-dossier-close aria-label="Закрыть подробности" tabindex="-1"></button>
@@ -534,13 +629,14 @@
       </section>
     </aside>
 
-    <script src="i18n.js?v=20260713-water-empathy-07"></script>
+    <script src="i18n.js?v=20260715-settings-language-daylight-1"></script>
     <script src="motion.js?v=20260713-water-empathy-07"></script>
     <script src="script.js?v=20260712-final-scene-1"></script>
-    <script src="daylight.js?v=20260713-water-empathy-07"></script>
-    <script src="empathy.js?v=20260713-water-empathy-07"></script>
+    <script src="settings.js?v=20260715-settings-language-daylight-1"></script>
+    <script src="daylight.js?v=20260715-settings-language-daylight-1"></script>
+    <script src="empathy.js?v=20260715-settings-nav-saved-1"></script>
     <script src="menu.js?v=20260713-light-edge-settle-2"></script>
     <script src="artists.js?v=20260712-artists-switch-2"></script>
-    <script src="trail.js?v=20260712-final-scene-1"></script>
+    <script src="trail.js?v=20260715-settings-today-1"></script>
   </body>
 </html>

@@ -19,6 +19,7 @@
   let canvas = null;
   let context = null;
   let frameId = null;
+  let isTrailArmed = false;
   let points = [];
   let deviceScale = 1;
   let trailRgb = '0, 0, 0';
@@ -469,8 +470,34 @@
     }
   };
 
+  const disarmTrail = () => {
+    if (!isTrailArmed) return;
+
+    window.removeEventListener('pointermove', activateTrailFromPointer);
+    isTrailArmed = false;
+  };
+
+  function activateTrailFromPointer(event) {
+    if (event.pointerType && event.pointerType !== 'mouse') return;
+
+    disarmTrail();
+    if (!shouldRun()) return;
+
+    enableTrail();
+    rememberPoint(event);
+  }
+
+  const armTrail = () => {
+    if (canvas || isTrailArmed || !shouldRun()) return;
+
+    isTrailArmed = true;
+    window.addEventListener('pointermove', activateTrailFromPointer, { passive: true });
+  };
+
   const enableTrail = () => {
     if (canvas || !shouldRun()) return;
+
+    disarmTrail();
 
     canvas = document.createElement('canvas');
     canvas.className = 'cursor-trail-canvas';
@@ -496,6 +523,7 @@
   };
 
   const disableTrail = () => {
+    disarmTrail();
     if (!canvas) return;
 
     window.removeEventListener('pointermove', rememberPoint);
@@ -520,7 +548,7 @@
 
   const syncTrail = () => {
     if (shouldRun()) {
-      enableTrail();
+      armTrail();
     } else {
       disableTrail();
     }

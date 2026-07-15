@@ -226,12 +226,12 @@ test('mobile menu and service panel preserve state, Escape, and focus return', a
   await expect.poll(() => serviceToggle.evaluate((element) => getComputedStyle(element).outlineStyle)).not.toBe('none');
 });
 
-test('menu surfaces share one live matte material without redundant shader canvases', async ({ page }) => {
+test('menu surfaces share one stable matte material without loading the Water experiment', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/?lang=ru');
 
-  await expect(page.locator('[data-water-surface]')).toHaveCount(0);
-  await expect(page.locator('script[src*="water-material"]')).toHaveCount(0);
+  await expect(page.locator('[data-water-surface], [data-water-controls]')).toHaveCount(0);
+  await expect(page.locator('script[src*="material.js"], script[src*="water-runtime"]')).toHaveCount(0);
   await expect(page.locator('canvas:not(.cursor-trail-canvas)')).toHaveCount(0);
 
   const materialState = await page.evaluate(() => {
@@ -289,12 +289,22 @@ test('daylight widget expands the service material and keeps theme modes accessi
   expect(daylightHandoff.depthClip).toContain('inset');
   await expect(widget).toHaveAttribute('aria-hidden', 'false');
   await expect(widget).toBeVisible();
+  await expect(widget.locator('.daylight-widget__all-settings')).toHaveCount(0);
   await expect(widget.locator('time')).toHaveCount(3);
   await expect(widget.locator('[data-empathy-panel]')).toBeVisible();
   await widget.locator('[data-empathy-answer="skip"]').click();
   await expect(widget.locator('[data-empathy-feedback]')).toBeVisible();
   await widget.locator('[data-empathy-show-settings]').click();
+  const siteSettings = page.locator('[data-site-settings]');
+  await expect(siteSettings).toHaveClass(/is-open/);
+  await expect(siteSettings).toHaveAttribute('aria-hidden', 'false');
+  await siteSettings.locator('.site-settings__close').click();
+  await expect(siteSettings).toBeHidden();
+  await expect(serviceToggle).toHaveAttribute('aria-expanded', 'false');
+  await serviceToggle.click();
+  await daylightToggle.click();
   await expect(widget.locator('[data-empathy-panel]')).toBeHidden();
+  await expect(widget.locator('[data-empathy-settings]')).not.toHaveAttribute('inert', '');
   await page.waitForTimeout(900);
 
   const expandedGeometry = await serviceRoot.evaluate((element) => {
@@ -470,8 +480,12 @@ test('daily empathy check-in stays local and exposes reversible motion adaptatio
   const panel = widget.locator('[data-empathy-panel]');
   await expect(panel).toBeVisible();
   await expect(widget.locator('[data-empathy-settings]')).toHaveAttribute('inert', '');
-  await expect(panel.locator('[data-empathy-question]')).toHaveText('Как вы сегодня?');
-  await expect(panel.locator('[data-empathy-privacy]')).toContainText('этом устройстве');
+  expect([
+    'Как вы сегодня?',
+    'Какой у вас сегодня внутренний ритм?',
+    'Что вы замечаете в своём состоянии сегодня?'
+  ]).toContain(await panel.locator('[data-empathy-question]').textContent());
+  await expect(panel.locator('[data-empathy-storage-confirmation]')).toBeHidden();
 
   const questionGeometry = async () => panel.locator('[data-empathy-question-state]').evaluate((element) => {
     const rect = element.getBoundingClientRect();
@@ -492,7 +506,8 @@ test('daily empathy check-in stays local and exposes reversible motion adaptatio
   });
   const ruQuestionGeometry = await questionGeometry();
   expect(ruQuestionGeometry.questionFont).toContain('Arial');
-  expect(ruQuestionGeometry.bottomGap).toBeGreaterThanOrEqual(11);
+  expect(ruQuestionGeometry.bottomGap).toBeGreaterThanOrEqual(-0.5);
+  expect(ruQuestionGeometry.bottomGap).toBeLessThanOrEqual(1);
   await page.locator('[data-mobile-service-panel] [data-language-option="en"]').click();
   const enQuestionGeometry = await questionGeometry();
   await page.locator('[data-mobile-service-panel] [data-language-option="ja"]').click();
@@ -511,6 +526,8 @@ test('daily empathy check-in stays local and exposes reversible motion adaptatio
   await expect(panel.locator('[data-empathy-question-state]')).toBeHidden();
   await expect(panel.locator('[data-empathy-feedback]')).toBeVisible();
   await expect(panel.locator('[data-empathy-feedback-text]')).toContainText('движение спокойнее');
+  await expect(panel.locator('[data-empathy-storage-confirmation]')).toHaveText('Ответ сохранён только на этом устройстве.');
+  await expect(panel.locator('[data-empathy-storage-confirmation]')).toBeVisible();
   await expect.poll(() => panel.locator('[data-empathy-feedback-text]').evaluate((element) => (
     getComputedStyle(element).fontFamily
   ))).toContain('Arial');
@@ -561,11 +578,13 @@ test('daily empathy check-in stays local and exposes reversible motion adaptatio
 
   await panel.locator('[data-empathy-undo]').click();
   await expect(page.locator('html')).toHaveAttribute('data-effective-motion', 'full');
-  await expect(panel.locator('[data-empathy-feedback-text]')).toContainText('системный ритм');
+  await expect(panel.locator('[data-empathy-feedback-text]')).toContainText('прежние настройки');
   await panel.locator('[data-empathy-show-settings]').click();
   await expect(panel).toBeHidden();
   await expect(widget.locator('[data-empathy-settings]')).not.toHaveAttribute('inert', '');
-  await expect(widget.locator('[data-theme-mode="auto"]')).toBeFocused();
+  const siteSettings = page.locator('[data-site-settings]');
+  await expect(siteSettings).toHaveClass(/is-open/);
+  await expect(siteSettings.locator('[data-site-settings-panel]')).toBeFocused();
 
   await page.evaluate(() => {
     const daylight = document.querySelector('[data-daylight-widget]');
@@ -582,9 +601,145 @@ test('motion preference is available on desktop and shares one state', async ({ 
   await page.setViewportSize({ width: 1280, height: 800 });
   await page.goto('/?lang=ru');
 
-  const desktopGroup = page.locator('.footer-motion-panel');
+  const settingsButton = page.locator('.nav-settings-toggle');
+  await expect(settingsButton).toBeVisible();
+  await expect(settingsButton).toHaveText('Настройки сайта');
+  await settingsButton.click();
+
+  const siteSettings = page.locator('[data-site-settings]');
+  await expect(siteSettings).toHaveClass(/is-open/);
+  await siteSettings.locator('[data-site-settings-panel]').evaluate(async (panel) => {
+    await Promise.all(panel.getAnimations().map((animation) => animation.finished));
+  });
+  const settingsMaterial = await siteSettings.locator('[data-site-settings-panel]').evaluate((panel) => {
+    const style = getComputedStyle(panel);
+    return {
+      backgroundImage: style.backgroundImage,
+      backdropFilter: style.backdropFilter || style.webkitBackdropFilter,
+    };
+  });
+  expect(settingsMaterial.backgroundImage).toBe('none');
+  expect(settingsMaterial.backdropFilter).toContain('blur');
+  await expect(siteSettings.locator('[data-settings-today]')).toBeVisible();
+  await expect(siteSettings.locator('[data-settings-eyebrow]')).toHaveCount(0);
+  await expect(siteSettings.locator('[data-settings-weather-status]')).toHaveText('Ясно');
+  await expect(siteSettings.locator('[data-settings-weather-temperature]')).toHaveText('13\u202F°C');
+  await expect(siteSettings.locator('[data-empathy-question]')).toBeVisible();
+
+  const daylightChart = siteSettings.locator('[data-settings-daylight-chart]');
+  await expect(daylightChart).toBeVisible();
+  await expect(daylightChart.locator('[data-settings-daylight-sunrise]')).not.toHaveText('—:—');
+  await expect(daylightChart.locator('[data-settings-daylight-sunset]')).not.toHaveText('—:—');
+  const daylightGeometry = await daylightChart.evaluate((element) => {
+    const svg = element.querySelector('svg');
+    const paths = Array.from(svg.querySelectorAll('path'));
+    const marker = element.querySelector('[data-settings-daylight-marker]');
+    const box = svg.getBoundingClientRect();
+    const markerBox = marker.getBoundingClientRect();
+    const toScreenX = (path, point) => {
+      const matrix = path.getScreenCTM();
+      return new DOMPoint(point.x, point.y).matrixTransform(matrix).x;
+    };
+    return {
+      svgHeight: box.height,
+      markerWidth: markerBox.width,
+      markerHeight: markerBox.height,
+      edges: paths.map((path) => {
+        const length = path.getTotalLength();
+        return {
+          leftInset: Math.abs(toScreenX(path, path.getPointAtLength(0)) - box.left),
+          rightInset: Math.abs(box.right - toScreenX(path, path.getPointAtLength(length))),
+        };
+      }),
+    };
+  });
+  expect(daylightGeometry.svgHeight).toBeGreaterThan(100);
+  expect(Math.abs(daylightGeometry.markerWidth - daylightGeometry.markerHeight)).toBeLessThanOrEqual(0.5);
+  daylightGeometry.edges.forEach(({ leftInset, rightInset }) => {
+    expect(leftInset).toBeLessThanOrEqual(1.5);
+    expect(rightInset).toBeLessThanOrEqual(1.5);
+  });
+
+  const closeButton = siteSettings.locator('.site-settings__close');
+  const closeResting = await closeButton.evaluate((element) => {
+    const style = getComputedStyle(element);
+    const rect = element.getBoundingClientRect();
+    return {
+      background: style.backgroundColor,
+      border: style.borderTopColor,
+      width: rect.width,
+      height: rect.height,
+    };
+  });
+  expect(closeResting.width).toBeGreaterThanOrEqual(44);
+  expect(closeResting.height).toBeGreaterThanOrEqual(44);
+  await closeButton.hover();
+  const closeHoverState = () => closeButton.evaluate((element) => {
+    const style = getComputedStyle(element);
+    return { background: style.backgroundColor, border: style.borderTopColor };
+  });
+  await expect.poll(async () => (await closeHoverState()).background).not.toBe(closeResting.background);
+  await expect.poll(async () => (await closeHoverState()).border).not.toBe(closeResting.border);
+  const closeHovered = await closeHoverState();
+  expect(closeHovered.background).not.toBe(closeResting.background);
+  expect(closeHovered.border).not.toBe(closeResting.border);
+  await page.mouse.down();
+  await expect.poll(() => closeButton.evaluate((element) => getComputedStyle(element).transform)).not.toBe('none');
+  await page.mouse.move(0, 0);
+  await page.mouse.up();
+  await expect(siteSettings).toHaveClass(/is-open/);
+  await siteSettings.locator('[data-site-settings-panel]').focus();
+  await page.keyboard.press('Tab');
+  await expect(closeButton).toBeFocused();
+  const closeFocused = await closeButton.evaluate((element) => getComputedStyle(element).boxShadow);
+  expect(closeFocused).not.toBe('none');
+
+  const settingsLanguages = siteSettings.locator('.site-settings__segmented--language');
+  await expect(settingsLanguages).toBeVisible();
+  await expect(settingsLanguages.locator('[data-language-option="ru"]')).toHaveAttribute('aria-pressed', 'true');
+  const questionIndex = [
+    'Как вы сегодня?',
+    'Какой у вас сегодня внутренний ритм?',
+    'Что вы замечаете в своём состоянии сегодня?',
+  ].indexOf(await siteSettings.locator('[data-empathy-question]').innerText());
+  expect(questionIndex).toBeGreaterThanOrEqual(0);
+  await settingsLanguages.locator('[data-language-option="en"]').click();
+  await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+  await expect(siteSettings.locator('[data-settings-language-title]')).toHaveText('Language');
+  await expect(siteSettings.locator('[data-empathy-question]')).toHaveText([
+    'How are you today?',
+    'What is your inner rhythm today?',
+    'What do you notice about how you feel today?',
+  ][questionIndex]);
+  await settingsLanguages.locator('[data-language-option="ja"]').click();
+  await expect(page.locator('html')).toHaveAttribute('lang', 'ja');
+  await expect(siteSettings.locator('[data-settings-language-title]')).toHaveText('言語');
+  await expect(siteSettings.locator('[data-empathy-question]')).toHaveText([
+    '今日はどんな調子ですか？',
+    '今日の心のリズムはどんな感じですか？',
+    '今日の自分の状態に何を感じますか？',
+  ][questionIndex]);
+  await settingsLanguages.locator('[data-language-option="ru"]').click();
+  await expect(page.locator('html')).toHaveAttribute('lang', 'ru');
+
+  const answerAlignment = await siteSettings.locator('[data-empathy-answer]').evaluateAll((buttons) => (
+    buttons.map((button) => {
+      const style = getComputedStyle(button);
+      return {
+        display: style.display,
+        placeItems: style.placeItems,
+        textAlign: style.textAlign,
+      };
+    })
+  ));
+  answerAlignment.forEach((alignment) => {
+    expect(alignment.display).toBe('grid');
+    expect(alignment.placeItems).toBe('center start');
+    expect(['left', 'start']).toContain(alignment.textAlign);
+  });
+
+  const desktopGroup = siteSettings.locator('[data-motion-mode-group]');
   const calm = desktopGroup.locator('[data-motion-mode="calm"]');
-  await desktopGroup.scrollIntoViewIfNeeded();
   await expect(desktopGroup).toBeVisible();
   await expect(calm).toHaveText('Спокойный');
   await calm.click();
@@ -592,6 +747,9 @@ test('motion preference is available on desktop and shares one state', async ({ 
   await expect(page.locator('html')).toHaveAttribute('data-motion-preference', 'calm');
   await expect(calm).toHaveAttribute('aria-pressed', 'true');
   await expect(page.locator('[data-daylight-widget] [data-motion-mode="calm"]')).toHaveAttribute('aria-pressed', 'true');
+  await siteSettings.locator('[data-settings-close]').last().click();
+  await expect(siteSettings).toBeHidden();
+  await expect(settingsButton).toBeFocused();
 
   const ctaAlignment = await page.locator('.site-footer__cta').evaluate((element) => {
     const label = element.querySelector('[data-footer-cta-label]').getBoundingClientRect();
@@ -615,47 +773,64 @@ test('motion preference is available on desktop and shares one state', async ({ 
   expect(footerGeometry.scrollHeight).toBeLessThanOrEqual(footerGeometry.viewportHeight + 1);
   expect(footerGeometry.routeDecorationCount).toBe(0);
 
-  const footerRows = await page.locator('.site-footer').evaluate((element) => ({
-    routes: element.querySelector('.site-footer__routes').getBoundingClientRect().height,
-    motion: element.querySelector('.site-footer__motion').getBoundingClientRect().height,
+  await expect(page.locator('.footer-motion-panel, .site-footer__motion, .site-footer__settings')).toHaveCount(0);
+  const settingsMetaGeometry = await settingsButton.evaluate((element) => ({
+    parentClass: element.parentElement?.className,
+    borderWidth: getComputedStyle(element).borderTopWidth,
+    width: element.getBoundingClientRect().width,
+    height: element.getBoundingClientRect().height,
   }));
-  expect(Math.abs(footerRows.routes - footerRows.motion)).toBeLessThanOrEqual(0.5);
+  expect(settingsMetaGeometry.parentClass).toContain('nav-service-panel');
+  expect(settingsMetaGeometry.borderWidth).toBe('0px');
+  expect(settingsMetaGeometry.width).toBeCloseTo(20, 0);
+  expect(settingsMetaGeometry.height).toBeCloseTo(20, 0);
+
+  const serviceGeometry = await page.locator('.nav-service-panel').evaluate((element) => {
+    const panel = element.getBoundingClientRect();
+    const theme = element.querySelector('[data-theme-toggle]').getBoundingClientRect();
+    const settings = element.querySelector('[data-settings-open]').getBoundingClientRect();
+    const themeStroke = parseFloat(getComputedStyle(element.querySelector('.theme-toggle__icon')).borderTopWidth);
+    const settingsStroke = parseFloat(getComputedStyle(element.querySelector('.nav-settings-toggle svg')).strokeWidth);
+    return {
+      themeContained: theme.left >= panel.left && theme.right <= panel.right,
+      settingsContained: settings.left >= panel.left && settings.right <= panel.right,
+      gap: settings.left - theme.right,
+      rightInset: panel.right - settings.right,
+      centerDelta: Math.abs((theme.top + theme.height / 2) - (settings.top + settings.height / 2)),
+      strokeDelta: Math.abs(themeStroke - settingsStroke),
+    };
+  });
+  expect(serviceGeometry.themeContained).toBe(true);
+  expect(serviceGeometry.settingsContained).toBe(true);
+  expect(serviceGeometry.gap).toBeGreaterThanOrEqual(3);
+  expect(serviceGeometry.gap).toBeLessThanOrEqual(10);
+  expect(serviceGeometry.rightInset).toBeGreaterThanOrEqual(10);
+  expect(serviceGeometry.centerDelta).toBeLessThanOrEqual(1);
+  expect(serviceGeometry.strokeDelta).toBeLessThanOrEqual(0.5);
 
   const firstRoute = page.locator('[data-footer-route]').first();
-  const routeBackground = async () => firstRoute.evaluate((element) => getComputedStyle(element).backgroundColor);
-  const routeBackgroundDefault = await routeBackground();
+  const routeState = async () => firstRoute.evaluate((element) => ({
+    background: getComputedStyle(element).backgroundColor,
+    border: getComputedStyle(element).borderBottomColor,
+    labelTransform: getComputedStyle(element.querySelector('span')).transform,
+  }));
+  const routeDefault = await routeState();
   await firstRoute.hover();
-  await expect.poll(routeBackground).not.toBe(routeBackgroundDefault);
+  await expect.poll(async () => (await routeState()).border).not.toBe(routeDefault.border);
+  const routeHover = await routeState();
+  expect(routeHover.background).toBe(routeDefault.background);
+  expect(routeHover.labelTransform).not.toBe(routeDefault.labelTransform);
 
-  const systemMotion = desktopGroup.locator('[data-motion-mode="system"]');
-  const motionColor = async () => systemMotion.evaluate((element) => getComputedStyle(element).color);
-  const motionColorDefault = await motionColor();
-  await systemMotion.hover();
-  await expect.poll(motionColor).not.toBe(motionColorDefault);
-  await page.mouse.down();
-  await expect.poll(() => systemMotion.evaluate((element) => getComputedStyle(element).transform)).not.toBe('none');
-  await page.mouse.up();
+  const settingsColor = async () => settingsButton.evaluate((element) => getComputedStyle(element).color);
+  const settingsColorDefault = await settingsColor();
+  await settingsButton.hover();
+  await expect.poll(settingsColor).not.toBe(settingsColorDefault);
 
   const footerMetaLink = page.locator('.site-footer__privacy');
   await footerMetaLink.focus();
   await page.keyboard.press('Tab');
   await page.keyboard.press('Shift+Tab');
   await expect.poll(() => footerMetaLink.evaluate((element) => getComputedStyle(element).boxShadow)).not.toBe('none');
-
-  const motionAlignment = await page.locator('.site-footer__motion').evaluate((element) => {
-    const label = element.querySelector('[data-motion-label]').getBoundingClientRect();
-    const control = element.querySelector('.footer-motion-panel').getBoundingClientRect();
-    const routes = document.querySelector('.site-footer__routes').getBoundingClientRect();
-    return {
-      labelLeft: Math.abs(label.left - routes.left),
-      rowRight: Math.abs(element.getBoundingClientRect().right - routes.right),
-      labelControlGap: control.left - label.right,
-    };
-  });
-  expect(motionAlignment.labelLeft).toBeLessThanOrEqual(1);
-  expect(motionAlignment.rowRight).toBeLessThanOrEqual(1);
-  expect(motionAlignment.labelControlGap).toBeGreaterThanOrEqual(12);
-  expect(motionAlignment.labelControlGap).toBeLessThanOrEqual(20);
 
   const desktopLensMaterial = await page.locator('.main-nav').evaluate((element) => {
     const style = getComputedStyle(element, '::after');
@@ -795,8 +970,18 @@ test('artist names remain headings with one keyboard trigger each', async ({ pag
   });
   expect(trackGeometry.radius).toBeGreaterThanOrEqual(trackGeometry.height / 2);
   expect(trackGeometry.clip).toContain('round 999px');
+  const cloudView = page.locator('[data-artists-view-option="cloud"]');
   const listView = page.locator('[data-artists-view-option="list"]');
-  await listView.click();
+  await cloudView.focus();
+  await page.keyboard.press('ArrowRight');
+  await expect(listView).toBeFocused();
+  await expect(listView).toHaveAttribute('aria-pressed', 'true');
+  await page.keyboard.press('Home');
+  await expect(cloudView).toBeFocused();
+  await expect(cloudView).toHaveAttribute('aria-pressed', 'true');
+  await page.keyboard.press('End');
+  await expect(listView).toBeFocused();
+  await expect(listView).toHaveAttribute('aria-pressed', 'true');
   await expect.poll(() => viewSwitch.evaluate((element) => (
     element.style.getPropertyValue('--artists-view-index')
   ))).toBe('1');

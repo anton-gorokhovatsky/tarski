@@ -15,6 +15,11 @@ Static GitHub Pages site for Tarski.
 - `.nojekyll` — keeps GitHub Pages from running Jekyll over the site.
 - `tools/check-media-assets.mjs` — lightweight media-size guard for new images.
 - `tests/site.spec.mjs` — Playwright regression checks for locales, reflow, menu focus and gallery loading.
+- `tests/accessibility.spec.mjs` — semantic, keyboard, reflow, reduced-motion and localized-copy checks.
+- `tests/empathy.spec.mjs` — daily empathy question, persistence, adaptation and geometry checks.
+- `tests/performance.spec.mjs` — critical byte budget, deferred media and lazy trail allocation checks.
+- `tests/visual.spec.mjs` — visual state matrix for mobile and desktop across themes and locales.
+- `docs/` — UI-system, release, empathy and performance rules.
 
 The site supports Russian, English and Japanese versions, automatic light/dark theme selection via `prefers-color-scheme`, and a manual theme switcher.
 
@@ -31,6 +36,8 @@ pnpm test
 ```
 
 The test suite starts its own local server and checks all three languages at 320 px, the localized privacy page, mobile menu and service-panel focus return, artist-card semantics, and responsive lazy gallery loading.
+
+See `docs/release-checklist.md` before publishing visual or copy changes. Automated checks are followed by matched visual comparisons and a manual accessibility pass.
 
 ## Media hygiene
 

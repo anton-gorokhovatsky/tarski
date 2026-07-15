@@ -11,6 +11,13 @@
   const sunriseLabel = widget?.querySelector('[data-daylight-sunrise]');
   const sunsetLabel = widget?.querySelector('[data-daylight-sunset]');
   const temperatureLabel = widget?.querySelector('[data-weather-temperature]');
+  const settingsWeatherStatus = document.querySelector('[data-settings-weather-status]');
+  const settingsTemperatureLabel = document.querySelector('[data-settings-weather-temperature]');
+  const settingsDaylightChart = document.querySelector('[data-settings-daylight-chart]');
+  const settingsMarker = document.querySelector('[data-settings-daylight-marker]');
+  const settingsMarkerHalo = document.querySelector('[data-settings-daylight-marker-halo]');
+  const settingsSunriseLabel = document.querySelector('[data-settings-daylight-sunrise]');
+  const settingsSunsetLabel = document.querySelector('[data-settings-daylight-sunset]');
   const launchers = Array.from(document.querySelectorAll('[data-daylight-launcher]'));
 
   if (!widget || !toggle || !service || !serviceToggle || !menu || !marker || !markerHalo || !temperatureLabel) return;
@@ -30,6 +37,7 @@
       : formatted;
   };
   const renderTime = (element, date, timeZone) => {
+    if (!element) return;
     const value = formatTime(date, timeZone);
     element.textContent = value;
     element.setAttribute('aria-label', value);
@@ -70,14 +78,26 @@
     if (!cachedWeather) {
       status.textContent = fallbackStatus;
       temperatureLabel.textContent = '—\u202F°C';
+      if (settingsWeatherStatus) {
+        settingsWeatherStatus.textContent = getLabel('ui.settings.weatherLoading', 'Погода загружается…');
+        delete settingsWeatherStatus.dataset.weatherKey;
+      }
+      if (settingsTemperatureLabel) settingsTemperatureLabel.textContent = '—\u202F°C';
       delete widget.dataset.weatherKey;
       delete widget.dataset.weatherTemperature;
       return;
     }
 
     const weatherKey = getWeatherKey(cachedWeather.code);
-    status.textContent = getLabel(`ui.weather.${weatherKey}`, weatherFallbacks[weatherKey]);
-    temperatureLabel.textContent = `${Math.round(cachedWeather.temperature)}\u202F°C`;
+    const weatherLabel = getLabel(`ui.weather.${weatherKey}`, weatherFallbacks[weatherKey]);
+    const temperature = `${Math.round(cachedWeather.temperature)}\u202F°C`;
+    status.textContent = weatherLabel;
+    temperatureLabel.textContent = temperature;
+    if (settingsWeatherStatus) {
+      settingsWeatherStatus.textContent = weatherLabel;
+      settingsWeatherStatus.dataset.weatherKey = weatherKey;
+    }
+    if (settingsTemperatureLabel) settingsTemperatureLabel.textContent = temperature;
     widget.dataset.weatherKey = weatherKey;
     widget.dataset.weatherTemperature = String(cachedWeather.temperature);
     window.dispatchEvent(new CustomEvent('tarski:weatherchange', {
@@ -130,10 +150,16 @@
     const markerX = 6 + (220 * progress);
     const markerY = 46.5 - (39.5 * Math.sin(Math.PI * progress));
 
-    marker.setAttribute('cx', markerX.toFixed(2));
-    marker.setAttribute('cy', markerY.toFixed(2));
-    markerHalo.setAttribute('cx', markerX.toFixed(2));
-    markerHalo.setAttribute('cy', markerY.toFixed(2));
+    [marker, settingsMarker].forEach((target) => {
+      if (!target) return;
+      target.setAttribute('cx', markerX.toFixed(2));
+      target.setAttribute('cy', markerY.toFixed(2));
+    });
+    [markerHalo, settingsMarkerHalo].forEach((target) => {
+      if (!target) return;
+      target.setAttribute('cx', markerX.toFixed(2));
+      target.setAttribute('cy', markerY.toFixed(2));
+    });
   };
 
   const animateMarker = (targetProgress) => {
@@ -147,8 +173,10 @@
     const startedAt = performance.now();
     const duration = 820;
     widget.classList.remove('is-marker-arriving');
+    settingsDaylightChart?.classList.remove('is-marker-arriving');
     widget.getBoundingClientRect();
     widget.classList.add('is-marker-arriving');
+    settingsDaylightChart?.classList.add('is-marker-arriving');
 
     const tick = (now) => {
       const elapsed = Math.min(1, (now - startedAt) / duration);
@@ -160,6 +188,7 @@
       } else {
         markerFrame = null;
         widget.classList.remove('is-marker-arriving');
+        settingsDaylightChart?.classList.remove('is-marker-arriving');
       }
     };
 
@@ -193,6 +222,10 @@
     sunriseLabel.setAttribute('datetime', daylight.sunrise.toISOString());
     renderTime(sunsetLabel, daylight.sunset, daylight.timeZone);
     sunsetLabel.setAttribute('datetime', daylight.sunset.toISOString());
+    renderTime(settingsSunriseLabel, daylight.sunrise, daylight.timeZone);
+    settingsSunriseLabel?.setAttribute('datetime', daylight.sunrise.toISOString());
+    renderTime(settingsSunsetLabel, daylight.sunset, daylight.timeZone);
+    settingsSunsetLabel?.setAttribute('datetime', daylight.sunset.toISOString());
     widget.dataset.phase = daylight.isDay ? 'day' : 'night';
   };
 
@@ -302,4 +335,11 @@
   syncWidget();
   syncToggleLabel();
   setOpen(false);
+
+  window.tarskiDaylight = {
+    refresh: (options = {}) => {
+      syncWidget(options);
+      return loadWeather();
+    }
+  };
 })();

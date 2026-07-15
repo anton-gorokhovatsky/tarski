@@ -68,9 +68,30 @@
         motionMode: 'Интенсивность движения',
         motionSystem: 'Системный',
         motionCalm: 'Спокойный',
+        settings: {
+          open: 'Настройки сайта',
+          openAll: 'Все настройки',
+          close: 'Закрыть настройки',
+          title: 'Настройки сайта',
+          intro: 'Выберите, как сайт будет отвечать вам.',
+          todayTitle: 'Сегодня',
+          weatherLoading: 'Погода загружается…',
+          daylightChartLabel: 'График светового дня',
+          languageTitle: 'Язык',
+          languageNote: 'Выбрать язык интерфейса.',
+          themeTitle: 'Тема',
+          themeNote: 'Следовать световому дню или выбрать вручную.',
+          motionTitle: 'Движение',
+          motionNote: 'Обычный ритм или более спокойные переходы.'
+        },
         empathy: {
           question: 'Как вы сегодня?',
-          privacy: 'Ответ останется только на этом устройстве.',
+          questions: [
+            'Как вы сегодня?',
+            'Какой у вас сегодня внутренний ритм?',
+            'Что вы замечаете в своём состоянии сегодня?'
+          ],
+          saved: 'Ответ сохранён только на этом устройстве.',
           optionsLabel: 'Самочувствие сегодня',
           options: {
             calm: 'Спокойно',
@@ -83,11 +104,11 @@
             calm: 'Спасибо. Оставляем обычный ритм.',
             tired: 'Спасибо. Сделали движение спокойнее.',
             tense: 'Спасибо. Сделали движение спокойнее.',
-            curious: 'Спасибо. Исследуйте в своем ритме.',
+            curious: 'Спасибо. Исследуйте в своём ритме.',
             skip: 'Хорошо. Ничего не меняем.',
-            restored: 'Вернули системный ритм.'
+            restored: 'Вернули ваши прежние настройки.'
           },
-          undo: 'Вернуть ритм',
+          undo: 'Вернуть',
           settings: 'К настройкам'
         },
         footerParticipation: {
@@ -201,9 +222,30 @@
         motionMode: 'Motion intensity',
         motionSystem: 'System',
         motionCalm: 'Calm',
+        settings: {
+          open: 'Site settings',
+          openAll: 'All settings',
+          close: 'Close settings',
+          title: 'Site settings',
+          intro: 'Choose how the site responds to you.',
+          todayTitle: 'Today',
+          weatherLoading: 'Loading weather…',
+          daylightChartLabel: 'Daylight curve',
+          languageTitle: 'Language',
+          languageNote: 'Choose the interface language.',
+          themeTitle: 'Theme',
+          themeNote: 'Follow daylight or choose a theme yourself.',
+          motionTitle: 'Motion',
+          motionNote: 'The usual rhythm or calmer transitions.'
+        },
         empathy: {
           question: 'How are you today?',
-          privacy: 'Your answer stays on this device.',
+          questions: [
+            'How are you today?',
+            'What is your inner rhythm today?',
+            'What do you notice about how you feel today?'
+          ],
+          saved: 'Your answer is saved only on this device.',
           optionsLabel: 'How you feel today',
           options: {
             calm: 'Calm',
@@ -218,9 +260,9 @@
             tense: 'Thank you. We made the motion calmer.',
             curious: 'Thank you. Explore at your own pace.',
             skip: 'All right. Nothing will change.',
-            restored: 'The system rhythm is back.'
+            restored: 'Your previous settings are back.'
           },
-          undo: 'Restore rhythm',
+          undo: 'Restore',
           settings: 'Open settings'
         },
         footerParticipation: {
@@ -432,9 +474,30 @@
         motionMode: 'モーションの強さ',
         motionSystem: 'システム',
         motionCalm: '穏やか',
+        settings: {
+          open: 'サイト設定',
+          openAll: 'すべての設定',
+          close: '設定を閉じる',
+          title: 'サイト設定',
+          intro: 'サイトがどのように応答するかを選べます。',
+          todayTitle: '今日',
+          weatherLoading: '天気を読み込んでいます…',
+          daylightChartLabel: '日照時間のグラフ',
+          languageTitle: '言語',
+          languageNote: 'インターフェースの言語を選べます。',
+          themeTitle: 'テーマ',
+          themeNote: '日照時間に合わせるか、手動で選べます。',
+          motionTitle: '動き',
+          motionNote: '通常のリズム、または穏やかな切り替え。'
+        },
         empathy: {
           question: '今日はどんな調子ですか？',
-          privacy: '回答はこの端末にだけ残ります。',
+          questions: [
+            '今日はどんな調子ですか？',
+            '今日の心のリズムはどんな感じですか？',
+            '今日の自分の状態に何を感じますか？'
+          ],
+          saved: '回答はこの端末にのみ保存されました。',
           optionsLabel: '今日の調子',
           options: {
             calm: '穏やか',
@@ -449,7 +512,7 @@
             tense: 'ありがとうございます。動きを穏やかにしました。',
             curious: 'ありがとうございます。ご自分のペースで探索してください。',
             skip: 'わかりました。何も変えません。',
-            restored: 'システムのリズムに戻しました。'
+            restored: '以前の設定に戻しました。'
           },
           undo: '元に戻す',
           settings: '設定へ'
@@ -797,6 +860,11 @@
       setAttr(button, 'aria-label', data.ui.languageNames[language]);
       button.removeAttribute('title');
     });
+
+    const languageIndex = supportedLanguages.indexOf(currentLanguage);
+    document.querySelectorAll('.site-settings__segmented--language').forEach((switcher) => {
+      switcher.style.setProperty('--language-mode-index', String(Math.max(0, languageIndex)));
+    });
   };
 
   const setInterface = (data) => {
@@ -826,10 +894,12 @@
     setAttr(document.querySelector('[data-mobile-service-panel]'), 'aria-label', data.ui.serviceSettings);
     setAttr(document.querySelector('[data-daylight-widget]'), 'aria-label', data.ui.daylightWidget);
     setText(document.querySelector('[data-weather-credit]'), data.ui.weatherCredit);
-    setAttr(document.querySelector('[data-theme-mode-group]'), 'aria-label', data.ui.themeMode);
-    setText(document.querySelector('[data-theme-mode-group] [data-theme-mode="auto"]'), data.ui.themeAuto);
-    setText(document.querySelector('[data-theme-mode-group] [data-theme-mode="light"]'), data.ui.themeLightShort);
-    setText(document.querySelector('[data-theme-mode-group] [data-theme-mode="dark"]'), data.ui.themeDarkShort);
+    document.querySelectorAll('[data-theme-mode-group]').forEach((group) => {
+      setAttr(group, 'aria-label', data.ui.themeMode);
+    });
+    document.querySelectorAll('[data-theme-mode="auto"]').forEach((control) => setText(control, data.ui.themeAuto));
+    document.querySelectorAll('[data-theme-mode="light"]').forEach((control) => setText(control, data.ui.themeLightShort));
+    document.querySelectorAll('[data-theme-mode="dark"]').forEach((control) => setText(control, data.ui.themeDarkShort));
     document.querySelectorAll('[data-motion-label]').forEach((label) => {
       setText(label, data.ui.motionLabel);
     });
@@ -842,15 +912,48 @@
     document.querySelectorAll('[data-motion-mode="calm"]').forEach((control) => {
       setText(control, data.ui.motionCalm);
     });
+    const settings = data.ui.settings || {};
+    document.querySelectorAll('[data-settings-open-label]').forEach((label) => {
+      const isWidgetLabel = Boolean(label.closest('.daylight-widget'));
+      setText(label, isWidgetLabel ? settings.openAll : settings.open);
+    });
+    document.querySelectorAll('[data-settings-close]').forEach((control) => {
+      setAttr(control, 'aria-label', settings.close);
+      setAttr(control, 'title', settings.close);
+    });
+    setText(document.querySelector('[data-settings-title]'), settings.title);
+    setText(document.querySelector('[data-settings-intro]'), settings.intro);
+    setText(document.querySelector('[data-settings-today-title]'), settings.todayTitle);
+    setAttr(document.querySelector('[data-settings-daylight-chart]'), 'aria-label', settings.daylightChartLabel);
+    const settingsWeather = document.querySelector('[data-settings-weather-status]');
+    if (settingsWeather && !settingsWeather.dataset.weatherKey) {
+      setText(settingsWeather, settings.weatherLoading);
+    }
+    setText(document.querySelector('[data-settings-language-title]'), settings.languageTitle);
+    setText(document.querySelector('[data-settings-language-note]'), settings.languageNote);
+    setText(document.querySelector('[data-settings-theme-title]'), settings.themeTitle);
+    setText(document.querySelector('[data-settings-theme-note]'), settings.themeNote);
+    setText(document.querySelector('[data-settings-motion-title]'), settings.motionTitle);
+    setText(document.querySelector('[data-settings-motion-note]'), settings.motionNote);
     const empathy = data.ui.empathy || {};
-    setText(document.querySelector('[data-empathy-question]'), empathy.question);
-    setText(document.querySelector('[data-empathy-privacy]'), empathy.privacy);
-    setAttr(document.querySelector('[data-empathy-options]'), 'aria-label', empathy.optionsLabel);
+    document.querySelectorAll('[data-empathy-question]').forEach((node) => {
+      setText(node, empathy.question);
+    });
+    document.querySelectorAll('[data-empathy-storage-confirmation]').forEach((node) => {
+      setText(node, empathy.saved);
+    });
+    document.querySelectorAll('[data-empathy-options]').forEach((group) => {
+      setAttr(group, 'aria-label', empathy.optionsLabel);
+    });
     document.querySelectorAll('[data-empathy-answer]').forEach((control) => {
       setText(control, empathy.options?.[control.dataset.empathyAnswer]);
     });
-    setText(document.querySelector('[data-empathy-undo]'), empathy.undo);
-    setText(document.querySelector('[data-empathy-show-settings]'), empathy.settings);
+    document.querySelectorAll('[data-empathy-undo]').forEach((control) => {
+      setText(control, empathy.undo);
+    });
+    document.querySelectorAll('[data-empathy-show-settings]').forEach((control) => {
+      setText(control, empathy.settings);
+    });
     document.querySelectorAll('[data-daylight-toggle], [data-daylight-launcher]').forEach((toggle) => {
       const isOpen = toggle.getAttribute('aria-expanded') === 'true';
       const label = isOpen ? data.ui.themeSettingsClose : data.ui.themeSettingsOpen;
