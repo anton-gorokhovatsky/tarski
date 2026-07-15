@@ -3823,7 +3823,9 @@ html.has-open-dossier {
     --island-motion-panel-content-delay: 120ms;
     --island-motion-compact-return-delay: 120ms;
     --island-motion-handoff-duration: 260ms;
+    --island-motion-menu-content-out: 100ms;
     --island-motion-menu-compact-in-delay: 180ms;
+    --island-motion-menu-compact-content-in-delay: 240ms;
     --island-motion-menu-compact-in-duration: 240ms;
     --island-motion-menu-panel-out-delay: 100ms;
     --island-motion-menu-panel-out-duration: 360ms;
@@ -4146,13 +4148,13 @@ html.has-open-dossier {
     transition-delay: 100ms;
   }
 
-  .mobile-floating-menu.is-menu-closing .mobile-island-surface {
+  .mobile-floating-menu.is-menu-compacting .mobile-island-surface {
     opacity: 1;
     transition-duration: var(--island-motion-menu-compact-in-duration);
     transition-delay: var(--island-motion-menu-compact-in-delay);
   }
 
-  .mobile-floating-menu.is-menu-closing .mobile-island-depth {
+  .mobile-floating-menu.is-menu-compacting .mobile-island-depth {
     opacity: 1;
     transition-duration: 180ms;
     transition-delay: 320ms;
@@ -4474,15 +4476,15 @@ html.has-open-dossier {
   }
 
   @keyframes mobile-menu-label-close {
-    0%, 15% { opacity: 0; }
-    42%, 100% { opacity: 1; }
+    0%, 38% { opacity: 0; }
+    70%, 100% { opacity: 1; }
   }
 
   .mobile-floating-menu.is-menu-open .mobile-menu-toggle span {
     animation: mobile-menu-label-open var(--mobile-island-morph) var(--island-motion-ease) both;
   }
 
-  .mobile-floating-menu.is-menu-closing .mobile-menu-toggle span {
+  .mobile-floating-menu.is-menu-compacting .mobile-menu-toggle span {
     animation: mobile-menu-label-close var(--mobile-island-morph) var(--island-motion-ease) both;
   }
 
@@ -5541,7 +5543,7 @@ html.has-open-dossier {
     transition-delay: var(--island-motion-panel-content-delay);
   }
 
-  .mobile-floating-menu.is-menu-closing .mobile-menu-expanded {
+  .mobile-floating-menu.is-menu-compacting .mobile-menu-expanded {
     opacity: 0;
     -webkit-clip-path: inset(
       var(--mobile-menu-compact-top)
@@ -5561,13 +5563,13 @@ html.has-open-dossier {
     transition-delay: var(--island-motion-menu-panel-out-delay), 0ms;
   }
 
-  .mobile-floating-menu.is-menu-closing .mobile-menu-expanded-depth {
+  .mobile-floating-menu.is-menu-compacting .mobile-menu-expanded-depth {
     opacity: 0;
     transition-duration: 100ms;
     transition-delay: 0ms;
   }
 
-  .mobile-floating-menu.is-menu-closing .mobile-menu-expanded-depth::before {
+  .mobile-floating-menu.is-menu-compacting .mobile-menu-expanded-depth::before {
     -webkit-clip-path: inset(
       var(--mobile-menu-compact-top)
       var(--mobile-menu-compact-side)
@@ -5588,17 +5590,21 @@ html.has-open-dossier {
   .mobile-floating-menu.is-menu-closing .mobile-menu-expanded > * {
     opacity: 0;
     transition-delay: 0ms;
-    transition-duration: 220ms;
+    transition-duration: var(--island-motion-menu-content-out);
   }
 
-  .mobile-floating-menu.is-menu-closing .mobile-menu-toggle {
+  .mobile-floating-menu.is-menu-closing .mobile-menu-expanded {
+    pointer-events: none;
+  }
+
+  .mobile-floating-menu.is-menu-compacting .mobile-menu-toggle {
     z-index: 5;
     transition-delay: 0ms;
   }
 
-  .mobile-floating-menu.is-menu-closing .mobile-mail-pill,
-  .mobile-floating-menu.is-menu-closing .mobile-service {
-    transition-delay: var(--island-motion-menu-compact-in-delay);
+  .mobile-floating-menu.is-menu-compacting .mobile-mail-pill,
+  .mobile-floating-menu.is-menu-compacting .mobile-service {
+    transition-delay: var(--island-motion-menu-compact-content-in-delay);
   }
 
   .mobile-menu-expanded:focus {
