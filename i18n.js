@@ -108,8 +108,7 @@
             skip: 'Хорошо. Ничего не меняем.',
             restored: 'Вернули ваши прежние настройки.'
           },
-          undo: 'Вернуть',
-          settings: 'К настройкам'
+          undo: 'Вернуть'
         },
         footerParticipation: {
           eyebrow: 'участие',
@@ -262,8 +261,7 @@
             skip: 'All right. Nothing will change.',
             restored: 'Your previous settings are back.'
           },
-          undo: 'Restore',
-          settings: 'Open settings'
+          undo: 'Restore'
         },
         footerParticipation: {
           eyebrow: 'participation',
@@ -514,8 +512,7 @@
             skip: 'わかりました。何も変えません。',
             restored: '以前の設定に戻しました。'
           },
-          undo: '元に戻す',
-          settings: '設定へ'
+          undo: '元に戻す'
         },
         footerParticipation: {
           eyebrow: '参加',
@@ -950,9 +947,6 @@
     });
     document.querySelectorAll('[data-empathy-undo]').forEach((control) => {
       setText(control, empathy.undo);
-    });
-    document.querySelectorAll('[data-empathy-show-settings]').forEach((control) => {
-      setText(control, empathy.settings);
     });
     document.querySelectorAll('[data-daylight-toggle], [data-daylight-launcher]').forEach((toggle) => {
       const isOpen = toggle.getAttribute('aria-expanded') === 'true';

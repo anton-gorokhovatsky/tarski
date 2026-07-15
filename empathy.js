@@ -19,7 +19,7 @@
     feedbackText: root.querySelector('[data-empathy-feedback-text]'),
     storageConfirmation: root.querySelector('[data-empathy-storage-confirmation]'),
     undo: root.querySelector('[data-empathy-undo]'),
-    showSettings: root.querySelector('[data-empathy-show-settings]'),
+    actions: root.querySelector('[data-empathy-actions]'),
     answers: Array.from(root.querySelectorAll('[data-empathy-answer]'))
   })).filter((surface) => (
     surface.question
@@ -118,13 +118,14 @@
     }
 
     const isPanelVisible = isQuestion || isFeedback;
+    const areSettingsVisible = !isQuestion;
     widget.classList.toggle('is-empathy-question', isQuestion);
     widget.classList.toggle('is-empathy-feedback', isFeedback);
     surface.root.hidden = !isPanelVisible;
     surface.root.setAttribute('aria-hidden', String(!isPanelVisible));
-    mobileSettings.setAttribute('aria-hidden', String(isPanelVisible));
+    mobileSettings.setAttribute('aria-hidden', String(!areSettingsVisible));
     surface.root.inert = !isPanelVisible;
-    mobileSettings.inert = isPanelVisible;
+    mobileSettings.inert = !areSettingsVisible;
   };
 
   const syncFeedback = () => {
@@ -162,12 +163,12 @@
     feedbackPersisted = persisted;
     surfaces.forEach((surface) => {
       surface.undo.hidden = !motionAdapted;
+      if (surface.actions) surface.actions.hidden = !motionAdapted;
       setSurfaceState(surface, 'feedback');
     });
     syncFeedback();
 
-    const target = originSurface?.showSettings
-      || (!originSurface?.undo?.hidden ? originSurface?.undo : originSurface?.feedback);
+    const target = originSurface?.feedback;
     window.requestAnimationFrame(() => target?.focus?.({ preventScroll: true }));
   };
 
@@ -195,6 +196,7 @@
       feedbackPersisted = false;
       surfaces.forEach((item) => {
         item.undo.hidden = true;
+        if (item.actions) item.actions.hidden = true;
       });
       writeRecord({
         date: getToday(),
@@ -205,12 +207,6 @@
       surface.feedback.focus({ preventScroll: true });
     });
 
-    surface.showSettings?.addEventListener('click', () => {
-      setSurfaceState(surface, 'settings');
-      window.dispatchEvent(new CustomEvent('tarski:settingsrequest', {
-        detail: { trigger: surface.showSettings }
-      }));
-    });
   });
 
   window.addEventListener('tarski:weatherchange', syncWeatherCare);
@@ -228,6 +224,7 @@
     window.tarskiMotion?.setOverride(record.motionAdapted ? 'calm' : null);
     surfaces.forEach((surface) => {
       surface.undo.hidden = !record.motionAdapted;
+      if (surface.actions) surface.actions.hidden = true;
       setSurfaceState(surface, surface.isMobile ? 'settings' : 'feedback');
     });
     syncFeedback();
