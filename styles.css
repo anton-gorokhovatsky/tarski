@@ -1410,7 +1410,9 @@ li::before {
   margin-bottom: 56px;
 }
 
-.artists-section .section-intro {
+.artists-section > .section-intro {
+  padding-top: var(--space-7);
+  border-top: 1px solid var(--rule);
   margin-bottom: 56px;
 }
 
@@ -3356,8 +3358,7 @@ html.has-open-dossier {
   }
 
   .artists-section > .section-intro {
-    padding-top: 20px;
-    border-top: 1px solid var(--rule);
+    padding-top: var(--space-5);
   }
 
   .artists-section h1 {
