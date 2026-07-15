@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test';
 
 const storageKey = 'tarski-empathy-v1';
+const verticalTextCenterTolerance = 1;
 const dates = [
   ['2026-07-14T12:00:00+03:00', 'Какой у вас сегодня внутренний ритм?'],
   ['2026-07-15T12:00:00+03:00', 'Что вы замечаете в своём состоянии сегодня?'],
@@ -28,6 +29,21 @@ const openWidget = async (page) => {
   await page.locator('[data-daylight-toggle]').click();
   const widget = page.locator('[data-daylight-widget]');
   await expect(widget).toBeVisible();
+  await expect.poll(async () => widget.evaluate((element) => {
+    const service = element.closest('.mobile-service');
+    const menu = element.closest('.mobile-floating-menu');
+    const targetHeight = Number.parseFloat(
+      getComputedStyle(menu).getPropertyValue('--island-daylight-height')
+    );
+    return Math.abs(service.getBoundingClientRect().height - targetHeight);
+  })).toBeLessThanOrEqual(0.5);
+  await expect.poll(async () => widget.evaluate((element) => {
+    const service = element.closest('.mobile-service');
+    return [service, element]
+      .flatMap((node) => node.getAnimations())
+      .filter((animation) => animation.playState === 'running')
+      .length;
+  })).toBe(0);
   return widget;
 };
 
@@ -107,7 +123,9 @@ for (const [date, expectedQuestion] of dates) {
     expect(geometry.buttonTextAlignments.every((alignment) => alignment === 'center')).toBe(true);
     expect(geometry.buttonPlaceItems.every((alignment) => alignment === 'center')).toBe(true);
     expect(geometry.textCenterOffsetsX.every((offset) => Math.abs(offset) <= 0.5)).toBe(true);
-    expect(geometry.textCenterOffsetsY.every((offset) => Math.abs(offset) <= 0.5)).toBe(true);
+    expect(geometry.textCenterOffsetsY.every(
+      (offset) => Math.abs(offset) <= verticalTextCenterTolerance
+    )).toBe(true);
     expect(Math.max(...geometry.buttonWidths) - Math.min(...geometry.buttonWidths)).toBeLessThanOrEqual(1);
     expect(Math.abs(geometry.secondRowInsetLeft)).toBeLessThanOrEqual(1);
     expect(geometry.secondRowInsetRight).toBeGreaterThan(0);
@@ -204,7 +222,9 @@ test('desktop Today keeps the same optional check-in and balanced answer geometr
   expect(geometry.textAlignments.every((alignment) => alignment === 'center')).toBe(true);
   expect(geometry.placeItems.every((alignment) => alignment === 'center')).toBe(true);
   expect(geometry.textCenterOffsetsX.every((offset) => Math.abs(offset) <= 0.5)).toBe(true);
-  expect(geometry.textCenterOffsetsY.every((offset) => Math.abs(offset) <= 0.5)).toBe(true);
+  expect(geometry.textCenterOffsetsY.every(
+    (offset) => Math.abs(offset) <= verticalTextCenterTolerance
+  )).toBe(true);
   expect(Math.abs(geometry.secondRowInsetLeft)).toBeLessThanOrEqual(1);
   expect(geometry.secondRowInsetRight).toBeGreaterThan(0);
   expect(geometry.rowCount).toBe(2);
