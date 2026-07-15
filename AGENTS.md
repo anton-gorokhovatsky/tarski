@@ -4,9 +4,10 @@ This repository is the production source for https://tarski.ru/.
 
 ## Publishing
 
-- The usual workflow for this project is direct publishing to `main`.
-- When the user explicitly says to push, commit the approved local changes directly on `main` and run `git push origin main`.
-- Do not propose a branch or pull request unless the user explicitly asks for one.
+- The usual workflow for this project is publishing through a short-lived `agent/<description>` branch and a draft pull request targeting `main`.
+- When the user explicitly says to push or publish, inspect the working tree, create a focused branch when currently on `main`, commit only the approved files, push with tracking, and open a draft pull request.
+- Keep the pull request as a draft until the relevant checks pass and the user approves merging it.
+- Push directly to `main` only when the user explicitly asks to bypass the pull request workflow.
 - Before every push, inspect `git status` and the diff so only the intended files are staged.
 - Keep commits small and name them after the visible change.
 
