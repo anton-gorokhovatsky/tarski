@@ -216,12 +216,21 @@
   if (!menu || !toggle || !drawer || !panel) return;
 
   let closeTimer = null;
+  let compactTimer = null;
   let openFrame = null;
   let focusTimer = null;
   let settleTimer = null;
   let activeTrigger = null;
 
   const prefersReducedMotion = () => prefersCalmMotion();
+  const getMenuContentOutDuration = () => {
+    if (prefersReducedMotion()) return 0;
+
+    const value = Number.parseFloat(
+      window.getComputedStyle(menu).getPropertyValue('--island-motion-menu-content-out')
+    );
+    return Number.isFinite(value) ? value : 100;
+  };
   const getLabel = (isOpen) => {
     const path = isOpen ? 'ui.menuClose' : 'ui.menuOpen';
     const fallback = isOpen ? 'Закрыть меню' : 'Открыть меню';
@@ -244,6 +253,7 @@
   const setOpen = (isOpen, options = {}) => {
     if (isOpen) {
       window.clearTimeout(closeTimer);
+      window.clearTimeout(compactTimer);
       window.clearTimeout(focusTimer);
       window.clearTimeout(settleTimer);
       window.cancelAnimationFrame(openFrame);
@@ -252,7 +262,7 @@
       drawer.hidden = false;
       panel.hidden = false;
       panel.setAttribute('aria-hidden', 'false');
-      menu.classList.remove('is-menu-closing');
+      menu.classList.remove('is-menu-closing', 'is-menu-compacting');
       syncToggleState(true);
       setModalBackgroundInert(true);
       panel.getBoundingClientRect();
@@ -292,6 +302,7 @@
     }
 
     window.clearTimeout(closeTimer);
+    window.clearTimeout(compactTimer);
     window.clearTimeout(focusTimer);
     window.clearTimeout(settleTimer);
     window.cancelAnimationFrame(openFrame);
@@ -302,10 +313,33 @@
 
     drawer.classList.remove('is-open');
     menu.classList.add('is-menu-closing');
-    menu.classList.remove('is-menu-open', 'is-menu-settled');
+    menu.classList.remove('is-menu-settled');
     panel.setAttribute('aria-hidden', 'true');
     syncToggleState(false);
     setModalBackgroundInert(false);
+
+    /*
+     * A settled panel uses clip-path: none. That value cannot interpolate to
+     * the compact inset, so closing used to jump straight to a small box.
+     * First restore the visually identical explicit full inset and let the
+     * panel content fade; only then start the geometric collapse.
+     */
+    panel.getBoundingClientRect();
+
+    const contentOutDuration = getMenuContentOutDuration();
+    const beginCompacting = () => {
+      compactTimer = null;
+      if (toggle.getAttribute('aria-expanded') === 'true') return;
+
+      menu.classList.add('is-menu-compacting');
+      menu.classList.remove('is-menu-open');
+    };
+
+    if (contentOutDuration === 0) {
+      beginCompacting();
+    } else {
+      compactTimer = window.setTimeout(beginCompacting, contentOutDuration);
+    }
 
     if (shouldRestoreFocus && activeTrigger instanceof HTMLElement) {
       const triggerToRestore = activeTrigger;
@@ -316,14 +350,14 @@
 
     closeTimer = window.setTimeout(() => {
       if (toggle.getAttribute('aria-expanded') === 'true') return;
-      menu.classList.remove('is-menu-closing');
+      menu.classList.remove('is-menu-closing', 'is-menu-compacting');
       window.dispatchEvent(new CustomEvent('tarski:mobileislandresize'));
 
       if (!drawer.classList.contains('is-open')) {
         drawer.hidden = true;
         panel.hidden = true;
       }
-    }, getMobileIslandMotionDuration(menu));
+    }, contentOutDuration + getMobileIslandMotionDuration(menu));
   };
 
   toggle.addEventListener('click', (event) => {
