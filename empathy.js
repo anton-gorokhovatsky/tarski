@@ -118,7 +118,7 @@
     }
 
     const isPanelVisible = isQuestion || isFeedback;
-    const areSettingsVisible = !isQuestion;
+    const areSettingsVisible = true;
     widget.classList.toggle('is-empathy-question', isQuestion);
     widget.classList.toggle('is-empathy-feedback', isFeedback);
     surface.root.hidden = !isPanelVisible;

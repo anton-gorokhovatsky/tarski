@@ -8,9 +8,12 @@ The empathy layer creates a brief, optional moment of self-check-in. It is not a
 - The question rotates through localized RU, EN and JA sets without a network request.
 - Answers are Calm, Tired, Tense, Curious and Skip.
 - Tired and Tense temporarily select Calm motion. Calm, Curious and Skip do not alter the interface rhythm.
+- On mobile, theme selection remains visible while the daily question is active.
 - Feedback always explains what changed. On mobile, the theme and motion controls remain visible directly below it; their selected states make the current result explicit without opening another panel.
 - When Tired or Tense temporarily selects Calm motion, a separate Restore action is available next to the feedback. Answers that do not change settings show no redundant action.
 - The question, feedback and inline controls occupy a stable reserved area so locale wrapping does not move controls outside the widget.
+- Answer pills form a left-packed grid: the second row begins at the first column, while every label remains centered inside its own pill on both axes.
+- Mobile daylight surfaces use the global `--space-7` edge inset (28px) for the content sides and the final control row at the bottom. Answer-row gaps use `--space-1-5` (6px); transitions between the question or feedback and a control row use `--space-3` (12px).
 
 ## Local storage and privacy
 
@@ -34,4 +37,4 @@ Any future personalisation requires a separate privacy review, an explicit expla
 
 ## QA
 
-Run `tests/empathy.spec.mjs` and then inspect every answer in RU, EN and JA on mobile and desktop. Check first visit, repeat visit, stale storage, malformed storage, calm-mode undo, equal answer geometry and stable widget/settings bounds.
+Run `tests/empathy.spec.mjs` and then inspect every answer in RU, EN and JA on mobile and desktop. Check first visit, repeat visit, stale storage, malformed storage, calm-mode undo, equal answer geometry, centered labels, the left-packed second row, the shared 28px side/bottom inset and stable widget/settings bounds.

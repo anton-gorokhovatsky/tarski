@@ -154,6 +154,8 @@ for (const language of languages) {
       await page.locator('[data-mobile-service-toggle]').click();
       await page.locator('[data-daylight-toggle]').click();
       await expect(page.locator('[data-empathy-panel]')).toBeVisible();
+      await expect(page.locator('[data-daylight-widget] [data-theme-mode-group]')).toBeVisible();
+      await expect(page.locator('[data-daylight-widget] [data-motion-mode-group]')).toBeHidden();
       await snapshot(page, `mobile-${language}-${theme}-empathy.png`);
 
       await page.locator('[data-daylight-widget] [data-empathy-answer="tired"]').click();

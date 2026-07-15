@@ -477,7 +477,9 @@ test('daily empathy check-in stays local and exposes reversible motion adaptatio
   const widget = page.locator('[data-daylight-widget]');
   const panel = widget.locator('[data-empathy-panel]');
   await expect(panel).toBeVisible();
-  await expect(widget.locator('[data-empathy-settings]')).toHaveAttribute('inert', '');
+  await expect(widget.locator('[data-empathy-settings]')).not.toHaveAttribute('inert', '');
+  await expect(widget.locator('[data-theme-mode-group]')).toBeVisible();
+  await expect(widget.locator('[data-motion-mode-group]')).toBeHidden();
   expect([
     'Как вы сегодня?',
     'Какой у вас сегодня внутренний ритм?',
