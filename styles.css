@@ -3815,25 +3815,35 @@ html.has-open-dossier {
     --island-glass-backdrop: var(--matte-lens-backdrop-filter);
     --mobile-island-clip: path("M 18.6433 54.7658 C 17.0966 40.6432 21.8307 29.4056 32.8455 21.0533 C 43.0745 12.7870 56.4407 7.7501 72.9442 5.9427 C 87.9618 5.0920 101.0086 8.0302 112.0842 14.7572 C 123.0743 20.6997 129.6495 29.9046 131.8096 42.3721 C 133.2704 55.7102 129.2800 66.4692 119.8365 74.6495 C 110.3933 82.8297 98.2060 87.7375 83.2743 89.3728 C 66.7708 91.1802 52.2383 89.1987 39.6767 83.4285 C 27.1152 77.6581 20.1040 68.1039 18.6433 54.7658 Z M 25.2443 101.8318 C 33.8994 94.2212 43.5671 92.1255 54.2473 95.5447 C 64.5039 98.4822 74.0791 105.0081 82.9727 115.1224 C 90.5384 124.6962 94.6699 134.7278 95.3670 145.2171 C 96.5450 155.2836 93.4990 163.9402 86.2290 171.1868 C 78.0547 178.3746 69.0509 180.7410 59.2178 178.2846 C 49.3846 175.8287 40.4447 170.0253 32.3981 160.8743 C 23.5045 150.7600 18.0452 140.1880 16.0202 129.1582 C 13.9953 118.1284 17.0699 109.0196 25.2443 101.8318 Z M 90.4708 108.1912 C 92.0036 101.4609 95.9621 97.0529 102.3462 94.9672 C 108.3559 92.7961 115.2931 92.6063 123.1580 94.3975 C 130.1888 96.3920 135.7127 99.8131 139.7299 104.6610 C 143.8322 109.1350 145.3894 114.4059 144.4015 120.4736 C 142.9538 126.8300 139.4124 131.1364 133.7772 133.3927 C 128.1421 135.6490 121.7666 135.9668 114.6508 134.3463 C 106.7859 132.5551 100.4278 129.3372 95.5764 124.6926 C 90.7250 120.0481 89.0232 114.5476 90.4708 108.1912 Z");
 
-    /* One motion scale drives mask reveal and content; material layers never scale. */
-    --island-motion-morph: 620ms;
-    /* Service geometry and its mask finish together; menu expansion keeps the
-       slightly longer 620ms envelope. */
-    --island-motion-service: 520ms;
-    --island-motion-content-fade: 260ms;
-    --island-motion-panel-content: 300ms;
-    --island-motion-panel-content-delay: 120ms;
-    --island-motion-compact-return-delay: 120ms;
-    --island-motion-handoff-duration: 260ms;
-    --island-motion-menu-content-out: 100ms;
-    --island-motion-menu-compact-in-delay: 180ms;
-    --island-motion-menu-compact-content-in-delay: 240ms;
-    --island-motion-menu-compact-in-duration: 240ms;
-    --island-motion-menu-panel-out-delay: 100ms;
-    --island-motion-menu-panel-out-duration: 360ms;
-    --island-motion-content-shift: 520ms;
+    /* One temporal grammar drives every connected island state. The material
+       never scales; content exits, the surface morphs, then content enters. */
+    --island-motion-phase-content-out: 120ms;
+    --island-motion-phase-surface: 520ms;
+    --island-motion-phase-content-in: 220ms;
+    --island-motion-phase-content-delay: 110ms;
+    --island-motion-phase-return: 220ms;
+    --island-motion-phase-return-delay: 100ms;
+    --island-motion-morph: var(--island-motion-phase-surface);
+    --island-motion-service: var(--island-motion-phase-surface);
+    --island-motion-content-fade: var(--island-motion-phase-content-in);
+    --island-motion-panel-content: var(--island-motion-phase-content-in);
+    --island-motion-panel-content-delay: var(--island-motion-phase-content-delay);
+    --island-motion-compact-return-delay: var(--island-motion-phase-return-delay);
+    --island-motion-handoff-duration: var(--island-motion-phase-return);
+    --island-motion-menu-content-out: var(--island-motion-phase-content-out);
+    --island-motion-menu-compact-in-delay: 160ms;
+    --island-motion-menu-compact-content-in-delay: 250ms;
+    --island-motion-menu-compact-in-duration: var(--island-motion-phase-return);
+    --island-motion-menu-panel-out-delay: 80ms;
+    --island-motion-menu-panel-out-duration: 300ms;
+    --island-motion-content-shift: var(--island-motion-phase-surface);
     --island-motion-content-collapse: 0ms;
     --island-motion-collapse-delay: 0ms;
+    --empathy-motion-content-out: var(--island-motion-phase-content-out);
+    --empathy-motion-layout-shift: 420ms;
+    --empathy-motion-feedback-in: var(--island-motion-phase-content-in);
+    --empathy-motion-controls-in: 260ms;
+    --empathy-motion-controls-delay: 100ms;
     --island-motion-ease: var(--ease-smooth);
     --island-motion-handoff-shift: none;
     --island-motion-return-shift: none;
@@ -3985,11 +3995,11 @@ html.has-open-dossier {
     opacity: 0;
     transition:
       opacity 140ms var(--island-motion-ease),
-      left 520ms var(--island-motion-ease),
-      top 520ms var(--island-motion-ease),
-      width 520ms var(--island-motion-ease),
-      height 520ms var(--island-motion-ease),
-      border-radius 520ms var(--island-motion-ease);
+      left var(--mobile-service-motion) var(--island-motion-ease),
+      top var(--mobile-service-motion) var(--island-motion-ease),
+      width var(--mobile-service-motion) var(--island-motion-ease),
+      height var(--mobile-service-motion) var(--island-motion-ease),
+      border-radius var(--mobile-service-motion) var(--island-motion-ease);
     will-change: opacity, left, top, width, height;
   }
 
@@ -4018,11 +4028,11 @@ html.has-open-dossier {
     transition:
       opacity 140ms var(--island-motion-ease),
       clip-path var(--mobile-service-motion) var(--island-motion-ease),
-      left 520ms var(--island-motion-ease),
-      top 520ms var(--island-motion-ease),
-      width 520ms var(--island-motion-ease),
-      height 520ms var(--island-motion-ease),
-      border-radius 520ms var(--island-motion-ease);
+      left var(--mobile-service-motion) var(--island-motion-ease),
+      top var(--mobile-service-motion) var(--island-motion-ease),
+      width var(--mobile-service-motion) var(--island-motion-ease),
+      height var(--mobile-service-motion) var(--island-motion-ease),
+      border-radius var(--mobile-service-motion) var(--island-motion-ease);
   }
 
   .mobile-floating-menu.is-visible {
@@ -4198,7 +4208,13 @@ html.has-open-dossier {
   }
 
   .mobile-floating-menu.is-service-open .mobile-service-depth {
-    transition-duration: 180ms, 520ms, 520ms, 520ms, 520ms, 520ms;
+    transition-duration:
+      180ms,
+      var(--mobile-service-motion),
+      var(--mobile-service-motion),
+      var(--mobile-service-motion),
+      var(--mobile-service-motion),
+      var(--mobile-service-motion);
     transition-delay: 200ms, 0ms, 0ms, 0ms, 0ms, 0ms;
   }
 
@@ -4207,7 +4223,14 @@ html.has-open-dossier {
   }
 
   .mobile-floating-menu.is-service-open .mobile-service-surface {
-    transition-duration: 140ms, var(--mobile-service-motion), 520ms, 520ms, 520ms, 520ms, 520ms;
+    transition-duration:
+      140ms,
+      var(--mobile-service-motion),
+      var(--mobile-service-motion),
+      var(--mobile-service-motion),
+      var(--mobile-service-motion),
+      var(--mobile-service-motion),
+      var(--mobile-service-motion);
     transition-delay: 70ms, 70ms, 0ms, 0ms, 0ms, 0ms, 0ms;
   }
 
@@ -4252,11 +4275,24 @@ html.has-open-dossier {
   }
 
   .mobile-floating-menu:is(.is-daylight-transitioning, .is-daylight-closing) .mobile-service-depth {
-    transition-duration: 140ms, 520ms, 520ms, 520ms, 520ms, 0ms;
+    transition-duration:
+      140ms,
+      var(--mobile-service-motion),
+      var(--mobile-service-motion),
+      var(--mobile-service-motion),
+      var(--mobile-service-motion),
+      0ms;
   }
 
   .mobile-floating-menu:is(.is-daylight-transitioning, .is-daylight-closing) .mobile-service-surface {
-    transition-duration: 140ms, 0ms, 520ms, 520ms, 520ms, 520ms, 0ms;
+    transition-duration:
+      140ms,
+      0ms,
+      var(--mobile-service-motion),
+      var(--mobile-service-motion),
+      var(--mobile-service-motion),
+      var(--mobile-service-motion),
+      0ms;
   }
 
   .mobile-floating-menu.is-service-closing .mobile-service-depth,
@@ -4271,7 +4307,13 @@ html.has-open-dossier {
   }
 
   .mobile-floating-menu.is-service-closing .mobile-service-depth {
-    transition-duration: 100ms, 520ms, 520ms, 520ms, 520ms, 520ms;
+    transition-duration:
+      100ms,
+      var(--mobile-service-motion),
+      var(--mobile-service-motion),
+      var(--mobile-service-motion),
+      var(--mobile-service-motion),
+      var(--mobile-service-motion);
     transition-delay: 0ms;
   }
 
@@ -4284,11 +4326,11 @@ html.has-open-dossier {
     transition-duration:
       220ms,
       var(--mobile-service-motion),
-      520ms,
-      520ms,
-      520ms,
-      520ms,
-      520ms;
+      var(--mobile-service-motion),
+      var(--mobile-service-motion),
+      var(--mobile-service-motion),
+      var(--mobile-service-motion),
+      var(--mobile-service-motion);
     transition-delay: 60ms, 0ms, 0ms, 0ms, 0ms, 0ms, 0ms;
   }
 
@@ -4527,10 +4569,10 @@ html.has-open-dossier {
     pointer-events: auto;
     transition:
       opacity var(--mobile-island-content-fade) var(--island-motion-ease),
-      left 520ms var(--island-motion-ease),
-      top 520ms var(--island-motion-ease),
-      width 520ms var(--island-motion-ease),
-      height 520ms var(--island-motion-ease);
+      left var(--mobile-service-motion) var(--island-motion-ease),
+      top var(--mobile-service-motion) var(--island-motion-ease),
+      width var(--mobile-service-motion) var(--island-motion-ease),
+      height var(--mobile-service-motion) var(--island-motion-ease);
     will-change: opacity, left, top, width, height;
   }
 
@@ -5039,6 +5081,19 @@ html.has-open-dossier {
     transform: translate3d(0, 0, 0);
   }
 
+  .daylight-widget.is-empathy-transitioning .daylight-widget__empathy {
+    pointer-events: none;
+  }
+
+  .daylight-widget.is-empathy-transitioning :is(
+    .daylight-widget__empathy-question,
+    .daylight-widget__empathy-feedback,
+    .daylight-widget__settings,
+    .daylight-widget__motion
+  ) {
+    will-change: opacity, transform;
+  }
+
   .daylight-widget__empathy-copy {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
@@ -5356,6 +5411,14 @@ html.has-open-dossier {
   .daylight-widget__motion-options button:focus-visible {
     outline: 0;
     box-shadow: var(--focus-ring-soft);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    :root[data-effective-motion="calm"]
+      .daylight-widget.is-empathy-entering
+      .daylight-widget__motion-options::before {
+      transition-duration: 320ms !important;
+    }
   }
 
   .daylight-widget__motion-options::before {

@@ -247,12 +247,18 @@
     toggle.setAttribute('title', label);
   };
 
+  const setDaylightMotionPhase = (phase) => {
+    if (phase) menu.dataset.daylightMotionPhase = phase;
+    else delete menu.dataset.daylightMotionPhase;
+  };
+
   const setOpen = (isOpen, options = {}) => {
     const motionTicket = motion.begin('daylight');
     window.cancelAnimationFrame(openFrame);
     openFrame = null;
 
     if (isOpen) {
+      setDaylightMotionPhase('surface-morph');
       updateViewportInset();
       widget.hidden = false;
       widget.setAttribute('aria-hidden', 'false');
@@ -272,6 +278,7 @@
         motion.wait(motionTicket, motionTargets).then((isCurrent) => {
           if (!isCurrent || toggle.getAttribute('aria-expanded') !== 'true') return;
           menu.classList.remove('is-daylight-transitioning');
+          setDaylightMotionPhase(null);
           if (options.focusToggle) focusWithoutScroll(toggle);
         });
       });
@@ -281,6 +288,7 @@
 
     window.cancelAnimationFrame(markerFrame);
     markerFrame = null;
+    setDaylightMotionPhase('surface-morph');
     widget.classList.remove('is-marker-arriving');
     toggle.setAttribute('aria-expanded', 'false');
     menu.classList.remove('is-daylight-transitioning');
@@ -295,6 +303,7 @@
       if (!isCurrent || toggle.getAttribute('aria-expanded') === 'true') return;
       menu.classList.remove('is-daylight-closing');
       widget.hidden = true;
+      setDaylightMotionPhase(null);
     });
 
     if (options.restoreFocus) {

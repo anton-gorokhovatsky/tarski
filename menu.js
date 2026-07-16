@@ -39,6 +39,12 @@
   let openFrame = null;
   let activeTrigger = null;
 
+  const setServiceMotionPhase = (phase) => {
+    if (!menu) return;
+    if (phase) menu.dataset.serviceMotionPhase = phase;
+    else delete menu.dataset.serviceMotionPhase;
+  };
+
   const setToggleState = (isOpen) => {
     toggle.setAttribute('aria-expanded', String(isOpen));
     toggle.setAttribute('aria-label', getLabel(isOpen));
@@ -85,6 +91,7 @@
     if (!isOpen && !isExpanded) {
       setToggleState(false);
       setPanelHiddenState(true);
+      setServiceMotionPhase(null);
       return;
     }
 
@@ -103,6 +110,7 @@
     if (isOpen) {
       updateServiceShellWidth();
       setPanelHiddenState(false);
+      setServiceMotionPhase('surface-morph');
       service.classList.remove('is-closing');
       menu?.classList.remove('is-service-closing');
       setToggleState(true);
@@ -110,6 +118,7 @@
       if (service.classList.contains('is-open') || menu?.classList.contains('is-service-open')) {
         service.classList.add('is-open');
         menu?.classList.add('is-service-open');
+        setServiceMotionPhase(null);
         return;
       }
 
@@ -120,6 +129,11 @@
 
         service.classList.add('is-open');
         menu?.classList.add('is-service-open');
+        motion.wait(motionTicket, motionTargets).then((isCurrent) => {
+          if (isCurrent && toggle.getAttribute('aria-expanded') === 'true') {
+            setServiceMotionPhase(null);
+          }
+        });
       });
       return;
     }
@@ -127,6 +141,7 @@
     const shouldRestoreFocus = options.restoreFocus !== false;
 
     window.dispatchEvent(new CustomEvent('tarski:daylightclose'));
+    setServiceMotionPhase('surface-morph');
     setToggleState(false);
     service.classList.add('is-closing');
     menu?.classList.add('is-service-closing');
@@ -145,6 +160,7 @@
       service.classList.remove('is-closing');
       menu?.classList.remove('is-service-closing');
       setPanelHiddenState(true);
+      setServiceMotionPhase(null);
       window.dispatchEvent(new CustomEvent('tarski:mobileislandresize'));
     });
   };
@@ -233,6 +249,11 @@
   let openFrame = null;
   let activeTrigger = null;
 
+  const setMenuMotionPhase = (phase) => {
+    if (phase) menu.dataset.menuMotionPhase = phase;
+    else delete menu.dataset.menuMotionPhase;
+  };
+
   const getLabel = (isOpen) => {
     const path = isOpen ? 'ui.menuClose' : 'ui.menuOpen';
     const fallback = isOpen ? 'Закрыть меню' : 'Открыть меню';
@@ -257,6 +278,7 @@
 
     if (isOpen) {
       window.cancelAnimationFrame(openFrame);
+      setMenuMotionPhase('surface-morph');
       activeTrigger = document.activeElement instanceof HTMLElement ? document.activeElement : toggle;
       window.dispatchEvent(new CustomEvent('tarski:mobilemenuopen'));
       drawer.hidden = false;
@@ -278,6 +300,7 @@
         motion.wait(motionTicket, motionTargets).then((isCurrent) => {
           if (isCurrent && menu.classList.contains('is-menu-open')) {
             menu.classList.add('is-menu-settled');
+            setMenuMotionPhase(null);
           }
 
           if (isCurrent && options.focus && toggle.getAttribute('aria-expanded') === 'true') {
@@ -294,6 +317,7 @@
 
     if (!isExpanded) {
       syncToggleState(false);
+      setMenuMotionPhase(null);
       return;
     }
 
@@ -303,6 +327,7 @@
     const shouldRestoreFocus = options.restoreFocus !== false;
 
     drawer.classList.remove('is-open');
+    setMenuMotionPhase('content-out');
     menu.classList.add('is-menu-closing');
     menu.classList.remove('is-menu-settled');
     panel.setAttribute('aria-hidden', 'true');
@@ -324,6 +349,7 @@
       const contentFinished = await motion.wait(motionTicket, contentTargets);
       if (!contentFinished || toggle.getAttribute('aria-expanded') === 'true') return;
 
+      setMenuMotionPhase('surface-morph');
       menu.classList.add('is-menu-compacting');
       menu.classList.remove('is-menu-open');
 
@@ -331,6 +357,7 @@
       if (!compactFinished || toggle.getAttribute('aria-expanded') === 'true') return;
 
       menu.classList.remove('is-menu-closing', 'is-menu-compacting');
+      setMenuMotionPhase(null);
       window.dispatchEvent(new CustomEvent('tarski:mobileislandresize'));
 
       if (!drawer.classList.contains('is-open')) {

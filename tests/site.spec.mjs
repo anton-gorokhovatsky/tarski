@@ -275,6 +275,7 @@ test('mobile island transitions reverse without leaving stale phases', async ({ 
   await expect(menuToggle).toHaveAttribute('aria-expanded', 'true');
   await expect(menuRoot).toHaveClass(/is-menu-settled/);
   await expect(menuRoot).not.toHaveClass(/is-menu-closing|is-menu-compacting/);
+  await expect.poll(() => menuRoot.getAttribute('data-menu-motion-phase')).toBeNull();
   await expect(menuPanel).toBeVisible();
 
   await page.keyboard.press('Escape');
@@ -290,6 +291,7 @@ test('mobile island transitions reverse without leaving stale phases', async ({ 
   await expect(serviceToggle).toHaveAttribute('aria-expanded', 'true');
   await expect(serviceRoot).toHaveClass(/is-open/);
   await expect(menuRoot).not.toHaveClass(/is-service-closing/);
+  await expect.poll(() => menuRoot.getAttribute('data-service-motion-phase')).toBeNull();
 
   const daylightToggle = page.locator('[data-daylight-toggle]');
   const daylightWidget = page.locator('[data-daylight-widget]');
@@ -302,6 +304,7 @@ test('mobile island transitions reverse without leaving stale phases', async ({ 
   await expect(daylightWidget).toBeVisible();
   await expect(menuRoot).not.toHaveClass(/is-daylight-transitioning|is-daylight-closing/);
   await expect(menuRoot).toHaveClass(/is-daylight-open/);
+  await expect.poll(() => menuRoot.getAttribute('data-daylight-motion-phase')).toBeNull();
 });
 
 test('menu surfaces share one stable matte material without loading the Water experiment', async ({ page }) => {
