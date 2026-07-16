@@ -442,6 +442,8 @@
     .filter(Boolean);
 
   const mainNav = document.querySelector('.main-nav');
+  const footer = document.querySelector('[data-semantic-footer]');
+  const footerEyebrow = footer?.querySelector('[data-footer-eyebrow]');
   const mobileMenu = document.querySelector('[data-mobile-menu]');
   const mobileMenuHome = document.querySelector('[data-mobile-menu-home]');
   const placementMotion = window.tarskiMobileIslandMotion;
@@ -456,6 +458,10 @@
   };
   const getSceneLabels = () => window.tarskiI18n?.getSceneLabels?.() || fallbackSceneLabels;
   const getLabelSources = () => Array.from(document.querySelectorAll('.section-intro, .editorial-block'));
+  const formatContextLabel = (label) => {
+    const [firstCharacter = '', ...remainingCharacters] = Array.from(label?.trim() || '');
+    return `${firstCharacter.toLocaleUpperCase(document.documentElement.lang)}${remainingCharacters.join('')}`;
+  };
 
   const getSourceLabel = (source) => {
     if (source.matches('.section-intro')) {
@@ -471,6 +477,13 @@
       return sceneLabels.cover || fallbackSceneLabels.cover;
     }
 
+    const anchor = window.innerHeight * 0.42;
+    const footerRect = footer?.getBoundingClientRect();
+    if (footerRect && footerRect.top <= anchor && footerRect.bottom >= anchor) {
+      const footerLabel = formatContextLabel(footerEyebrow?.textContent);
+      if (footerLabel) return footerLabel;
+    }
+
     const sceneRoot = document.getElementById(currentScene);
     const sceneIntro = Array.from(sceneRoot?.children || []).find((element) => element.classList?.contains('section-intro'));
     if (sceneIntro) {
@@ -481,7 +494,6 @@
       }
     }
 
-    const anchor = window.innerHeight * 0.42;
     let currentSource = null;
     let closestDistance = Infinity;
 

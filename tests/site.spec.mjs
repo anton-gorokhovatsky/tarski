@@ -9,6 +9,8 @@ const languages = {
     day: 'День',
     night: 'Ночь',
     weather: 'Ясно',
+    artistsContext: 'Сеть',
+    footerContext: 'Участие',
     footerCta: 'Написать нам',
     footerRoutes: ['Предложить проект', 'Стать партнёром', 'Задать вопрос']
   },
@@ -20,6 +22,8 @@ const languages = {
     day: 'Day',
     night: 'Night',
     weather: 'Clear',
+    artistsContext: 'Network',
+    footerContext: 'Participation',
     footerCta: 'Contact us',
     footerRoutes: ['Propose a project', 'Become a partner', 'Ask a question']
   },
@@ -31,6 +35,8 @@ const languages = {
     day: '昼',
     night: '夜',
     weather: '晴れ',
+    artistsContext: 'ネットワーク',
+    footerContext: '参加',
     footerCta: 'お問い合わせ',
     footerRoutes: ['プロジェクトを提案', 'パートナーになる', '質問する']
   }
@@ -132,6 +138,19 @@ for (const [language, copy] of Object.entries(languages)) {
     );
   });
 }
+
+test('desktop context label follows the artists section into participation', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+
+  for (const [language, copy] of Object.entries(languages)) {
+    await page.goto(`/?lang=${language}`);
+    await page.locator('#artists').scrollIntoViewIfNeeded();
+    await expect(page.locator('.main-nav .nav-label')).toHaveText(copy.artistsContext);
+
+    await page.locator('[data-semantic-footer]').scrollIntoViewIfNeeded();
+    await expect(page.locator('.main-nav .nav-label')).toHaveText(copy.footerContext);
+  }
+});
 
 test('mobile menu and service panel preserve state, Escape, and focus return', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
