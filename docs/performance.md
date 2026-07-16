@@ -7,6 +7,7 @@ Tarski is a static site. Interaction richness must not turn into permanent work 
 - Critical local scripts and styles stay below 360 KB uncompressed in aggregate.
 - Artist dossier media is not requested on initial load.
 - The pointer trail creates no canvas and runs no animation loop until an eligible mouse interaction occurs.
+- The pointer-trail code itself loads only after the first eligible mouse movement.
 - Touch input, Calm mode and `prefers-reduced-motion` never allocate the trail canvas.
 - The canvas pixel ratio is capped at 1.6 to limit fill cost on high-DPR displays.
 - Stop animation loops as soon as their visible work is complete.

@@ -126,7 +126,11 @@ for (const [locale, copy] of Object.entries(locales)) {
     await expect(dialog).toBeVisible();
     await expect(dialog).toHaveAttribute('aria-modal', 'true');
 
-    for (let index = 0; index < 9; index += 1) await page.keyboard.press('Tab');
+    await page.keyboard.press('Tab');
+    await expect(dialog.locator('[data-mobile-menu-close]')).toBeFocused();
+    await page.keyboard.press('Tab');
+    await expect(dialog.locator('a[href="#about"]')).toBeFocused();
+    for (let index = 0; index < 7; index += 1) await page.keyboard.press('Tab');
     expect(await dialog.evaluate((element) => element.contains(document.activeElement))).toBe(true);
     await page.keyboard.press('Escape');
     await expect(menuToggle).toBeFocused();
@@ -150,6 +154,37 @@ test('reduced-motion preference reaches the shared motion system', async ({ page
   await expect(page.locator('html')).toHaveAttribute('data-motion-preference', 'system');
   await expect(page.locator('html')).toHaveAttribute('data-effective-motion', 'calm');
   await expect(page.locator('[data-motion-mode="system"]').first()).toHaveAttribute('aria-pressed', 'true');
+});
+
+test('theme action buttons do not announce a conflicting pressed state', async ({ page }) => {
+  await page.addInitScript(() => window.localStorage.setItem('tarski-theme', 'dark'));
+  await page.goto('/?lang=ru');
+
+  await expect(page.locator('[data-theme-toggle][aria-pressed]')).toHaveCount(0);
+  await expect(page.locator('.main-nav [data-theme-toggle]')).toHaveAttribute(
+    'aria-label',
+    'Включить светлую тему'
+  );
+  await expect(page.locator('[data-daylight-toggle]')).toHaveAttribute('aria-expanded', 'false');
+});
+
+test('artist dossier includes its links in the keyboard focus cycle', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/?lang=ru#artists');
+  await page.locator('[data-artists-view-option="list"]').click();
+
+  const trigger = page.locator('#artist-anastasia-dahl .artist-card__detail-trigger');
+  await trigger.focus();
+  await page.keyboard.press('Enter');
+
+  const dialog = page.getByRole('dialog', { name: 'Анастасия Даль' });
+  await expect(dialog).toBeFocused();
+  await page.keyboard.press('Tab');
+  await expect(dialog.locator('[data-artist-dossier-close]')).toBeFocused();
+  await page.keyboard.press('Tab');
+  await expect(dialog.locator('a[href="https://anastasiadahl.wordpress.com/"]')).toBeFocused();
+  await page.keyboard.press('Escape');
+  await expect(trigger).toBeFocused();
 });
 
 test('320 CSS-pixel reflow keeps reading order and fixed controls inside the viewport', async ({ page }) => {

@@ -24,7 +24,8 @@ const getVisibleFocusableElements = (root) => {
     element instanceof HTMLElement
     && !element.hidden
     && !element.closest('[hidden]')
-    && element.offsetParent !== null
+    && element.getClientRects().length > 0
+    && window.getComputedStyle(element).visibility !== 'hidden'
   ));
 };
 
@@ -286,7 +287,10 @@ window.tarskiMobileIslandMotion = createMobileIslandMotionCoordinator();
       : getLabel('ui.themeDark', 'Включить темную тему');
 
     themeToggles.forEach((toggle) => {
-      toggle.setAttribute('aria-pressed', String(isDark));
+      // These controls expose the next action in their accessible name. Mixing
+      // that changing label with aria-pressed would announce two competing
+      // states (for example, "Switch to light theme, pressed").
+      toggle.removeAttribute('aria-pressed');
 
       if (toggle.matches('[data-daylight-toggle], [data-daylight-launcher]')) {
         const isOpen = toggle.getAttribute('aria-expanded') === 'true';

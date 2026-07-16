@@ -34,13 +34,15 @@ test('initial route keeps critical code within budget and defers dossier media',
     return {
       criticalBytes,
       galleryMedia,
-      canvases: document.querySelectorAll('canvas').length
+      canvases: document.querySelectorAll('canvas').length,
+      trailLoaded: resources.some((entry) => new URL(entry.name).pathname === '/trail.js')
     };
   }, localOrigin);
 
   expect(metrics.criticalBytes).toBeLessThan(360_000);
   expect(metrics.galleryMedia).toEqual([]);
   expect(metrics.canvases).toBe(0);
+  expect(metrics.trailLoaded).toBe(false);
 });
 
 test('cursor trail allocates lazily and respects the calm-motion gate', async ({ page }) => {
