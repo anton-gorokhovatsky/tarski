@@ -136,7 +136,9 @@
     );
     surfaces.forEach((surface) => {
       surface.feedbackText.textContent = label;
-      surface.storageConfirmation.hidden = !feedbackPersisted || ['skip', 'restored'].includes(feedbackKey);
+      const isStoredAnswer = !['skip', 'restored'].includes(feedbackKey)
+        && (feedbackPersisted || previewMode);
+      surface.storageConfirmation.hidden = !isStoredAnswer;
     });
   };
 

@@ -73,7 +73,11 @@ for (const [date, expectedQuestion] of dates) {
       const themeRect = element.closest('[data-daylight-widget]')
         .querySelector('[data-theme-mode-group]')
         .getBoundingClientRect();
+      const weatherRect = element.closest('[data-daylight-widget]')
+        .querySelector('.daylight-widget__weather')
+        .getBoundingClientRect();
       const copyRect = element.querySelector('.daylight-widget__empathy-copy').getBoundingClientRect();
+      const questionRect = element.querySelector('[data-empathy-question]').getBoundingClientRect();
       const optionsRect = element.querySelector('[data-empathy-options]').getBoundingClientRect();
       const buttons = [...element.querySelectorAll('[data-empathy-answer]')].map((button) => {
         const rect = button.getBoundingClientRect();
@@ -98,6 +102,9 @@ for (const [date, expectedQuestion] of dates) {
         copyBottom: copyRect.bottom,
         optionsTop: optionsRect.top,
         optionsBottom: optionsRect.bottom,
+        weatherToCheckIn: copyRect.top - weatherRect.bottom,
+        questionToAnswers: optionsRect.top - questionRect.bottom,
+        answersToTheme: themeRect.top - optionsRect.bottom,
         panelBottom: panelRect.bottom,
         expectedPanelInset,
         horizontalContentInset: themeRect.left - serviceRect.left,
@@ -117,6 +124,9 @@ for (const [date, expectedQuestion] of dates) {
     });
     expect(geometry.copyBottom).toBeLessThanOrEqual(geometry.optionsTop);
     expect(geometry.optionsBottom).toBeLessThanOrEqual(geometry.panelBottom);
+    expect(geometry.weatherToCheckIn).toBeCloseTo(20, 1);
+    expect(geometry.questionToAnswers).toBeCloseTo(12, 1);
+    expect(geometry.answersToTheme).toBeCloseTo(16, 1);
     expect(geometry.horizontalContentInset).toBeCloseTo(geometry.expectedPanelInset, 1);
     expect(geometry.bottomContentInset).toBeCloseTo(geometry.horizontalContentInset, 1);
     expect(geometry.buttonHeights.every((height) => height === 32)).toBe(true);
@@ -137,6 +147,7 @@ for (const [date, expectedQuestion] of dates) {
 
     await widget.locator('[data-empathy-answer="skip"]').click();
     await expect(widget.locator('[data-empathy-feedback]')).toBeVisible();
+    await expect(widget.locator('[data-empathy-storage-confirmation]')).toBeHidden();
     expect(await page.evaluate((key) => localStorage.getItem(key), storageKey)).toBeNull();
   });
 }
@@ -164,6 +175,11 @@ test('every answer produces one clear, reversible response', async ({ page }) =>
     await expect(widget.locator('[data-empathy-settings]')).not.toHaveAttribute('inert', '');
     await expect(widget.locator(`[data-motion-mode="${canUndo ? 'calm' : 'system'}"]`)).toHaveAttribute('aria-pressed', 'true');
     await expect(widget.locator('[data-theme-mode="auto"]')).toHaveAttribute('aria-pressed', 'true');
+    if (answer === 'skip') {
+      await expect(widget.locator('[data-empathy-storage-confirmation]')).toBeHidden();
+    } else {
+      await expect(widget.locator('[data-empathy-storage-confirmation]')).toBeVisible();
+    }
   }
 });
 
@@ -232,7 +248,7 @@ test('desktop Today keeps the same optional check-in and balanced answer geometr
   await today.locator('[data-empathy-answer="curious"]').click();
   await expect(today.locator('[data-empathy-feedback]')).toBeVisible();
   await expect(today.locator('[data-empathy-feedback-text]')).toContainText('Исследуйте в своём ритме');
-  await expect(today.locator('[data-empathy-storage-confirmation]')).toBeHidden();
+  await expect(today.locator('[data-empathy-storage-confirmation]')).toBeVisible();
   await expect(page.locator('html')).toHaveAttribute('data-effective-motion', 'full');
   await expect(today.locator('[data-empathy-undo]')).toBeHidden();
 });

@@ -42,14 +42,88 @@ const getMobileIslandMotionDuration = (element) => {
   return Number.isFinite(value) ? value : 720;
 };
 
-const getMobileServiceMotionDuration = (element) => {
-  if (!element || prefersCalmMotion()) return 0;
+/*
+ * Mobile island transitions are authored in CSS, but their lifecycle is
+ * coordinated here through the Web Animations API. Waiting for the animations
+ * the browser is actually running keeps cleanup aligned with interrupted,
+ * reversed and reduced-motion transitions instead of duplicating CSS timings
+ * in JavaScript timers.
+ */
+const createMobileIslandMotionCoordinator = () => {
+  const generations = new Map();
 
-  const value = Number.parseFloat(
-    window.getComputedStyle(element).getPropertyValue('--mobile-service-motion')
+  const begin = (channel) => {
+    const generation = (generations.get(channel) || 0) + 1;
+    generations.set(channel, generation);
+    return { channel, generation };
+  };
+
+  const isCurrent = (ticket) => (
+    ticket
+    && generations.get(ticket.channel) === ticket.generation
   );
-  return Number.isFinite(value) ? value : 560;
+
+  const collectAnimations = (elements) => {
+    const animations = new Set();
+
+    elements.filter(Boolean).forEach((element) => {
+      if (typeof element.getAnimations !== 'function') return;
+      element.getAnimations().forEach((animation) => {
+        if (animation.playState === 'running' || animation.playState === 'pending') {
+          animations.add(animation);
+        }
+      });
+    });
+
+    return [...animations];
+  };
+
+  const parseTimes = (value) => value.split(',').map((part) => {
+    const time = Number.parseFloat(part);
+    if (!Number.isFinite(time)) return 0;
+    return part.trim().endsWith('ms') ? time : time * 1000;
+  });
+
+  const getLongestStyleMotion = (element) => {
+    const style = window.getComputedStyle(element);
+    const getLongestTrack = (durationValue, delayValue) => {
+      const durations = parseTimes(durationValue);
+      const delays = parseTimes(delayValue);
+      const trackCount = Math.max(durations.length, delays.length);
+
+      return Math.max(0, ...Array.from({ length: trackCount }, (_, index) => (
+        durations[index % durations.length] + delays[index % delays.length]
+      )));
+    };
+
+    return Math.max(
+      getLongestTrack(style.transitionDuration, style.transitionDelay),
+      getLongestTrack(style.animationDuration, style.animationDelay)
+    );
+  };
+
+  const wait = async (ticket, elements) => {
+    await new Promise((resolve) => window.requestAnimationFrame(resolve));
+    if (!isCurrent(ticket)) return false;
+
+    const animations = collectAnimations(elements);
+    if (animations.length) {
+      await Promise.allSettled(animations.map((animation) => animation.finished));
+    } else {
+      /* Compatibility fallback for older engines without Element.getAnimations. */
+      const fallbackDuration = Math.max(0, ...elements.filter(Boolean).map(getLongestStyleMotion));
+      if (fallbackDuration > 0) {
+        await new Promise((resolve) => window.setTimeout(resolve, fallbackDuration));
+      }
+    }
+
+    return isCurrent(ticket);
+  };
+
+  return { begin, isCurrent, wait };
 };
+
+window.tarskiMobileIslandMotion = createMobileIslandMotionCoordinator();
 
 (() => {
   const iconLink = document.querySelector('link[rel~="icon"]');

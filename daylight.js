@@ -42,7 +42,16 @@
     element.textContent = value;
     element.setAttribute('aria-label', value);
   };
-  let closeTimer = null;
+  const motion = window.tarskiMobileIslandMotion;
+  const motionTargets = [
+    service,
+    service.querySelector('.mobile-service-panel'),
+    toggle,
+    widget,
+    menu.querySelector('.mobile-service-depth'),
+    menu.querySelector('.mobile-service-surface')
+  ].filter(Boolean);
+
   let openFrame = null;
   let markerFrame = null;
   let weatherRequest = null;
@@ -239,7 +248,7 @@
   };
 
   const setOpen = (isOpen, options = {}) => {
-    window.clearTimeout(closeTimer);
+    const motionTicket = motion.begin('daylight');
     window.cancelAnimationFrame(openFrame);
     openFrame = null;
 
@@ -255,15 +264,18 @@
       menu.getBoundingClientRect();
       openFrame = window.requestAnimationFrame(() => {
         openFrame = null;
-        if (toggle.getAttribute('aria-expanded') !== 'true') return;
+        if (!motion.isCurrent(motionTicket) || toggle.getAttribute('aria-expanded') !== 'true') return;
         menu.classList.add('is-daylight-open');
         service.classList.add('is-daylight-open');
         widget.classList.add('is-visible');
+
+        motion.wait(motionTicket, motionTargets).then((isCurrent) => {
+          if (!isCurrent || toggle.getAttribute('aria-expanded') !== 'true') return;
+          menu.classList.remove('is-daylight-transitioning');
+          if (options.focusToggle) focusWithoutScroll(toggle);
+        });
       });
       syncToggleLabel();
-      if (options.focusToggle) {
-        window.setTimeout(() => focusWithoutScroll(toggle), 80);
-      }
       return;
     }
 
@@ -279,14 +291,14 @@
     widget.setAttribute('aria-hidden', 'true');
     syncToggleLabel();
 
-    closeTimer = window.setTimeout(() => {
-      if (toggle.getAttribute('aria-expanded') === 'true') return;
+    motion.wait(motionTicket, motionTargets).then((isCurrent) => {
+      if (!isCurrent || toggle.getAttribute('aria-expanded') === 'true') return;
       menu.classList.remove('is-daylight-closing');
       widget.hidden = true;
-    }, 540);
+    });
 
     if (options.restoreFocus) {
-      window.setTimeout(() => focusWithoutScroll(toggle), 0);
+      window.requestAnimationFrame(() => focusWithoutScroll(toggle));
     }
   };
 
