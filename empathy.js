@@ -39,12 +39,16 @@
   const validAnswers = new Set(['calm', 'tired', 'tense', 'curious', 'skip']);
   const precipitation = new Set(['drizzle', 'rain', 'showers', 'thunderstorm']);
   const islandMotion = window.tarskiMobileIslandMotion;
+  const mobileMenuRoot = widget.closest('[data-mobile-menu]');
+  const mobileSurfaceTargets = [
+    mobileMenuRoot?.querySelector('.mobile-service-depth'),
+    mobileMenuRoot?.querySelector('.mobile-service-surface')
+  ].filter(Boolean);
   const reduceMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
   let currentAnswer = null;
   let feedbackKey = null;
   let feedbackPersisted = false;
   let isMobileTransitioning = false;
-  let motionOverrideTimer = null;
   const activeMobileAnimations = new Set();
 
   const getLabel = (path, fallback) => window.tarskiI18n?.t(path) || fallback;
@@ -229,11 +233,12 @@
     const ticket = islandMotion?.begin?.('empathy') || { channel: 'empathy' };
     const timings = getMobileTransitionTimings();
     const motionRow = mobileSettings.querySelector('.daylight-widget__motion');
-    const targetMotion = motionAdapted ? 'calm' : null;
+    const shouldPreviewCalm = motionAdapted && window.tarskiMotion?.isCalm?.() !== true;
 
     isMobileTransitioning = true;
     surface.root.setAttribute('aria-busy', 'true');
     surface.questionState.inert = true;
+    mobileSettings.inert = true;
     widget.classList.add('is-empathy-transitioning', 'is-empathy-content-out');
     widget.dataset.empathyMotionPhase = 'content-out';
 
@@ -250,6 +255,7 @@
     const initialSettingsTop = mobileSettings.getBoundingClientRect().top;
     setSurfaceState(surface, 'feedback');
     surface.feedback.inert = true;
+    mobileSettings.inert = true;
     exitAnimation?.cancel();
 
     const finalSettingsTop = mobileSettings.getBoundingClientRect().top;
@@ -257,6 +263,7 @@
 
     widget.classList.remove('is-empathy-content-out');
     widget.classList.add('is-empathy-entering');
+    widget.classList.toggle('is-empathy-motion-preview-calm', shouldPreviewCalm);
     widget.dataset.empathyMotionPhase = 'content-in';
 
     const settingsAnimation = animateElement(mobileSettings, [
@@ -280,33 +287,27 @@
       delay: timings.motionDelay
     });
 
-    window.clearTimeout(motionOverrideTimer);
-    let motionOverrideApplied = false;
-    const applyMotionOverride = () => {
-      if (islandMotion?.isCurrent && !islandMotion.isCurrent(ticket)) return;
-      if (motionOverrideApplied) return;
-      motionOverrideApplied = true;
-      window.tarskiMotion?.setOverride(targetMotion);
-    };
-
-    if (timings.motionDelay > 0) {
-      motionOverrideTimer = window.setTimeout(applyMotionOverride, timings.motionDelay);
-    } else {
-      applyMotionOverride();
-    }
-
-    await waitForAnimations([settingsAnimation, feedbackAnimation, motionAnimation]);
+    const surfaceAnimation = islandMotion?.wait?.(ticket, mobileSurfaceTargets)
+      || Promise.resolve(true);
+    await Promise.all([
+      waitForAnimations([settingsAnimation, feedbackAnimation, motionAnimation]),
+      surfaceAnimation
+    ]);
     if (islandMotion?.isCurrent && !islandMotion.isCurrent(ticket)) return;
 
-    window.clearTimeout(motionOverrideTimer);
-    applyMotionOverride();
+    if (motionAdapted) window.tarskiMotion?.setOverride('calm');
     settingsAnimation?.cancel();
     feedbackAnimation?.cancel();
     motionAnimation?.cancel();
-    widget.classList.remove('is-empathy-transitioning', 'is-empathy-entering');
+    widget.classList.remove(
+      'is-empathy-transitioning',
+      'is-empathy-entering',
+      'is-empathy-motion-preview-calm'
+    );
     delete widget.dataset.empathyMotionPhase;
     surface.root.removeAttribute('aria-busy');
     surface.feedback.inert = false;
+    mobileSettings.inert = false;
     isMobileTransitioning = false;
 
     const isWidgetVisible = !widget.hidden && widget.classList.contains('is-visible');
@@ -331,7 +332,7 @@
       return;
     }
 
-    window.tarskiMotion?.setOverride(motionAdapted ? 'calm' : null);
+    if (motionAdapted) window.tarskiMotion?.setOverride('calm');
     surfaces.forEach((surface) => setSurfaceState(surface, 'feedback'));
     const target = originSurface?.feedback;
     window.requestAnimationFrame(() => target?.focus?.({ preventScroll: true }));
@@ -387,7 +388,7 @@
     currentAnswer = record.answer;
     feedbackKey = record.answer;
     feedbackPersisted = true;
-    window.tarskiMotion?.setOverride(record.motionAdapted ? 'calm' : null);
+    if (record.motionAdapted) window.tarskiMotion?.setOverride('calm');
     surfaces.forEach((surface) => {
       surface.undo.hidden = !record.motionAdapted;
       if (surface.actions) surface.actions.hidden = true;

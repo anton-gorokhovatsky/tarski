@@ -383,6 +383,7 @@ test('daylight widget expands the service material and keeps theme modes accessi
   await expect(page.locator('[data-mobile-menu]')).not.toHaveClass(/is-daylight-transitioning/);
   const weatherGrouping = await widget.evaluate((element) => {
     const service = element.closest('[data-mobile-service]');
+    const serviceRect = service.getBoundingClientRect();
     const surfaceRect = document.querySelector('.mobile-service-surface').getBoundingClientRect();
     const servicePanelRect = service.querySelector('.mobile-service-panel').getBoundingClientRect();
     const serviceToggleRect = service.querySelector('.mobile-service-toggle').getBoundingClientRect();
@@ -396,10 +397,13 @@ test('daylight widget expands the service material and keeps theme modes accessi
     const questionRect = element.querySelector('[data-empathy-question]').getBoundingClientRect();
     const optionsRect = element.querySelector('[data-empathy-options]').getBoundingClientRect();
     const modesRect = element.querySelector('.daylight-widget__modes').getBoundingClientRect();
+    const dividerTop = parseFloat(getComputedStyle(service, '::before').top);
     const headerCenters = [serviceToggleRect, languageRect, themeToggleRect]
       .map((rect) => rect.top + rect.height / 2);
     return {
       headerHeight: servicePanelRect.height,
+      headerToDivider: dividerTop - servicePanelRect.height,
+      dividerToWidget: widgetRect.top - serviceRect.top - dividerTop,
       headerToWidget: widgetRect.top - servicePanelRect.bottom,
       headerCenterDelta: Math.max(...headerCenters) - Math.min(...headerCenters),
       topDelta: Math.abs(temperatureRect.top - careRect.top),
@@ -412,6 +416,8 @@ test('daylight widget expands the service material and keeps theme modes accessi
     };
   });
   expect(weatherGrouping.headerHeight).toBeCloseTo(64, 1);
+  expect(weatherGrouping.headerToDivider).toBeCloseTo(0, 1);
+  expect(weatherGrouping.dividerToWidget).toBeCloseTo(12, 1);
   expect(weatherGrouping.headerToWidget).toBeCloseTo(12, 1);
   expect(weatherGrouping.headerCenterDelta).toBeLessThanOrEqual(0.1);
   expect(weatherGrouping.topDelta).toBeLessThanOrEqual(0.5);
@@ -1070,19 +1076,44 @@ test('mobile archipelago enters vertically at both scroll placements', async ({ 
   await page.goto('/?lang=ru');
 
   const menu = page.locator('[data-mobile-menu]');
+  await expect(menu).toHaveClass(/is-home-arriving/);
+  await expect(menu).toHaveAttribute('data-placement-motion-phase', 'initial-home');
+
+  const initialMotion = await menu.evaluate((element) => {
+    const animation = element.getAnimations()[0];
+    return {
+      name: getComputedStyle(element).animationName,
+      keyframes: animation?.effect?.getKeyframes().map(({ opacity, translate, transform }) => ({
+        opacity,
+        translate,
+        transform
+      })) || []
+    };
+  });
+
+  expect(initialMotion.name).toBe('mobile-island-home-arrival');
+  expect(initialMotion.keyframes[0].opacity).toBe('0');
+  expect(initialMotion.keyframes[0].translate).toBe('0px -20px');
+  expect(initialMotion.keyframes.at(-1).opacity).toBe('1');
+  expect(initialMotion.keyframes.at(-1).translate).toBe('0px');
+  await expect(menu).not.toHaveClass(/is-home-arriving/);
+  await expect.poll(() => menu.getAttribute('data-placement-motion-phase')).toBeNull();
+
   const threshold = await page.locator('[data-mobile-menu-home]').evaluate((element) => (
-    element.getBoundingClientRect().bottom + window.scrollY + 2
+    element.getBoundingClientRect().bottom + window.scrollY + 12
   ));
 
   await page.evaluate((top) => window.scrollTo(0, top), threshold);
   await expect(menu).toHaveClass(/is-visible/);
   await expect(menu).toHaveClass(/is-docking/);
+  await expect(menu).toHaveAttribute('data-placement-motion-phase', 'dock');
 
   const dockingMotion = await menu.evaluate((element) => {
     const animation = element.getAnimations()[0];
     return {
       name: getComputedStyle(element).animationName,
-      keyframes: animation?.effect?.getKeyframes().map(({ translate, transform }) => ({
+      keyframes: animation?.effect?.getKeyframes().map(({ opacity, translate, transform }) => ({
+        opacity,
         translate,
         transform
       })) || []
@@ -1090,20 +1121,25 @@ test('mobile archipelago enters vertically at both scroll placements', async ({ 
   });
 
   expect(dockingMotion.name).toBe('mobile-island-dock-in');
-  expect(dockingMotion.keyframes[0].translate).toBe('0px 24px');
+  expect(dockingMotion.keyframes[0].opacity).toBe('0.18');
+  expect(dockingMotion.keyframes[0].translate).toBe('0px 32px');
+  expect(dockingMotion.keyframes[1].translate).toBe('0px -1.5px');
   expect(dockingMotion.keyframes.at(-1).translate).toBe('0px');
   expect(dockingMotion.keyframes.every(({ transform }) => !transform || transform === 'none')).toBe(true);
 
   await expect(menu).not.toHaveClass(/is-docking/);
+  await expect.poll(() => menu.getAttribute('data-placement-motion-phase')).toBeNull();
   await page.evaluate(() => window.scrollTo(0, 0));
   await expect(menu).not.toHaveClass(/is-visible/);
   await expect(menu).toHaveClass(/is-returning-home/);
+  await expect(menu).toHaveAttribute('data-placement-motion-phase', 'return-home');
 
   const homeMotion = await menu.evaluate((element) => {
     const animation = element.getAnimations()[0];
     return {
       name: getComputedStyle(element).animationName,
-      keyframes: animation?.effect?.getKeyframes().map(({ translate, transform }) => ({
+      keyframes: animation?.effect?.getKeyframes().map(({ opacity, translate, transform }) => ({
+        opacity,
         translate,
         transform
       })) || []
@@ -1111,9 +1147,13 @@ test('mobile archipelago enters vertically at both scroll placements', async ({ 
   });
 
   expect(homeMotion.name).toBe('mobile-island-home-in');
-  expect(homeMotion.keyframes[0].translate).toBe('0px -24px');
+  expect(homeMotion.keyframes[0].opacity).toBe('0.3');
+  expect(homeMotion.keyframes[0].translate).toBe('0px -18px');
+  expect(homeMotion.keyframes[1].translate).toBe('0px 0.75px');
   expect(homeMotion.keyframes.at(-1).translate).toBe('0px');
   expect(homeMotion.keyframes.every(({ transform }) => !transform || transform === 'none')).toBe(true);
+  await expect(menu).not.toHaveClass(/is-returning-home/);
+  await expect.poll(() => menu.getAttribute('data-placement-motion-phase')).toBeNull();
 });
 
 test('artist names remain headings with one keyboard trigger each', async ({ page }) => {

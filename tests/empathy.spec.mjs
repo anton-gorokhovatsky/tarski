@@ -188,6 +188,7 @@ test('mobile answer transition keeps one causal content-out to controls-in seque
   const widget = await openWidget(page);
   const questionState = widget.locator('[data-empathy-question-state]');
   const feedback = widget.locator('[data-empathy-feedback]');
+  const settings = widget.locator('[data-empathy-settings]');
   const motionControls = widget.locator('[data-motion-mode-group]');
 
   await page.evaluate(() => {
@@ -200,8 +201,11 @@ test('mobile answer transition keeps one causal content-out to controls-in seque
   await expect(feedback).toBeHidden();
 
   await expect(widget).toHaveAttribute('data-empathy-motion-phase', 'content-in');
+  await expect(widget).toHaveClass(/is-empathy-motion-preview-calm/);
+  await expect(page.locator('html')).toHaveAttribute('data-effective-motion', 'full');
   await expect(feedback).toBeVisible();
   await expect(motionControls).toBeVisible();
+  await expect(settings).toHaveAttribute('inert', '');
   await expect.poll(() => widget.evaluate((element) => (
     element.querySelectorAll('[inert]').length
   ))).toBeGreaterThan(0);
@@ -209,6 +213,8 @@ test('mobile answer transition keeps one causal content-out to controls-in seque
   await expect.poll(() => widget.getAttribute('data-empathy-motion-phase')).toBeNull();
   await expect(widget.locator('[data-empathy-panel]')).not.toHaveAttribute('aria-busy', 'true');
   await expect(feedback).toBeFocused();
+  await expect(settings).not.toHaveAttribute('inert', '');
+  await expect(widget).not.toHaveClass(/is-empathy-motion-preview-calm/);
   await expect(page.locator('html')).toHaveAttribute('data-effective-motion', 'calm');
   await expect(widget.locator('[data-motion-mode="calm"]')).toHaveAttribute('aria-pressed', 'true');
 });
@@ -240,6 +246,20 @@ test('reduced motion skips empathy choreography without losing final state or fo
   await expect(widget.locator('[data-empathy-feedback]')).toBeFocused();
   await expect.poll(() => widget.getAttribute('data-empathy-motion-phase')).toBeNull();
   await expect(widget).not.toHaveClass(/is-empathy-transitioning|is-empathy-entering|is-empathy-content-out/);
+});
+
+test('an answer that does not adapt motion preserves the chosen motion preference', async ({ page }) => {
+  await page.addInitScript(() => window.localStorage.setItem('tarski-motion', 'calm'));
+  await page.goto('/?lang=ru&empathy=preview');
+  const widget = await openWidget(page);
+
+  await widget.locator('[data-empathy-answer="curious"]').click();
+
+  await expect(widget.locator('[data-empathy-feedback]')).toBeVisible();
+  await expect.poll(() => widget.getAttribute('data-empathy-motion-phase')).toBeNull();
+  await expect(page.locator('html')).toHaveAttribute('data-motion-preference', 'calm');
+  await expect(page.locator('html')).toHaveAttribute('data-effective-motion', 'calm');
+  await expect.poll(() => page.evaluate(() => window.tarskiMotion?.getOverride?.())).toBeNull();
 });
 
 test('desktop Today keeps the same optional check-in and balanced answer geometry', async ({ page }) => {

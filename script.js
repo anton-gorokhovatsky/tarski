@@ -33,15 +33,6 @@ const prefersCalmMotion = () => (
   || window.matchMedia('(prefers-reduced-motion: reduce)').matches
 );
 
-const getMobileIslandMotionDuration = (element) => {
-  if (!element || prefersCalmMotion()) return 0;
-
-  const value = Number.parseFloat(
-    window.getComputedStyle(element).getPropertyValue('--mobile-island-morph')
-  );
-  return Number.isFinite(value) ? value : 720;
-};
-
 /*
  * Mobile island transitions are authored in CSS, but their lifecycle is
  * coordinated here through the Web Animations API. Waiting for the animations

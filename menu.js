@@ -446,8 +446,11 @@
   const mainNav = document.querySelector('.main-nav');
   const mobileMenu = document.querySelector('[data-mobile-menu]');
   const mobileMenuHome = document.querySelector('[data-mobile-menu-home]');
+  const placementMotion = window.tarskiMobileIslandMotion;
   const navLabel = mainNav?.querySelector('.nav-label');
   const mobileQuery = window.matchMedia('(max-width: 720px)');
+  const placementClasses = ['is-home-arriving', 'is-docking', 'is-returning-home'];
+  const placementHysteresis = 10;
   const fallbackSceneLabels = {
     cover: 'Меню',
     about: 'Среда',
@@ -516,7 +519,7 @@
   let currentActiveId = null;
   let currentScene = document.documentElement.dataset.scene || 'cover';
   let navigationFrame = null;
-  let mobilePlacementTimer = null;
+  let placementInitialized = false;
   let needsIndicatorUpdate = false;
   const indicatorTimers = new WeakMap();
   const pulseIndicator = (container) => {
@@ -626,37 +629,78 @@
     updateNavLabel();
   };
 
-  const updateMobileMenuVisibility = () => {
+  const clearPlacementMotion = () => {
+    if (!mobileMenu) return;
+    mobileMenu.classList.remove(...placementClasses);
+    delete mobileMenu.dataset.placementMotionPhase;
+  };
+
+  const startPlacementMotion = (placementClass, phase) => {
     if (!mobileMenu) return;
 
+    const ticket = placementMotion?.begin?.('placement');
+    clearPlacementMotion();
+
+    if (!ticket || prefersCalmMotion()) return;
+
+    mobileMenu.classList.add(placementClass);
+    mobileMenu.dataset.placementMotionPhase = phase;
+    placementMotion.wait(ticket, [mobileMenu]).then((isCurrent) => {
+      if (!isCurrent || !mobileMenu.classList.contains(placementClass)) return;
+      clearPlacementMotion();
+    });
+  };
+
+  const updateMobileMenuVisibility = ({ initial = false } = {}) => {
+    if (!mobileMenu) return;
+    if (!initial && !placementInitialized) return;
+
     if (!mobileQuery.matches) {
-      window.clearTimeout(mobilePlacementTimer);
-      mobilePlacementTimer = null;
-      mobileMenu.classList.remove('is-visible', 'is-docking', 'is-returning-home');
+      placementMotion?.begin?.('placement');
+      mobileMenu.classList.remove('is-visible');
+      clearPlacementMotion();
       return;
     }
 
     const mainNav = document.querySelector('.main-nav');
     const mobileHomeBottom = mobileMenuHome ? mobileMenuHome.getBoundingClientRect().bottom : null;
     const navBottom = mainNav ? mainNav.getBoundingClientRect().bottom : 0;
-    const shouldShow = mobileHomeBottom !== null ? mobileHomeBottom < 0 : navBottom < 0;
     const isVisible = mobileMenu.classList.contains('is-visible');
+    const placementMarker = mobileHomeBottom ?? navBottom;
+    const shouldShow = initial
+      ? placementMarker < 0
+      : isVisible
+        ? placementMarker < placementHysteresis
+        : placementMarker < -placementHysteresis;
 
-    if (shouldShow === isVisible) return;
+    if (shouldShow === isVisible && !initial) return;
 
-    window.clearTimeout(mobilePlacementTimer);
-    mobilePlacementTimer = null;
-    mobileMenu.classList.remove('is-docking', 'is-returning-home');
     mobileMenu.classList.toggle('is-visible', shouldShow);
 
-    if (prefersCalmMotion()) return;
+    if (shouldShow) {
+      startPlacementMotion('is-docking', 'dock');
+    } else if (initial) {
+      startPlacementMotion('is-home-arriving', 'initial-home');
+    } else {
+      startPlacementMotion('is-returning-home', 'return-home');
+    }
+  };
 
-    const placementClass = shouldShow ? 'is-docking' : 'is-returning-home';
-    mobileMenu.classList.add(placementClass);
-    mobilePlacementTimer = window.setTimeout(() => {
-      mobilePlacementTimer = null;
-      mobileMenu.classList.remove(placementClass);
-    }, getMobileIslandMotionDuration(mobileMenu));
+  const initializeMobilePlacement = () => {
+    if (!mobileMenu) return;
+
+    if (mobileQuery.matches && !prefersCalmMotion()) {
+      mobileMenu.classList.add('is-placement-pending');
+    }
+
+    const start = () => window.requestAnimationFrame(() => {
+      mobileMenu.classList.remove('is-placement-pending');
+      placementInitialized = true;
+      updateMobileMenuVisibility({ initial: true });
+    });
+
+    if (document.readyState === 'complete') start();
+    else window.addEventListener('load', start, { once: true });
   };
 
   const updateNavigationState = () => {
@@ -679,7 +723,7 @@
 
   updateActive();
   updateMenuIndicators(false);
-  updateMobileMenuVisibility();
+  initializeMobilePlacement();
 
   window.addEventListener('scroll', () => scheduleNavigationState(), { passive: true });
 
