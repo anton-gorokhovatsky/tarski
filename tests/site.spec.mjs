@@ -608,6 +608,58 @@ test('daylight widget expands the service material and keeps theme modes accessi
   await expect(serviceToggle).toHaveAttribute('aria-expanded', 'false');
 });
 
+test('stored mobile settings keep the final control row on the global bottom inset', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.addInitScript(() => {
+    const now = new Date();
+    const date = [
+      now.getFullYear(),
+      String(now.getMonth() + 1).padStart(2, '0'),
+      String(now.getDate()).padStart(2, '0')
+    ].join('-');
+
+    window.localStorage.setItem('tarski-empathy-v1', JSON.stringify({
+      date,
+      answer: 'calm',
+      motionAdapted: false
+    }));
+  });
+  await page.goto('/?lang=ru');
+
+  await page.locator('[data-mobile-service-toggle]').click();
+  await page.locator('[data-daylight-toggle]').click();
+
+  const service = page.locator('[data-mobile-service]');
+  const menu = page.locator('[data-mobile-menu]');
+  const widget = page.locator('[data-daylight-widget]');
+  await expect(widget).toBeVisible();
+  await expect(widget.locator('[data-empathy-panel]')).toBeHidden();
+  await expect(widget.locator('[data-motion-mode-group]')).toBeVisible();
+  await expect(menu).toHaveClass(/is-daylight-open/);
+  await expect(menu).not.toHaveClass(/is-daylight-transitioning/);
+  await expect.poll(() => service.evaluate((element) => {
+    const root = element.closest('[data-mobile-menu]');
+    const targetHeight = Number.parseFloat(
+      getComputedStyle(root).getPropertyValue('--island-daylight-height')
+    );
+    return Math.abs(element.getBoundingClientRect().height - targetHeight);
+  })).toBeLessThanOrEqual(0.5);
+
+  const spacing = await service.evaluate((element) => {
+    const menu = element.closest('[data-mobile-menu]');
+    const surfaceRect = element.getBoundingClientRect();
+    const finalRowRect = element.querySelector('.daylight-widget__motion').getBoundingClientRect();
+    return {
+      actual: surfaceRect.bottom - finalRowRect.bottom,
+      token: Number.parseFloat(
+        getComputedStyle(menu).getPropertyValue('--island-daylight-bottom-inset')
+      )
+    };
+  });
+
+  expect(spacing.actual).toBeCloseTo(spacing.token, 0);
+});
+
 test('daily empathy check-in stays local and exposes reversible motion adaptation', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/?lang=ru');
@@ -1071,7 +1123,7 @@ test('widget language switching preserves the live page and preview URL', async 
   await expect(widget.locator('[data-theme-mode="dark"]')).toHaveText('夜');
 });
 
-test('mobile archipelago enters vertically at both scroll placements', async ({ page }) => {
+test('mobile archipelago stays opaque while entering at both scroll placements', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/?lang=ru');
 
@@ -1092,12 +1144,29 @@ test('mobile archipelago enters vertically at both scroll placements', async ({ 
   });
 
   expect(initialMotion.name).toBe('mobile-island-home-arrival');
-  expect(initialMotion.keyframes[0].opacity).toBe('0');
+  expect(initialMotion.keyframes.every(({ opacity }) => !opacity || opacity === '1')).toBe(true);
   expect(initialMotion.keyframes[0].translate).toBe('0px -20px');
-  expect(initialMotion.keyframes.at(-1).opacity).toBe('1');
   expect(initialMotion.keyframes.at(-1).translate).toBe('0px');
+  await expect(menu).toHaveCSS('opacity', '1');
   await expect(menu).not.toHaveClass(/is-home-arriving/);
   await expect.poll(() => menu.getAttribute('data-placement-motion-phase')).toBeNull();
+
+  const pendingPresentation = await menu.evaluate((element) => {
+    element.classList.add('is-placement-pending');
+    const style = getComputedStyle(element);
+    const presentation = {
+      opacity: style.opacity,
+      visibility: style.visibility,
+      translate: style.translate
+    };
+    element.classList.remove('is-placement-pending');
+    return presentation;
+  });
+  expect(pendingPresentation).toEqual({
+    opacity: '1',
+    visibility: 'visible',
+    translate: '0px -20px'
+  });
 
   const threshold = await page.locator('[data-mobile-menu-home]').evaluate((element) => (
     element.getBoundingClientRect().bottom + window.scrollY + 12
@@ -1121,11 +1190,11 @@ test('mobile archipelago enters vertically at both scroll placements', async ({ 
   });
 
   expect(dockingMotion.name).toBe('mobile-island-dock-in');
-  expect(dockingMotion.keyframes[0].opacity).toBe('0.18');
-  expect(dockingMotion.keyframes[0].translate).toBe('0px 32px');
-  expect(dockingMotion.keyframes[1].translate).toBe('0px -1.5px');
+  expect(dockingMotion.keyframes.every(({ opacity }) => !opacity || opacity === '1')).toBe(true);
+  expect(dockingMotion.keyframes[0].translate).toBe('0px 100%');
   expect(dockingMotion.keyframes.at(-1).translate).toBe('0px');
   expect(dockingMotion.keyframes.every(({ transform }) => !transform || transform === 'none')).toBe(true);
+  await expect(menu).toHaveCSS('opacity', '1');
 
   await expect(menu).not.toHaveClass(/is-docking/);
   await expect.poll(() => menu.getAttribute('data-placement-motion-phase')).toBeNull();
@@ -1147,11 +1216,11 @@ test('mobile archipelago enters vertically at both scroll placements', async ({ 
   });
 
   expect(homeMotion.name).toBe('mobile-island-home-in');
-  expect(homeMotion.keyframes[0].opacity).toBe('0.3');
+  expect(homeMotion.keyframes.every(({ opacity }) => !opacity || opacity === '1')).toBe(true);
   expect(homeMotion.keyframes[0].translate).toBe('0px -18px');
-  expect(homeMotion.keyframes[1].translate).toBe('0px 0.75px');
   expect(homeMotion.keyframes.at(-1).translate).toBe('0px');
   expect(homeMotion.keyframes.every(({ transform }) => !transform || transform === 'none')).toBe(true);
+  await expect(menu).toHaveCSS('opacity', '1');
   await expect(menu).not.toHaveClass(/is-returning-home/);
   await expect.poll(() => menu.getAttribute('data-placement-motion-phase')).toBeNull();
 });

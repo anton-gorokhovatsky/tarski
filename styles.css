@@ -3801,7 +3801,7 @@ html.has-open-dossier {
     --island-service-toggle-size: 32px;
     --island-daylight-width: min(332px, calc(100vw - 24px));
     --daylight-panel-inset: var(--space-7);
-    --island-daylight-height: 384px;
+    --island-daylight-height: 377px;
     --island-daylight-question-height: 450px;
     --island-daylight-feedback-height: 464px;
     --island-daylight-top: 8px;
@@ -3828,9 +3828,9 @@ html.has-open-dossier {
     --island-motion-phase-content-delay: 110ms;
     --island-motion-phase-return: 220ms;
     --island-motion-phase-return-delay: 100ms;
-    --island-motion-placement-initial: 600ms;
-    --island-motion-placement-dock: 520ms;
-    --island-motion-placement-home: 440ms;
+    --island-motion-placement-initial: 480ms;
+    --island-motion-placement-dock: 460ms;
+    --island-motion-placement-home: 360ms;
     --island-motion-morph: var(--island-motion-phase-surface);
     --island-motion-service: var(--island-motion-phase-surface);
     --island-motion-content-fade: var(--island-motion-phase-content-in);
@@ -4082,74 +4082,51 @@ html.has-open-dossier {
 
   @keyframes mobile-island-home-arrival {
     0% {
-      opacity: 0;
       translate: 0 -20px;
-      animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    70% {
-      opacity: 1;
-      translate: 0 1px;
-      animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
     }
     100% {
-      opacity: 1;
       translate: 0 0;
     }
   }
 
   @keyframes mobile-island-dock-in {
     0% {
-      opacity: 0.18;
-      translate: 0 32px;
-      animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    72% {
-      opacity: 1;
-      translate: 0 -1.5px;
-      animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
+      translate: 0 100%;
     }
     100% {
-      opacity: 1;
       translate: 0 0;
     }
   }
 
   @keyframes mobile-island-home-in {
     0% {
-      opacity: 0.3;
       translate: 0 -18px;
-      animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    74% {
-      opacity: 1;
-      translate: 0 0.75px;
-      animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
     }
     100% {
-      opacity: 1;
       translate: 0 0;
     }
   }
 
   .mobile-floating-menu:is(.is-home-arriving, .is-docking, .is-returning-home) {
-    will-change: opacity, translate, transform;
+    opacity: 1;
+    will-change: translate, transform;
   }
 
   .mobile-floating-menu.is-placement-pending {
-    opacity: 0;
+    translate: 0 -20px;
     pointer-events: none;
   }
 
   .mobile-floating-menu.is-home-arriving {
-    animation: mobile-island-home-arrival var(--island-motion-placement-initial) linear both;
+    animation: mobile-island-home-arrival var(--island-motion-placement-initial) cubic-bezier(0.16, 1, 0.3, 1) both;
   }
 
   .mobile-floating-menu.is-docking {
-    animation: mobile-island-dock-in var(--island-motion-placement-dock) linear both;
+    animation: mobile-island-dock-in var(--island-motion-placement-dock) cubic-bezier(0.16, 1, 0.3, 1) both;
   }
 
   .mobile-floating-menu.is-returning-home {
-    animation: mobile-island-home-in var(--island-motion-placement-home) linear both;
+    animation: mobile-island-home-in var(--island-motion-placement-home) cubic-bezier(0.16, 1, 0.3, 1) both;
   }
 
   :root[data-effective-theme="light"] .mobile-floating-menu {
