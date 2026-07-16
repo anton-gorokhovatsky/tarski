@@ -73,7 +73,11 @@ for (const [date, expectedQuestion] of dates) {
       const themeRect = element.closest('[data-daylight-widget]')
         .querySelector('[data-theme-mode-group]')
         .getBoundingClientRect();
+      const weatherRect = element.closest('[data-daylight-widget]')
+        .querySelector('.daylight-widget__weather')
+        .getBoundingClientRect();
       const copyRect = element.querySelector('.daylight-widget__empathy-copy').getBoundingClientRect();
+      const questionRect = element.querySelector('[data-empathy-question]').getBoundingClientRect();
       const optionsRect = element.querySelector('[data-empathy-options]').getBoundingClientRect();
       const buttons = [...element.querySelectorAll('[data-empathy-answer]')].map((button) => {
         const rect = button.getBoundingClientRect();
@@ -98,6 +102,9 @@ for (const [date, expectedQuestion] of dates) {
         copyBottom: copyRect.bottom,
         optionsTop: optionsRect.top,
         optionsBottom: optionsRect.bottom,
+        weatherToCheckIn: copyRect.top - weatherRect.bottom,
+        questionToAnswers: optionsRect.top - questionRect.bottom,
+        answersToTheme: themeRect.top - optionsRect.bottom,
         panelBottom: panelRect.bottom,
         expectedPanelInset,
         horizontalContentInset: themeRect.left - serviceRect.left,
@@ -117,6 +124,9 @@ for (const [date, expectedQuestion] of dates) {
     });
     expect(geometry.copyBottom).toBeLessThanOrEqual(geometry.optionsTop);
     expect(geometry.optionsBottom).toBeLessThanOrEqual(geometry.panelBottom);
+    expect(geometry.weatherToCheckIn).toBeCloseTo(20, 1);
+    expect(geometry.questionToAnswers).toBeCloseTo(12, 1);
+    expect(geometry.answersToTheme).toBeCloseTo(16, 1);
     expect(geometry.horizontalContentInset).toBeCloseTo(geometry.expectedPanelInset, 1);
     expect(geometry.bottomContentInset).toBeCloseTo(geometry.horizontalContentInset, 1);
     expect(geometry.buttonHeights.every((height) => height === 32)).toBe(true);
@@ -137,6 +147,7 @@ for (const [date, expectedQuestion] of dates) {
 
     await widget.locator('[data-empathy-answer="skip"]').click();
     await expect(widget.locator('[data-empathy-feedback]')).toBeVisible();
+    await expect(widget.locator('[data-empathy-storage-confirmation]')).toBeHidden();
     expect(await page.evaluate((key) => localStorage.getItem(key), storageKey)).toBeNull();
   });
 }
@@ -164,7 +175,91 @@ test('every answer produces one clear, reversible response', async ({ page }) =>
     await expect(widget.locator('[data-empathy-settings]')).not.toHaveAttribute('inert', '');
     await expect(widget.locator(`[data-motion-mode="${canUndo ? 'calm' : 'system'}"]`)).toHaveAttribute('aria-pressed', 'true');
     await expect(widget.locator('[data-theme-mode="auto"]')).toHaveAttribute('aria-pressed', 'true');
+    if (answer === 'skip') {
+      await expect(widget.locator('[data-empathy-storage-confirmation]')).toBeHidden();
+    } else {
+      await expect(widget.locator('[data-empathy-storage-confirmation]')).toBeVisible();
+    }
   }
+});
+
+test('mobile answer transition keeps one causal content-out to controls-in sequence', async ({ page }) => {
+  await page.goto('/?lang=ru&empathy=preview');
+  const widget = await openWidget(page);
+  const questionState = widget.locator('[data-empathy-question-state]');
+  const feedback = widget.locator('[data-empathy-feedback]');
+  const settings = widget.locator('[data-empathy-settings]');
+  const motionControls = widget.locator('[data-motion-mode-group]');
+
+  await page.evaluate(() => {
+    document.querySelector('[data-daylight-widget] [data-empathy-answer="tired"]').click();
+  });
+
+  await expect(widget).toHaveAttribute('data-empathy-motion-phase', 'content-out');
+  await expect(widget.locator('[data-empathy-panel]')).toHaveAttribute('aria-busy', 'true');
+  await expect(questionState).toBeVisible();
+  await expect(feedback).toBeHidden();
+
+  await expect(widget).toHaveAttribute('data-empathy-motion-phase', 'content-in');
+  await expect(widget).toHaveClass(/is-empathy-motion-preview-calm/);
+  await expect(page.locator('html')).toHaveAttribute('data-effective-motion', 'full');
+  await expect(feedback).toBeVisible();
+  await expect(motionControls).toBeVisible();
+  await expect(settings).toHaveAttribute('inert', '');
+  await expect.poll(() => widget.evaluate((element) => (
+    element.querySelectorAll('[inert]').length
+  ))).toBeGreaterThan(0);
+
+  await expect.poll(() => widget.getAttribute('data-empathy-motion-phase')).toBeNull();
+  await expect(widget.locator('[data-empathy-panel]')).not.toHaveAttribute('aria-busy', 'true');
+  await expect(feedback).toBeFocused();
+  await expect(settings).not.toHaveAttribute('inert', '');
+  await expect(widget).not.toHaveClass(/is-empathy-motion-preview-calm/);
+  await expect(page.locator('html')).toHaveAttribute('data-effective-motion', 'calm');
+  await expect(widget.locator('[data-motion-mode="calm"]')).toHaveAttribute('aria-pressed', 'true');
+});
+
+test('mobile answer transition accepts only the first rapid answer and settles cleanly', async ({ page }) => {
+  await page.goto('/?lang=ru&empathy=preview');
+  const widget = await openWidget(page);
+
+  await page.evaluate(() => {
+    const root = document.querySelector('[data-daylight-widget]');
+    root.querySelector('[data-empathy-answer="tired"]').click();
+    root.querySelector('[data-empathy-answer="curious"]').click();
+  });
+
+  await expect(widget.locator('[data-empathy-feedback-text]')).toContainText('движение спокойнее');
+  await expect.poll(() => widget.getAttribute('data-empathy-motion-phase')).toBeNull();
+  await expect(widget).not.toHaveClass(/is-empathy-transitioning|is-empathy-entering|is-empathy-content-out/);
+  await expect(page.locator('html')).toHaveAttribute('data-effective-motion', 'calm');
+});
+
+test('reduced motion skips empathy choreography without losing final state or focus', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('/?lang=ru&empathy=preview');
+  const widget = await openWidget(page);
+
+  await widget.locator('[data-empathy-answer="calm"]').click();
+
+  await expect(widget.locator('[data-empathy-feedback]')).toBeVisible();
+  await expect(widget.locator('[data-empathy-feedback]')).toBeFocused();
+  await expect.poll(() => widget.getAttribute('data-empathy-motion-phase')).toBeNull();
+  await expect(widget).not.toHaveClass(/is-empathy-transitioning|is-empathy-entering|is-empathy-content-out/);
+});
+
+test('an answer that does not adapt motion preserves the chosen motion preference', async ({ page }) => {
+  await page.addInitScript(() => window.localStorage.setItem('tarski-motion', 'calm'));
+  await page.goto('/?lang=ru&empathy=preview');
+  const widget = await openWidget(page);
+
+  await widget.locator('[data-empathy-answer="curious"]').click();
+
+  await expect(widget.locator('[data-empathy-feedback]')).toBeVisible();
+  await expect.poll(() => widget.getAttribute('data-empathy-motion-phase')).toBeNull();
+  await expect(page.locator('html')).toHaveAttribute('data-motion-preference', 'calm');
+  await expect(page.locator('html')).toHaveAttribute('data-effective-motion', 'calm');
+  await expect.poll(() => page.evaluate(() => window.tarskiMotion?.getOverride?.())).toBeNull();
 });
 
 test('desktop Today keeps the same optional check-in and balanced answer geometry', async ({ page }) => {
@@ -232,7 +327,7 @@ test('desktop Today keeps the same optional check-in and balanced answer geometr
   await today.locator('[data-empathy-answer="curious"]').click();
   await expect(today.locator('[data-empathy-feedback]')).toBeVisible();
   await expect(today.locator('[data-empathy-feedback-text]')).toContainText('Исследуйте в своём ритме');
-  await expect(today.locator('[data-empathy-storage-confirmation]')).toBeHidden();
+  await expect(today.locator('[data-empathy-storage-confirmation]')).toBeVisible();
   await expect(page.locator('html')).toHaveAttribute('data-effective-motion', 'full');
   await expect(today.locator('[data-empathy-undo]')).toBeHidden();
 });

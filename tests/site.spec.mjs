@@ -145,7 +145,7 @@ test('mobile menu and service panel preserve state, Escape, and focus return', a
   await expect(menuToggle).toHaveAttribute('aria-expanded', 'true');
   await expect(menu).toHaveAttribute('aria-hidden', 'false');
   await expect(menuRoot).toHaveClass(/is-menu-settled/);
-  expect(await menu.evaluate((element) => getComputedStyle(element).clipPath)).toBe('none');
+  expect(await menu.evaluate((element) => getComputedStyle(element).clipPath)).toContain('inset(0px');
   await page.evaluate(() => {
     const root = document.querySelector('[data-mobile-menu]');
     const panel = document.querySelector('#mobile-menu-expanded');
@@ -259,6 +259,54 @@ test('mobile menu and service panel preserve state, Escape, and focus return', a
   await expect.poll(() => serviceToggle.evaluate((element) => getComputedStyle(element).outlineStyle)).not.toBe('none');
 });
 
+test('mobile island transitions reverse without leaving stale phases', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/?lang=ru');
+
+  const menuRoot = page.locator('[data-mobile-menu]');
+  const menuToggle = page.locator('[data-mobile-menu-toggle]');
+  const menuPanel = page.locator('#mobile-menu-expanded');
+
+  await menuToggle.click();
+  await page.waitForTimeout(80);
+  await page.keyboard.press('Escape');
+  await page.waitForTimeout(80);
+  await page.evaluate(() => document.querySelector('[data-mobile-menu-toggle]').click());
+  await expect(menuToggle).toHaveAttribute('aria-expanded', 'true');
+  await expect(menuRoot).toHaveClass(/is-menu-settled/);
+  await expect(menuRoot).not.toHaveClass(/is-menu-closing|is-menu-compacting/);
+  await expect.poll(() => menuRoot.getAttribute('data-menu-motion-phase')).toBeNull();
+  await expect(menuPanel).toBeVisible();
+
+  await page.keyboard.press('Escape');
+  await expect(menuPanel).toBeHidden();
+
+  const serviceToggle = page.locator('[data-mobile-service-toggle]');
+  const serviceRoot = page.locator('[data-mobile-service]');
+  await serviceToggle.click();
+  await page.waitForTimeout(80);
+  await page.evaluate(() => document.querySelector('[data-mobile-service-toggle]').click());
+  await page.waitForTimeout(80);
+  await page.evaluate(() => document.querySelector('[data-mobile-service-toggle]').click());
+  await expect(serviceToggle).toHaveAttribute('aria-expanded', 'true');
+  await expect(serviceRoot).toHaveClass(/is-open/);
+  await expect(menuRoot).not.toHaveClass(/is-service-closing/);
+  await expect.poll(() => menuRoot.getAttribute('data-service-motion-phase')).toBeNull();
+
+  const daylightToggle = page.locator('[data-daylight-toggle]');
+  const daylightWidget = page.locator('[data-daylight-widget]');
+  await daylightToggle.click();
+  await page.waitForTimeout(80);
+  await page.evaluate(() => document.querySelector('[data-daylight-toggle]').click());
+  await page.waitForTimeout(80);
+  await page.evaluate(() => document.querySelector('[data-daylight-toggle]').click());
+  await expect(daylightToggle).toHaveAttribute('aria-expanded', 'true');
+  await expect(daylightWidget).toBeVisible();
+  await expect(menuRoot).not.toHaveClass(/is-daylight-transitioning|is-daylight-closing/);
+  await expect(menuRoot).toHaveClass(/is-daylight-open/);
+  await expect.poll(() => menuRoot.getAttribute('data-daylight-motion-phase')).toBeNull();
+});
+
 test('menu surfaces share one stable matte material without loading the Water experiment', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/?lang=ru');
@@ -331,12 +379,67 @@ test('daylight widget expands the service material and keeps theme modes accessi
   await expect(widget.locator('.daylight-widget__all-settings')).toHaveCount(0);
   await expect(widget.locator('time')).toHaveCount(3);
   await expect(widget.locator('[data-empathy-panel]')).toBeVisible();
+  await expect(widget.locator('[data-weather-care]')).toBeVisible();
+  await expect(page.locator('[data-mobile-menu]')).not.toHaveClass(/is-daylight-transitioning/);
+  const weatherGrouping = await widget.evaluate((element) => {
+    const service = element.closest('[data-mobile-service]');
+    const serviceRect = service.getBoundingClientRect();
+    const surfaceRect = document.querySelector('.mobile-service-surface').getBoundingClientRect();
+    const servicePanelRect = service.querySelector('.mobile-service-panel').getBoundingClientRect();
+    const serviceToggleRect = service.querySelector('.mobile-service-toggle').getBoundingClientRect();
+    const languageRect = service.querySelector('.language-switcher').getBoundingClientRect();
+    const themeToggleRect = service.querySelector('.theme-toggle').getBoundingClientRect();
+    const widgetRect = element.getBoundingClientRect();
+    const weatherRect = element.querySelector('.daylight-widget__weather').getBoundingClientRect();
+    const temperatureRect = element.querySelector('[data-weather-temperature]').getBoundingClientRect();
+    const careRect = element.querySelector('[data-weather-care]').getBoundingClientRect();
+    const copyRect = element.querySelector('.daylight-widget__empathy-copy').getBoundingClientRect();
+    const questionRect = element.querySelector('[data-empathy-question]').getBoundingClientRect();
+    const optionsRect = element.querySelector('[data-empathy-options]').getBoundingClientRect();
+    const modesRect = element.querySelector('.daylight-widget__modes').getBoundingClientRect();
+    const dividerTop = parseFloat(getComputedStyle(service, '::before').top);
+    const headerCenters = [serviceToggleRect, languageRect, themeToggleRect]
+      .map((rect) => rect.top + rect.height / 2);
+    return {
+      headerHeight: servicePanelRect.height,
+      headerToDivider: dividerTop - servicePanelRect.height,
+      dividerToWidget: widgetRect.top - serviceRect.top - dividerTop,
+      headerToWidget: widgetRect.top - servicePanelRect.bottom,
+      headerCenterDelta: Math.max(...headerCenters) - Math.min(...headerCenters),
+      topDelta: Math.abs(temperatureRect.top - careRect.top),
+      inlineGap: careRect.left - temperatureRect.right,
+      careTextAlign: getComputedStyle(element.querySelector('[data-weather-care]')).textAlign,
+      weatherToCheckIn: copyRect.top - weatherRect.bottom,
+      questionToAnswers: optionsRect.top - questionRect.bottom,
+      answersToTheme: modesRect.top - optionsRect.bottom,
+      themeToSurface: surfaceRect.bottom - modesRect.bottom
+    };
+  });
+  expect(weatherGrouping.headerHeight).toBeCloseTo(64, 1);
+  expect(weatherGrouping.headerToDivider).toBeCloseTo(0, 1);
+  expect(weatherGrouping.dividerToWidget).toBeCloseTo(12, 1);
+  expect(weatherGrouping.headerToWidget).toBeCloseTo(12, 1);
+  expect(weatherGrouping.headerCenterDelta).toBeLessThanOrEqual(0.1);
+  expect(weatherGrouping.topDelta).toBeLessThanOrEqual(0.5);
+  expect(weatherGrouping.inlineGap).toBeGreaterThanOrEqual(15);
+  expect(weatherGrouping.inlineGap).toBeLessThanOrEqual(17);
+  expect(weatherGrouping.careTextAlign).toBe('left');
+  expect(weatherGrouping.weatherToCheckIn).toBeCloseTo(20, 1);
+  expect(weatherGrouping.questionToAnswers).toBeCloseTo(12, 1);
+  expect(weatherGrouping.answersToTheme).toBeCloseTo(16, 1);
+  expect(weatherGrouping.themeToSurface).toBeCloseTo(28, 1);
   await widget.locator('[data-empathy-answer="skip"]').click();
   await expect(widget.locator('[data-empathy-feedback]')).toBeVisible();
   await expect(widget.locator('[data-empathy-panel]')).toBeVisible();
   await expect(widget.locator('[data-empathy-settings]')).toBeVisible();
   await expect(widget.locator('[data-empathy-settings]')).not.toHaveAttribute('inert', '');
-  await page.waitForTimeout(900);
+  await expect.poll(() => serviceRoot.evaluate((element) => {
+    const menu = element.closest('[data-mobile-menu]');
+    const targetHeight = Number.parseFloat(
+      getComputedStyle(menu).getPropertyValue('--island-daylight-height')
+    );
+    return Math.abs(element.getBoundingClientRect().height - targetHeight);
+  })).toBeLessThanOrEqual(0.5);
 
   const expandedGeometry = await serviceRoot.evaluate((element) => {
     const menu = element.closest('[data-mobile-menu]');
@@ -413,8 +516,7 @@ test('daylight widget expands the service material and keeps theme modes accessi
   expect(expandedGeometry.ghostShadowContent).toBe('none');
   expect(expandedGeometry.widgetInsetLeft).toBeCloseTo(28, 0);
   expect(expandedGeometry.widgetInsetRight).toBeCloseTo(28, 0);
-  expect(expandedGeometry.widgetInsetBottom).toBeGreaterThanOrEqual(18);
-  expect(expandedGeometry.widgetInsetBottom).toBeLessThanOrEqual(22);
+  expect(expandedGeometry.widgetInsetBottom).toBeCloseTo(28, 0);
   expect(expandedGeometry.chartInsetLeft).toBeCloseTo(0, 1);
   expect(expandedGeometry.chartInsetRight).toBeCloseTo(0, 1);
   expect(expandedGeometry.chartPreserveAspectRatio).toBe('xMidYMid slice');
@@ -974,19 +1076,44 @@ test('mobile archipelago enters vertically at both scroll placements', async ({ 
   await page.goto('/?lang=ru');
 
   const menu = page.locator('[data-mobile-menu]');
+  await expect(menu).toHaveClass(/is-home-arriving/);
+  await expect(menu).toHaveAttribute('data-placement-motion-phase', 'initial-home');
+
+  const initialMotion = await menu.evaluate((element) => {
+    const animation = element.getAnimations()[0];
+    return {
+      name: getComputedStyle(element).animationName,
+      keyframes: animation?.effect?.getKeyframes().map(({ opacity, translate, transform }) => ({
+        opacity,
+        translate,
+        transform
+      })) || []
+    };
+  });
+
+  expect(initialMotion.name).toBe('mobile-island-home-arrival');
+  expect(initialMotion.keyframes[0].opacity).toBe('0');
+  expect(initialMotion.keyframes[0].translate).toBe('0px -20px');
+  expect(initialMotion.keyframes.at(-1).opacity).toBe('1');
+  expect(initialMotion.keyframes.at(-1).translate).toBe('0px');
+  await expect(menu).not.toHaveClass(/is-home-arriving/);
+  await expect.poll(() => menu.getAttribute('data-placement-motion-phase')).toBeNull();
+
   const threshold = await page.locator('[data-mobile-menu-home]').evaluate((element) => (
-    element.getBoundingClientRect().bottom + window.scrollY + 2
+    element.getBoundingClientRect().bottom + window.scrollY + 12
   ));
 
   await page.evaluate((top) => window.scrollTo(0, top), threshold);
   await expect(menu).toHaveClass(/is-visible/);
   await expect(menu).toHaveClass(/is-docking/);
+  await expect(menu).toHaveAttribute('data-placement-motion-phase', 'dock');
 
   const dockingMotion = await menu.evaluate((element) => {
     const animation = element.getAnimations()[0];
     return {
       name: getComputedStyle(element).animationName,
-      keyframes: animation?.effect?.getKeyframes().map(({ translate, transform }) => ({
+      keyframes: animation?.effect?.getKeyframes().map(({ opacity, translate, transform }) => ({
+        opacity,
         translate,
         transform
       })) || []
@@ -994,20 +1121,25 @@ test('mobile archipelago enters vertically at both scroll placements', async ({ 
   });
 
   expect(dockingMotion.name).toBe('mobile-island-dock-in');
-  expect(dockingMotion.keyframes[0].translate).toBe('0px 24px');
+  expect(dockingMotion.keyframes[0].opacity).toBe('0.18');
+  expect(dockingMotion.keyframes[0].translate).toBe('0px 32px');
+  expect(dockingMotion.keyframes[1].translate).toBe('0px -1.5px');
   expect(dockingMotion.keyframes.at(-1).translate).toBe('0px');
   expect(dockingMotion.keyframes.every(({ transform }) => !transform || transform === 'none')).toBe(true);
 
   await expect(menu).not.toHaveClass(/is-docking/);
+  await expect.poll(() => menu.getAttribute('data-placement-motion-phase')).toBeNull();
   await page.evaluate(() => window.scrollTo(0, 0));
   await expect(menu).not.toHaveClass(/is-visible/);
   await expect(menu).toHaveClass(/is-returning-home/);
+  await expect(menu).toHaveAttribute('data-placement-motion-phase', 'return-home');
 
   const homeMotion = await menu.evaluate((element) => {
     const animation = element.getAnimations()[0];
     return {
       name: getComputedStyle(element).animationName,
-      keyframes: animation?.effect?.getKeyframes().map(({ translate, transform }) => ({
+      keyframes: animation?.effect?.getKeyframes().map(({ opacity, translate, transform }) => ({
+        opacity,
         translate,
         transform
       })) || []
@@ -1015,9 +1147,13 @@ test('mobile archipelago enters vertically at both scroll placements', async ({ 
   });
 
   expect(homeMotion.name).toBe('mobile-island-home-in');
-  expect(homeMotion.keyframes[0].translate).toBe('0px -24px');
+  expect(homeMotion.keyframes[0].opacity).toBe('0.3');
+  expect(homeMotion.keyframes[0].translate).toBe('0px -18px');
+  expect(homeMotion.keyframes[1].translate).toBe('0px 0.75px');
   expect(homeMotion.keyframes.at(-1).translate).toBe('0px');
   expect(homeMotion.keyframes.every(({ transform }) => !transform || transform === 'none')).toBe(true);
+  await expect(menu).not.toHaveClass(/is-returning-home/);
+  await expect.poll(() => menu.getAttribute('data-placement-motion-phase')).toBeNull();
 });
 
 test('artist names remain headings with one keyboard trigger each', async ({ page }) => {

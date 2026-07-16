@@ -38,9 +38,18 @@
   const motionAdaptiveAnswers = new Set(['tired', 'tense']);
   const validAnswers = new Set(['calm', 'tired', 'tense', 'curious', 'skip']);
   const precipitation = new Set(['drizzle', 'rain', 'showers', 'thunderstorm']);
+  const islandMotion = window.tarskiMobileIslandMotion;
+  const mobileMenuRoot = widget.closest('[data-mobile-menu]');
+  const mobileSurfaceTargets = [
+    mobileMenuRoot?.querySelector('.mobile-service-depth'),
+    mobileMenuRoot?.querySelector('.mobile-service-surface')
+  ].filter(Boolean);
+  const reduceMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
   let currentAnswer = null;
   let feedbackKey = null;
   let feedbackPersisted = false;
+  let isMobileTransitioning = false;
+  const activeMobileAnimations = new Set();
 
   const getLabel = (path, fallback) => window.tarskiI18n?.t(path) || fallback;
   const getToday = () => {
@@ -105,12 +114,73 @@
     }
   };
 
+  const parseDuration = (value, fallback) => {
+    const duration = Number.parseFloat(value);
+    if (!Number.isFinite(duration)) return fallback;
+    return String(value).trim().endsWith('s') && !String(value).trim().endsWith('ms')
+      ? duration * 1000
+      : duration;
+  };
+
+  const getMobileTransitionTimings = () => {
+    if (reduceMotionQuery.matches) {
+      return {
+        contentOut: 0,
+        layoutShift: 0,
+        feedbackIn: 0,
+        motionIn: 0,
+        motionDelay: 0
+      };
+    }
+
+    const style = window.getComputedStyle(widget);
+    const isAlreadyCalm = window.tarskiMotion?.isCalm?.() === true;
+    const scale = isAlreadyCalm ? 0.48 : 1;
+    const read = (property, fallback) => (
+      parseDuration(style.getPropertyValue(property), fallback) * scale
+    );
+
+    return {
+      contentOut: read('--empathy-motion-content-out', 120),
+      layoutShift: read('--empathy-motion-layout-shift', 420),
+      feedbackIn: read('--empathy-motion-feedback-in', 220),
+      motionIn: read('--empathy-motion-controls-in', 260),
+      motionDelay: read('--empathy-motion-controls-delay', 100)
+    };
+  };
+
+  const trackAnimation = (animation) => {
+    if (!animation) return null;
+    activeMobileAnimations.add(animation);
+    animation.finished
+      .catch(() => {})
+      .finally(() => activeMobileAnimations.delete(animation));
+    return animation;
+  };
+
+  const animateElement = (element, keyframes, options) => {
+    if (!element || !options.duration || typeof element.animate !== 'function') return null;
+    return trackAnimation(element.animate(keyframes, {
+      easing: 'cubic-bezier(0.16, 1, 0.3, 1)',
+      fill: 'both',
+      ...options
+    }));
+  };
+
+  const waitForAnimations = async (animations) => {
+    await Promise.allSettled(
+      animations.filter(Boolean).map((animation) => animation.finished)
+    );
+  };
+
   const setSurfaceState = (surface, state) => {
     const isQuestion = state === 'question';
     const isFeedback = state === 'feedback';
 
     surface.questionState.hidden = !isQuestion;
     surface.feedback.hidden = !isFeedback;
+    surface.questionState.inert = !isQuestion;
+    surface.feedback.inert = !isFeedback;
 
     if (!surface.isMobile) {
       surface.root.dataset.empathyState = state;
@@ -136,7 +206,9 @@
     );
     surfaces.forEach((surface) => {
       surface.feedbackText.textContent = label;
-      surface.storageConfirmation.hidden = !feedbackPersisted || ['skip', 'restored'].includes(feedbackKey);
+      const isStoredAnswer = !['skip', 'restored'].includes(feedbackKey)
+        && (feedbackPersisted || previewMode);
+      surface.storageConfirmation.hidden = !isStoredAnswer;
     });
   };
 
@@ -157,6 +229,91 @@
     });
   };
 
+  const transitionMobileFeedback = async (surface, motionAdapted) => {
+    const ticket = islandMotion?.begin?.('empathy') || { channel: 'empathy' };
+    const timings = getMobileTransitionTimings();
+    const motionRow = mobileSettings.querySelector('.daylight-widget__motion');
+    const shouldPreviewCalm = motionAdapted && window.tarskiMotion?.isCalm?.() !== true;
+
+    isMobileTransitioning = true;
+    surface.root.setAttribute('aria-busy', 'true');
+    surface.questionState.inert = true;
+    mobileSettings.inert = true;
+    widget.classList.add('is-empathy-transitioning', 'is-empathy-content-out');
+    widget.dataset.empathyMotionPhase = 'content-out';
+
+    const exitAnimation = animateElement(surface.questionState, [
+      { opacity: 1, transform: 'translate3d(0, 0, 0)' },
+      { opacity: 0, transform: 'translate3d(0, -6px, 0)' }
+    ], {
+      duration: timings.contentOut
+    });
+
+    await waitForAnimations([exitAnimation]);
+    if (islandMotion?.isCurrent && !islandMotion.isCurrent(ticket)) return;
+
+    const initialSettingsTop = mobileSettings.getBoundingClientRect().top;
+    setSurfaceState(surface, 'feedback');
+    surface.feedback.inert = true;
+    mobileSettings.inert = true;
+    exitAnimation?.cancel();
+
+    const finalSettingsTop = mobileSettings.getBoundingClientRect().top;
+    const settingsDelta = initialSettingsTop - finalSettingsTop;
+
+    widget.classList.remove('is-empathy-content-out');
+    widget.classList.add('is-empathy-entering');
+    widget.classList.toggle('is-empathy-motion-preview-calm', shouldPreviewCalm);
+    widget.dataset.empathyMotionPhase = 'content-in';
+
+    const settingsAnimation = animateElement(mobileSettings, [
+      { transform: `translate3d(0, ${settingsDelta}px, 0)` },
+      { transform: 'translate3d(0, 0, 0)' }
+    ], {
+      duration: timings.layoutShift
+    });
+    const feedbackAnimation = animateElement(surface.feedback, [
+      { opacity: 0, transform: 'translate3d(0, 6px, 0)' },
+      { opacity: 1, transform: 'translate3d(0, 0, 0)' }
+    ], {
+      duration: timings.feedbackIn,
+      delay: Math.min(30, timings.feedbackIn * 0.15)
+    });
+    const motionAnimation = animateElement(motionRow, [
+      { opacity: 0, transform: 'translate3d(0, 8px, 0)' },
+      { opacity: 1, transform: 'translate3d(0, 0, 0)' }
+    ], {
+      duration: timings.motionIn,
+      delay: timings.motionDelay
+    });
+
+    const surfaceAnimation = islandMotion?.wait?.(ticket, mobileSurfaceTargets)
+      || Promise.resolve(true);
+    await Promise.all([
+      waitForAnimations([settingsAnimation, feedbackAnimation, motionAnimation]),
+      surfaceAnimation
+    ]);
+    if (islandMotion?.isCurrent && !islandMotion.isCurrent(ticket)) return;
+
+    if (motionAdapted) window.tarskiMotion?.setOverride('calm');
+    settingsAnimation?.cancel();
+    feedbackAnimation?.cancel();
+    motionAnimation?.cancel();
+    widget.classList.remove(
+      'is-empathy-transitioning',
+      'is-empathy-entering',
+      'is-empathy-motion-preview-calm'
+    );
+    delete widget.dataset.empathyMotionPhase;
+    surface.root.removeAttribute('aria-busy');
+    surface.feedback.inert = false;
+    mobileSettings.inert = false;
+    isMobileTransitioning = false;
+
+    const isWidgetVisible = !widget.hidden && widget.classList.contains('is-visible');
+    if (isWidgetVisible) surface.feedback.focus({ preventScroll: true });
+  };
+
   const showFeedback = (answer, motionAdapted, persisted, originSurface = null) => {
     currentAnswer = answer;
     feedbackKey = answer;
@@ -164,19 +321,29 @@
     surfaces.forEach((surface) => {
       surface.undo.hidden = !motionAdapted;
       if (surface.actions) surface.actions.hidden = !motionAdapted;
-      setSurfaceState(surface, 'feedback');
     });
     syncFeedback();
 
+    if (originSurface?.isMobile) {
+      surfaces.filter((surface) => !surface.isMobile).forEach((surface) => {
+        setSurfaceState(surface, 'feedback');
+      });
+      transitionMobileFeedback(originSurface, motionAdapted);
+      return;
+    }
+
+    if (motionAdapted) window.tarskiMotion?.setOverride('calm');
+    surfaces.forEach((surface) => setSurfaceState(surface, 'feedback'));
     const target = originSurface?.feedback;
     window.requestAnimationFrame(() => target?.focus?.({ preventScroll: true }));
   };
 
   const answer = (value, originSurface) => {
+    if (originSurface?.isMobile && isMobileTransitioning) return;
+
     const nextAnswer = validAnswers.has(value) ? value : 'skip';
     const motionAdapted = motionAdaptiveAnswers.has(nextAnswer);
 
-    window.tarskiMotion?.setOverride(motionAdapted ? 'calm' : null);
     const persisted = nextAnswer === 'skip' ? false : writeRecord({
       date: getToday(),
       answer: nextAnswer,
@@ -221,7 +388,7 @@
     currentAnswer = record.answer;
     feedbackKey = record.answer;
     feedbackPersisted = true;
-    window.tarskiMotion?.setOverride(record.motionAdapted ? 'calm' : null);
+    if (record.motionAdapted) window.tarskiMotion?.setOverride('calm');
     surfaces.forEach((surface) => {
       surface.undo.hidden = !record.motionAdapted;
       if (surface.actions) surface.actions.hidden = true;

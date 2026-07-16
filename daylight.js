@@ -42,7 +42,16 @@
     element.textContent = value;
     element.setAttribute('aria-label', value);
   };
-  let closeTimer = null;
+  const motion = window.tarskiMobileIslandMotion;
+  const motionTargets = [
+    service,
+    service.querySelector('.mobile-service-panel'),
+    toggle,
+    widget,
+    menu.querySelector('.mobile-service-depth'),
+    menu.querySelector('.mobile-service-surface')
+  ].filter(Boolean);
+
   let openFrame = null;
   let markerFrame = null;
   let weatherRequest = null;
@@ -238,12 +247,18 @@
     toggle.setAttribute('title', label);
   };
 
+  const setDaylightMotionPhase = (phase) => {
+    if (phase) menu.dataset.daylightMotionPhase = phase;
+    else delete menu.dataset.daylightMotionPhase;
+  };
+
   const setOpen = (isOpen, options = {}) => {
-    window.clearTimeout(closeTimer);
+    const motionTicket = motion.begin('daylight');
     window.cancelAnimationFrame(openFrame);
     openFrame = null;
 
     if (isOpen) {
+      setDaylightMotionPhase('surface-morph');
       updateViewportInset();
       widget.hidden = false;
       widget.setAttribute('aria-hidden', 'false');
@@ -255,20 +270,25 @@
       menu.getBoundingClientRect();
       openFrame = window.requestAnimationFrame(() => {
         openFrame = null;
-        if (toggle.getAttribute('aria-expanded') !== 'true') return;
+        if (!motion.isCurrent(motionTicket) || toggle.getAttribute('aria-expanded') !== 'true') return;
         menu.classList.add('is-daylight-open');
         service.classList.add('is-daylight-open');
         widget.classList.add('is-visible');
+
+        motion.wait(motionTicket, motionTargets).then((isCurrent) => {
+          if (!isCurrent || toggle.getAttribute('aria-expanded') !== 'true') return;
+          menu.classList.remove('is-daylight-transitioning');
+          setDaylightMotionPhase(null);
+          if (options.focusToggle) focusWithoutScroll(toggle);
+        });
       });
       syncToggleLabel();
-      if (options.focusToggle) {
-        window.setTimeout(() => focusWithoutScroll(toggle), 80);
-      }
       return;
     }
 
     window.cancelAnimationFrame(markerFrame);
     markerFrame = null;
+    setDaylightMotionPhase('surface-morph');
     widget.classList.remove('is-marker-arriving');
     toggle.setAttribute('aria-expanded', 'false');
     menu.classList.remove('is-daylight-transitioning');
@@ -279,14 +299,15 @@
     widget.setAttribute('aria-hidden', 'true');
     syncToggleLabel();
 
-    closeTimer = window.setTimeout(() => {
-      if (toggle.getAttribute('aria-expanded') === 'true') return;
+    motion.wait(motionTicket, motionTargets).then((isCurrent) => {
+      if (!isCurrent || toggle.getAttribute('aria-expanded') === 'true') return;
       menu.classList.remove('is-daylight-closing');
       widget.hidden = true;
-    }, 540);
+      setDaylightMotionPhase(null);
+    });
 
     if (options.restoreFocus) {
-      window.setTimeout(() => focusWithoutScroll(toggle), 0);
+      window.requestAnimationFrame(() => focusWithoutScroll(toggle));
     }
   };
 

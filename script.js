@@ -33,23 +33,80 @@ const prefersCalmMotion = () => (
   || window.matchMedia('(prefers-reduced-motion: reduce)').matches
 );
 
-const getMobileIslandMotionDuration = (element) => {
-  if (!element || prefersCalmMotion()) return 0;
+const createMobileIslandMotionCoordinator = () => {
+  const generations = new Map();
 
-  const value = Number.parseFloat(
-    window.getComputedStyle(element).getPropertyValue('--mobile-island-morph')
+  const begin = (channel) => {
+    const generation = (generations.get(channel) || 0) + 1;
+    generations.set(channel, generation);
+    return { channel, generation };
+  };
+
+  const isCurrent = (ticket) => (
+    ticket
+    && generations.get(ticket.channel) === ticket.generation
   );
-  return Number.isFinite(value) ? value : 720;
+
+  const collectAnimations = (elements) => {
+    const animations = new Set();
+
+    elements.filter(Boolean).forEach((element) => {
+      if (typeof element.getAnimations !== 'function') return;
+      element.getAnimations().forEach((animation) => {
+        if (animation.playState === 'running' || animation.playState === 'pending') {
+          animations.add(animation);
+        }
+      });
+    });
+
+    return [...animations];
+  };
+
+  const parseTimes = (value) => value.split(',').map((part) => {
+    const time = Number.parseFloat(part);
+    if (!Number.isFinite(time)) return 0;
+    return part.trim().endsWith('ms') ? time : time * 1000;
+  });
+
+  const getLongestStyleMotion = (element) => {
+    const style = window.getComputedStyle(element);
+    const getLongestTrack = (durationValue, delayValue) => {
+      const durations = parseTimes(durationValue);
+      const delays = parseTimes(delayValue);
+      const trackCount = Math.max(durations.length, delays.length);
+
+      return Math.max(0, ...Array.from({ length: trackCount }, (_, index) => (
+        durations[index % durations.length] + delays[index % delays.length]
+      )));
+    };
+
+    return Math.max(
+      getLongestTrack(style.transitionDuration, style.transitionDelay),
+      getLongestTrack(style.animationDuration, style.animationDelay)
+    );
+  };
+
+  const wait = async (ticket, elements) => {
+    await new Promise((resolve) => window.requestAnimationFrame(resolve));
+    if (!isCurrent(ticket)) return false;
+
+    const animations = collectAnimations(elements);
+    if (animations.length) {
+      await Promise.allSettled(animations.map((animation) => animation.finished));
+    } else {
+      const fallbackDuration = Math.max(0, ...elements.filter(Boolean).map(getLongestStyleMotion));
+      if (fallbackDuration > 0) {
+        await new Promise((resolve) => window.setTimeout(resolve, fallbackDuration));
+      }
+    }
+
+    return isCurrent(ticket);
+  };
+
+  return { begin, isCurrent, wait };
 };
 
-const getMobileServiceMotionDuration = (element) => {
-  if (!element || prefersCalmMotion()) return 0;
-
-  const value = Number.parseFloat(
-    window.getComputedStyle(element).getPropertyValue('--mobile-service-motion')
-  );
-  return Number.isFinite(value) ? value : 560;
-};
+window.tarskiMobileIslandMotion = createMobileIslandMotionCoordinator();
 
 (() => {
   const iconLink = document.querySelector('link[rel~="icon"]');

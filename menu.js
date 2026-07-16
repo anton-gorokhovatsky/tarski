@@ -24,9 +24,26 @@
     code.textContent = languageCodes[language] || language.toUpperCase();
   };
 
-  let transitionTimer = null;
+  const motion = window.tarskiMobileIslandMotion;
+  const motionTargets = [
+    service,
+    panel,
+    toggle,
+    toggle.querySelector('span'),
+    menu?.querySelector('.mobile-island-depth'),
+    menu?.querySelector('.mobile-island-surface'),
+    menu?.querySelector('.mobile-service-depth'),
+    menu?.querySelector('.mobile-service-surface')
+  ].filter(Boolean);
+
   let openFrame = null;
   let activeTrigger = null;
+
+  const setServiceMotionPhase = (phase) => {
+    if (!menu) return;
+    if (phase) menu.dataset.serviceMotionPhase = phase;
+    else delete menu.dataset.serviceMotionPhase;
+  };
 
   const setToggleState = (isOpen) => {
     toggle.setAttribute('aria-expanded', String(isOpen));
@@ -64,6 +81,7 @@
   };
 
   const setOpen = (isOpen, options = {}) => {
+    const motionTicket = motion.begin('service');
     const isExpanded = service.classList.contains('is-open')
       || service.classList.contains('is-closing')
       || menu?.classList.contains('is-service-open')
@@ -73,10 +91,10 @@
     if (!isOpen && !isExpanded) {
       setToggleState(false);
       setPanelHiddenState(true);
+      setServiceMotionPhase(null);
       return;
     }
 
-    window.clearTimeout(transitionTimer);
     window.cancelAnimationFrame(openFrame);
     openFrame = null;
 
@@ -92,6 +110,7 @@
     if (isOpen) {
       updateServiceShellWidth();
       setPanelHiddenState(false);
+      setServiceMotionPhase('surface-morph');
       service.classList.remove('is-closing');
       menu?.classList.remove('is-service-closing');
       setToggleState(true);
@@ -99,19 +118,22 @@
       if (service.classList.contains('is-open') || menu?.classList.contains('is-service-open')) {
         service.classList.add('is-open');
         menu?.classList.add('is-service-open');
-        menu?.classList.remove('is-service-transitioning');
+        setServiceMotionPhase(null);
         return;
       }
 
-      menu?.classList.add('is-service-transitioning');
       menu?.getBoundingClientRect();
       openFrame = window.requestAnimationFrame(() => {
         openFrame = null;
-        if (toggle.getAttribute('aria-expanded') !== 'true') return;
+        if (!motion.isCurrent(motionTicket) || toggle.getAttribute('aria-expanded') !== 'true') return;
 
         service.classList.add('is-open');
         menu?.classList.add('is-service-open');
-        window.requestAnimationFrame(() => menu?.classList.remove('is-service-transitioning'));
+        motion.wait(motionTicket, motionTargets).then((isCurrent) => {
+          if (isCurrent && toggle.getAttribute('aria-expanded') === 'true') {
+            setServiceMotionPhase(null);
+          }
+        });
       });
       return;
     }
@@ -119,16 +141,12 @@
     const shouldRestoreFocus = options.restoreFocus !== false;
 
     window.dispatchEvent(new CustomEvent('tarski:daylightclose'));
+    setServiceMotionPhase('surface-morph');
     setToggleState(false);
     service.classList.add('is-closing');
     menu?.classList.add('is-service-closing');
-    menu?.classList.add('is-service-transitioning');
     service.classList.remove('is-open');
     menu?.classList.remove('is-service-open');
-    openFrame = window.requestAnimationFrame(() => {
-      openFrame = null;
-      menu?.classList.remove('is-service-transitioning');
-    });
 
     if (shouldRestoreFocus && activeTrigger instanceof HTMLElement) {
       const triggerToRestore = activeTrigger;
@@ -137,14 +155,14 @@
 
     activeTrigger = null;
 
-    transitionTimer = window.setTimeout(() => {
-      if (toggle.getAttribute('aria-expanded') === 'true') return;
+    motion.wait(motionTicket, motionTargets).then((isCurrent) => {
+      if (!isCurrent || toggle.getAttribute('aria-expanded') === 'true') return;
       service.classList.remove('is-closing');
       menu?.classList.remove('is-service-closing');
-      menu?.classList.remove('is-service-transitioning');
       setPanelHiddenState(true);
+      setServiceMotionPhase(null);
       window.dispatchEvent(new CustomEvent('tarski:mobileislandresize'));
-    }, getMobileServiceMotionDuration(menu));
+    });
   };
 
   toggle.addEventListener('click', (event) => {
@@ -215,22 +233,27 @@
 
   if (!menu || !toggle || !drawer || !panel) return;
 
-  let closeTimer = null;
-  let compactTimer = null;
+  const motion = window.tarskiMobileIslandMotion;
+  const menuDepth = menu.querySelector('.mobile-menu-expanded-depth');
+  const motionTargets = [
+    panel,
+    menuDepth,
+    menu.querySelector('.mobile-island-depth'),
+    menu.querySelector('.mobile-island-surface'),
+    toggle,
+    menu.querySelector('.mobile-mail-pill'),
+    menu.querySelector('.mobile-service')
+  ].filter(Boolean);
+  const contentTargets = [...panel.children];
+
   let openFrame = null;
-  let focusTimer = null;
-  let settleTimer = null;
   let activeTrigger = null;
 
-  const prefersReducedMotion = () => prefersCalmMotion();
-  const getMenuContentOutDuration = () => {
-    if (prefersReducedMotion()) return 0;
-
-    const value = Number.parseFloat(
-      window.getComputedStyle(menu).getPropertyValue('--island-motion-menu-content-out')
-    );
-    return Number.isFinite(value) ? value : 100;
+  const setMenuMotionPhase = (phase) => {
+    if (phase) menu.dataset.menuMotionPhase = phase;
+    else delete menu.dataset.menuMotionPhase;
   };
+
   const getLabel = (isOpen) => {
     const path = isOpen ? 'ui.menuClose' : 'ui.menuOpen';
     const fallback = isOpen ? 'Закрыть меню' : 'Открыть меню';
@@ -251,12 +274,11 @@
   };
 
   const setOpen = (isOpen, options = {}) => {
+    const motionTicket = motion.begin('menu');
+
     if (isOpen) {
-      window.clearTimeout(closeTimer);
-      window.clearTimeout(compactTimer);
-      window.clearTimeout(focusTimer);
-      window.clearTimeout(settleTimer);
       window.cancelAnimationFrame(openFrame);
+      setMenuMotionPhase('surface-morph');
       activeTrigger = document.activeElement instanceof HTMLElement ? document.activeElement : toggle;
       window.dispatchEvent(new CustomEvent('tarski:mobilemenuopen'));
       drawer.hidden = false;
@@ -269,25 +291,22 @@
 
       openFrame = window.requestAnimationFrame(() => {
         openFrame = null;
-        if (toggle.getAttribute('aria-expanded') !== 'true') return;
+        if (!motion.isCurrent(motionTicket) || toggle.getAttribute('aria-expanded') !== 'true') return;
 
         menu.classList.add('is-menu-open');
         drawer.classList.add('is-open');
         window.dispatchEvent(new CustomEvent('tarski:mobileislandresize'));
-        settleTimer = window.setTimeout(() => {
-          settleTimer = null;
-          if (menu.classList.contains('is-menu-open')) {
+
+        motion.wait(motionTicket, motionTargets).then((isCurrent) => {
+          if (isCurrent && menu.classList.contains('is-menu-open')) {
             menu.classList.add('is-menu-settled');
+            setMenuMotionPhase(null);
           }
-        }, prefersReducedMotion() ? 0 : getMobileIslandMotionDuration(menu));
-        if (options.focus) {
-          focusTimer = window.setTimeout(() => {
-            focusTimer = null;
-            if (toggle.getAttribute('aria-expanded') === 'true') {
-              focusWithoutScroll(panel);
-            }
-          }, prefersReducedMotion() ? 0 : 440);
-        }
+
+          if (isCurrent && options.focus && toggle.getAttribute('aria-expanded') === 'true') {
+            focusWithoutScroll(panel);
+          }
+        });
       });
       return;
     }
@@ -298,66 +317,54 @@
 
     if (!isExpanded) {
       syncToggleState(false);
+      setMenuMotionPhase(null);
       return;
     }
 
-    window.clearTimeout(closeTimer);
-    window.clearTimeout(compactTimer);
-    window.clearTimeout(focusTimer);
-    window.clearTimeout(settleTimer);
     window.cancelAnimationFrame(openFrame);
     openFrame = null;
-    focusTimer = null;
 
     const shouldRestoreFocus = options.restoreFocus !== false;
 
     drawer.classList.remove('is-open');
+    setMenuMotionPhase('content-out');
     menu.classList.add('is-menu-closing');
     menu.classList.remove('is-menu-settled');
     panel.setAttribute('aria-hidden', 'true');
     syncToggleState(false);
     setModalBackgroundInert(false);
 
-    /*
-     * A settled panel uses clip-path: none. That value cannot interpolate to
-     * the compact inset, so closing used to jump straight to a small box.
-     * First restore the visually identical explicit full inset and let the
-     * panel content fade; only then start the geometric collapse.
-     */
     panel.getBoundingClientRect();
-
-    const contentOutDuration = getMenuContentOutDuration();
-    const beginCompacting = () => {
-      compactTimer = null;
-      if (toggle.getAttribute('aria-expanded') === 'true') return;
-
-      menu.classList.add('is-menu-compacting');
-      menu.classList.remove('is-menu-open');
-    };
-
-    if (contentOutDuration === 0) {
-      beginCompacting();
-    } else {
-      compactTimer = window.setTimeout(beginCompacting, contentOutDuration);
-    }
 
     if (shouldRestoreFocus && activeTrigger instanceof HTMLElement) {
       const triggerToRestore = activeTrigger;
-      window.setTimeout(() => focusWithoutScroll(triggerToRestore), 0);
+      window.requestAnimationFrame(() => focusWithoutScroll(triggerToRestore));
     }
 
     activeTrigger = null;
 
-    closeTimer = window.setTimeout(() => {
-      if (toggle.getAttribute('aria-expanded') === 'true') return;
+    const finishClosing = async () => {
+      const contentFinished = await motion.wait(motionTicket, contentTargets);
+      if (!contentFinished || toggle.getAttribute('aria-expanded') === 'true') return;
+
+      setMenuMotionPhase('surface-morph');
+      menu.classList.add('is-menu-compacting');
+      menu.classList.remove('is-menu-open');
+
+      const compactFinished = await motion.wait(motionTicket, motionTargets);
+      if (!compactFinished || toggle.getAttribute('aria-expanded') === 'true') return;
+
       menu.classList.remove('is-menu-closing', 'is-menu-compacting');
+      setMenuMotionPhase(null);
       window.dispatchEvent(new CustomEvent('tarski:mobileislandresize'));
 
       if (!drawer.classList.contains('is-open')) {
         drawer.hidden = true;
         panel.hidden = true;
       }
-    }, contentOutDuration + getMobileIslandMotionDuration(menu));
+    };
+
+    finishClosing();
   };
 
   toggle.addEventListener('click', (event) => {
@@ -437,8 +444,11 @@
   const mainNav = document.querySelector('.main-nav');
   const mobileMenu = document.querySelector('[data-mobile-menu]');
   const mobileMenuHome = document.querySelector('[data-mobile-menu-home]');
+  const placementMotion = window.tarskiMobileIslandMotion;
   const navLabel = mainNav?.querySelector('.nav-label');
   const mobileQuery = window.matchMedia('(max-width: 720px)');
+  const placementClasses = ['is-home-arriving', 'is-docking', 'is-returning-home'];
+  const placementHysteresis = 10;
   const fallbackSceneLabels = {
     cover: 'Меню',
     about: 'Среда',
@@ -507,7 +517,7 @@
   let currentActiveId = null;
   let currentScene = document.documentElement.dataset.scene || 'cover';
   let navigationFrame = null;
-  let mobilePlacementTimer = null;
+  let placementInitialized = false;
   let needsIndicatorUpdate = false;
   const indicatorTimers = new WeakMap();
   const pulseIndicator = (container) => {
@@ -617,37 +627,78 @@
     updateNavLabel();
   };
 
-  const updateMobileMenuVisibility = () => {
+  const clearPlacementMotion = () => {
+    if (!mobileMenu) return;
+    mobileMenu.classList.remove(...placementClasses);
+    delete mobileMenu.dataset.placementMotionPhase;
+  };
+
+  const startPlacementMotion = (placementClass, phase) => {
     if (!mobileMenu) return;
 
+    const ticket = placementMotion?.begin?.('placement');
+    clearPlacementMotion();
+
+    if (!ticket || prefersCalmMotion()) return;
+
+    mobileMenu.classList.add(placementClass);
+    mobileMenu.dataset.placementMotionPhase = phase;
+    placementMotion.wait(ticket, [mobileMenu]).then((isCurrent) => {
+      if (!isCurrent || !mobileMenu.classList.contains(placementClass)) return;
+      clearPlacementMotion();
+    });
+  };
+
+  const updateMobileMenuVisibility = ({ initial = false } = {}) => {
+    if (!mobileMenu) return;
+    if (!initial && !placementInitialized) return;
+
     if (!mobileQuery.matches) {
-      window.clearTimeout(mobilePlacementTimer);
-      mobilePlacementTimer = null;
-      mobileMenu.classList.remove('is-visible', 'is-docking', 'is-returning-home');
+      placementMotion?.begin?.('placement');
+      mobileMenu.classList.remove('is-visible');
+      clearPlacementMotion();
       return;
     }
 
     const mainNav = document.querySelector('.main-nav');
     const mobileHomeBottom = mobileMenuHome ? mobileMenuHome.getBoundingClientRect().bottom : null;
     const navBottom = mainNav ? mainNav.getBoundingClientRect().bottom : 0;
-    const shouldShow = mobileHomeBottom !== null ? mobileHomeBottom < 0 : navBottom < 0;
     const isVisible = mobileMenu.classList.contains('is-visible');
+    const placementMarker = mobileHomeBottom ?? navBottom;
+    const shouldShow = initial
+      ? placementMarker < 0
+      : isVisible
+        ? placementMarker < placementHysteresis
+        : placementMarker < -placementHysteresis;
 
-    if (shouldShow === isVisible) return;
+    if (shouldShow === isVisible && !initial) return;
 
-    window.clearTimeout(mobilePlacementTimer);
-    mobilePlacementTimer = null;
-    mobileMenu.classList.remove('is-docking', 'is-returning-home');
     mobileMenu.classList.toggle('is-visible', shouldShow);
 
-    if (prefersCalmMotion()) return;
+    if (shouldShow) {
+      startPlacementMotion('is-docking', 'dock');
+    } else if (initial) {
+      startPlacementMotion('is-home-arriving', 'initial-home');
+    } else {
+      startPlacementMotion('is-returning-home', 'return-home');
+    }
+  };
 
-    const placementClass = shouldShow ? 'is-docking' : 'is-returning-home';
-    mobileMenu.classList.add(placementClass);
-    mobilePlacementTimer = window.setTimeout(() => {
-      mobilePlacementTimer = null;
-      mobileMenu.classList.remove(placementClass);
-    }, getMobileIslandMotionDuration(mobileMenu));
+  const initializeMobilePlacement = () => {
+    if (!mobileMenu) return;
+
+    if (mobileQuery.matches && !prefersCalmMotion()) {
+      mobileMenu.classList.add('is-placement-pending');
+    }
+
+    const start = () => window.requestAnimationFrame(() => {
+      mobileMenu.classList.remove('is-placement-pending');
+      placementInitialized = true;
+      updateMobileMenuVisibility({ initial: true });
+    });
+
+    if (document.readyState === 'complete') start();
+    else window.addEventListener('load', start, { once: true });
   };
 
   const updateNavigationState = () => {
@@ -670,7 +721,7 @@
 
   updateActive();
   updateMenuIndicators(false);
-  updateMobileMenuVisibility();
+  initializeMobilePlacement();
 
   window.addEventListener('scroll', () => scheduleNavigationState(), { passive: true });
 
