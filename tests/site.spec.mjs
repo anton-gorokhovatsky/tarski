@@ -795,15 +795,38 @@ test('daily empathy check-in stays local and exposes reversible motion adaptatio
   await expect(widget.locator('[data-empathy-settings]')).not.toHaveAttribute('inert', '');
   await expect(widget.locator('[data-motion-mode="system"]')).toHaveAttribute('aria-pressed', 'true');
 
-  await page.evaluate(() => {
+  const setWeatherState = (weatherKey, temperature = 18) => page.evaluate(({ key, value }) => {
     const daylight = document.querySelector('[data-daylight-widget]');
-    daylight.dataset.weatherKey = 'rain';
-    daylight.dataset.weatherTemperature = '18';
+    daylight.dataset.weatherKey = key;
+    daylight.dataset.weatherTemperature = String(value);
     window.dispatchEvent(new CustomEvent('tarski:weatherchange', {
-      detail: { weatherKey: 'rain', temperature: 18 }
+      detail: { weatherKey: key, temperature: value }
     }));
-  });
+  }, { key: weatherKey, value: temperature });
+
+  await setWeatherState('rain');
   await expect(widget.locator('[data-weather-care]')).toContainText('зонт может пригодиться');
+
+  await setWeatherState('thunderstorm');
+  const weatherCare = widget.locator('[data-weather-care]');
+  const expectWeatherCareToFit = async () => {
+    const overflow = await weatherCare.evaluate((element) => ({
+      horizontal: element.scrollWidth - element.clientWidth,
+      vertical: element.scrollHeight - element.clientHeight
+    }));
+    expect(overflow.horizontal).toBeLessThanOrEqual(1);
+    expect(overflow.vertical).toBeLessThanOrEqual(1);
+  };
+  await expect(weatherCare).toHaveText('В грозу оставайтесь в помещении, вдали от окон.');
+  await expectWeatherCareToFit();
+  await page.locator('[data-mobile-service-panel] [data-language-option="en"]').click();
+  await setWeatherState('thunderstorm');
+  await expect(weatherCare).toHaveText('Thunderstorm: stay indoors, away from windows.');
+  await expectWeatherCareToFit();
+  await page.locator('[data-mobile-service-panel] [data-language-option="ja"]').click();
+  await setWeatherState('thunderstorm');
+  await expect(weatherCare).toHaveText('雷雨時は屋内に入り、窓から離れてください。');
+  await expectWeatherCareToFit();
 });
 
 test('text controls stay vertically centered across mobile and desktop settings', async ({ page }) => {
