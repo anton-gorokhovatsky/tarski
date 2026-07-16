@@ -37,7 +37,7 @@
   const previewMode = new URLSearchParams(window.location.search).get('empathy') === 'preview';
   const motionAdaptiveAnswers = new Set(['tired', 'tense']);
   const validAnswers = new Set(['calm', 'tired', 'tense', 'curious', 'skip']);
-  const precipitation = new Set(['drizzle', 'rain', 'showers', 'thunderstorm']);
+  const precipitation = new Set(['drizzle', 'rain', 'showers']);
   const islandMotion = window.tarskiMobileIslandMotion;
   const mobileMenuRoot = widget.closest('[data-mobile-menu]');
   const mobileSurfaceTargets = [
@@ -217,7 +217,8 @@
     const temperature = Number(widget.dataset.weatherTemperature);
     let careKey = null;
 
-    if (precipitation.has(weatherKey)) careKey = 'umbrella';
+    if (weatherKey === 'thunderstorm') careKey = 'storm';
+    else if (precipitation.has(weatherKey)) careKey = 'umbrella';
     else if (Number.isFinite(temperature) && temperature >= 27) careKey = 'heat';
     else if (Number.isFinite(temperature) && temperature <= 3) careKey = 'warm';
     else if (weatherKey === 'clear') careKey = 'walk';

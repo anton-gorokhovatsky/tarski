@@ -137,6 +137,7 @@
           thunderstorm: 'Гроза'
         },
         weatherCare: {
+          storm: 'В грозу оставайтесь в помещении, вдали от окон.',
           umbrella: 'Если собираетесь выходить, зонт может пригодиться.',
           heat: 'Вода, тень и SPF сегодня будут кстати.',
           warm: 'Возможно, стоит одеться чуть теплее.',
@@ -290,6 +291,7 @@
           thunderstorm: 'Thunderstorm'
         },
         weatherCare: {
+          storm: 'Thunderstorm: stay indoors, away from windows.',
           umbrella: 'If you are heading out, an umbrella may come in handy.',
           heat: 'Water, shade, and SPF may be useful today.',
           warm: 'You may want to dress a little warmer.',
@@ -541,6 +543,7 @@
           thunderstorm: '雷雨'
         },
         weatherCare: {
+          storm: '雷雨時は屋内に入り、窓から離れてください。',
           umbrella: '外出するなら、傘が役立ちそうです。',
           heat: '今日は水分と日陰、日焼け止めが役立ちそうです。',
           warm: '少し暖かい服装がよさそうです。',
