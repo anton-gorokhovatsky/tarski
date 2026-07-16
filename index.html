@@ -88,7 +88,7 @@
                 <button type="button" data-language-option="en" lang="en" aria-pressed="false">EN</button>
                 <button type="button" data-language-option="ja" lang="ja" aria-pressed="false">JP</button>
               </div>
-              <button class="theme-toggle" type="button" data-theme-toggle aria-label="Переключить тему" aria-pressed="false" title="Переключить тему">
+              <button class="theme-toggle" type="button" data-theme-toggle aria-label="Переключить тему" title="Переключить тему">
                 <span class="theme-toggle__icon" aria-hidden="true"></span>
               </button>
               <button class="nav-settings-toggle" type="button" data-settings-open>
@@ -129,7 +129,7 @@
                 <button type="button" data-language-option="en" lang="en" aria-pressed="false">EN</button>
                 <button type="button" data-language-option="ja" lang="ja" aria-pressed="false">JP</button>
               </div>
-              <button class="theme-toggle" type="button" data-theme-toggle data-daylight-toggle aria-expanded="false" aria-controls="mobile-daylight-widget" aria-label="Открыть настройки темы" aria-pressed="false" title="Открыть настройки темы">
+              <button class="theme-toggle" type="button" data-theme-toggle data-daylight-toggle aria-expanded="false" aria-controls="mobile-daylight-widget" aria-label="Открыть настройки темы" title="Открыть настройки темы">
                 <span class="theme-toggle__icon" aria-hidden="true"></span>
               </button>
             </div>
@@ -220,7 +220,7 @@
                 <button type="button" data-language-option="en" lang="en" aria-pressed="false">EN</button>
                 <button type="button" data-language-option="ja" lang="ja" aria-pressed="false">JP</button>
               </div>
-              <button class="theme-toggle" type="button" data-theme-toggle data-daylight-launcher aria-controls="mobile-daylight-widget" aria-label="Открыть настройки темы" aria-pressed="false" title="Открыть настройки темы">
+              <button class="theme-toggle" type="button" data-theme-toggle data-daylight-launcher aria-controls="mobile-daylight-widget" aria-label="Открыть настройки темы" title="Открыть настройки темы">
                 <span class="theme-toggle__icon" aria-hidden="true"></span>
               </button>
             </div>
@@ -288,7 +288,7 @@
               <p>Мы фиксируем и&nbsp;описываем практики через тексты и&nbsp;ридеры, формируя язык, который позволяет о&nbsp;них говорить. Параллельно развиваем медийное присутствие через интервью с&nbsp;художниками, кураторами и&nbsp;участниками, а&nbsp;также публикации, раскрывающие контекст их&nbsp;работы.</p>
 
               <h3 data-i18n-item="collectibleForms">Разработка коллекционируемых форм</h3>
-              <p>Мы&nbsp;работаем с&nbsp;художественными практиками, которым сложнее существовать в&nbsp;рыночной логике, и&nbsp;создаем для них условия коллекционирования: объекты, документация, формы участия, специальные издания и&nbsp;другие.</p>
+              <p>Мы&nbsp;работаем с&nbsp;художественными практиками, которым сложнее существовать в&nbsp;рыночной логике, и&nbsp;создаем для них условия коллекционирования: объекты, документация, формы участия, специальные издания и&nbsp;другие форматы.</p>
 
               <h3 data-i18n-item="visibility">Видимость</h3>
               <p>Мы выстраиваем публичное поле вокруг социально ориентированного искусства, делая его понятным и&nbsp;видимым за&nbsp;пределами профессионального круга. Мы&nbsp;знакомим аудиторию с&nbsp;такими практиками через публичную программу фонда, постепенно формируя вокруг них устойчивое солидарное сообщество.</p>
@@ -377,7 +377,7 @@
                 </div>
                 <p class="artist-card__role">Художница танца и&nbsp;перформанса</p>
                 <p>
-                  Занимается танц-перформансом, и&nbsp;помимо работ в&nbsp;этом медиуме, интересуется как особая тонкость внимания, которую тренирует практика танц-импровизации, может проявляться в&nbsp;других контекстах. Близка социология и&nbsp;культурная антропология. Так&nbsp;же ведет арт-медиации в&nbsp;художественных галереях и&nbsp;курирует сообщество междисциплинарных художников в&nbsp;Бристоле.
+                  Занимается танц-перформансом и,&nbsp;помимо работ в&nbsp;этом медиуме, исследует, как особая тонкость внимания, которую тренирует практика танц-импровизации, может проявляться в&nbsp;других контекстах. Ей&nbsp;близки социология и&nbsp;культурная антропология. Также ведёт арт-медиации в&nbsp;художественных галереях и&nbsp;курирует сообщество междисциплинарных художников в&nbsp;Бристоле.
                 </p>
               </div>
             </article>
@@ -630,12 +630,53 @@
 
     <script src="i18n.js?v=20260715-empathy-inline-controls-2"></script>
     <script src="motion.js?v=20260713-water-empathy-07"></script>
-    <script src="script.js?v=20260716-mobile-menu-motion-5"></script>
+    <script src="script.js?v=20260716-stage-6-a11y-1"></script>
     <script src="settings.js?v=20260715-settings-language-daylight-1"></script>
     <script src="daylight.js?v=20260716-mobile-menu-motion-5"></script>
     <script src="empathy.js?v=20260716-mobile-menu-motion-5"></script>
     <script src="menu.js?v=20260716-mobile-menu-motion-5"></script>
     <script src="artists.js?v=20260712-artists-switch-2"></script>
-    <script src="trail.js?v=20260715-settings-today-1"></script>
+    <script>
+      (() => {
+        const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)');
+        const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+        let isLoading = false;
+
+        const shouldLoad = (event) => (
+          (!event.pointerType || event.pointerType === 'mouse')
+          && finePointer.matches
+          && !reducedMotion.matches
+          && !window.tarskiMotion?.isCalm?.()
+        );
+
+        const loadTrail = (event) => {
+          if (isLoading || !shouldLoad(event)) return;
+
+          isLoading = true;
+          window.removeEventListener('pointermove', loadTrail);
+          const initialPointer = {
+            clientX: event.clientX,
+            clientY: event.clientY,
+            pointerType: event.pointerType || 'mouse'
+          };
+          const script = document.createElement('script');
+          script.src = 'trail.js?v=20260716-stage-6-performance-1';
+          script.addEventListener('load', () => {
+            if (typeof window.PointerEvent !== 'function') return;
+            window.dispatchEvent(new PointerEvent('pointermove', {
+              ...initialPointer,
+              bubbles: true
+            }));
+          }, { once: true });
+          script.addEventListener('error', () => {
+            isLoading = false;
+            window.addEventListener('pointermove', loadTrail, { passive: true });
+          }, { once: true });
+          document.body.append(script);
+        };
+
+        window.addEventListener('pointermove', loadTrail, { passive: true });
+      })();
+    </script>
   </body>
 </html>
