@@ -33,13 +33,6 @@ const prefersCalmMotion = () => (
   || window.matchMedia('(prefers-reduced-motion: reduce)').matches
 );
 
-/*
- * Mobile island transitions are authored in CSS, but their lifecycle is
- * coordinated here through the Web Animations API. Waiting for the animations
- * the browser is actually running keeps cleanup aligned with interrupted,
- * reversed and reduced-motion transitions instead of duplicating CSS timings
- * in JavaScript timers.
- */
 const createMobileIslandMotionCoordinator = () => {
   const generations = new Map();
 
@@ -101,7 +94,6 @@ const createMobileIslandMotionCoordinator = () => {
     if (animations.length) {
       await Promise.allSettled(animations.map((animation) => animation.finished));
     } else {
-      /* Compatibility fallback for older engines without Element.getAnimations. */
       const fallbackDuration = Math.max(0, ...elements.filter(Boolean).map(getLongestStyleMotion));
       if (fallbackDuration > 0) {
         await new Promise((resolve) => window.setTimeout(resolve, fallbackDuration));

@@ -334,8 +334,6 @@
     syncToggleState(false);
     setModalBackgroundInert(false);
 
-    /* Fade the panel content before the geometric collapse so the copy never
-       compresses into the returning compact island. */
     panel.getBoundingClientRect();
 
     if (shouldRestoreFocus && activeTrigger instanceof HTMLElement) {
