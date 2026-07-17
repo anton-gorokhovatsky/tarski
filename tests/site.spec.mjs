@@ -158,6 +158,26 @@ test('desktop context label follows the artists section into participation', asy
   }
 });
 
+test('footer credits keep the tablet bottom inset', async ({ page }) => {
+  await page.setViewportSize({ width: 879, height: 530 });
+  await page.goto('/?lang=ru');
+
+  const geometry = await page.locator('.site-footer').evaluate((footer) => {
+    const disclaimer = footer.querySelector('.site-footer__disclaimer').getBoundingClientRect();
+    const credits = footer.querySelector('.site-footer__credits').getBoundingClientRect();
+    const footerRect = footer.getBoundingClientRect();
+    return {
+      creditsGap: credits.top - disclaimer.bottom,
+      bottomInset: footerRect.bottom - credits.bottom,
+      leftDelta: Math.abs(credits.left - disclaimer.left)
+    };
+  });
+
+  expect(geometry.creditsGap).toBeCloseTo(8, 0);
+  expect(geometry.bottomInset).toBeCloseTo(24, 0);
+  expect(geometry.leftDelta).toBeLessThanOrEqual(0.5);
+});
+
 test('mobile menu and service panel preserve state, Escape, and focus return', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.addInitScript(() => window.localStorage.setItem('tarski-theme', 'light'));

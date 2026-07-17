@@ -2856,6 +2856,7 @@ html.has-open-dossier {
     minmax(0, var(--footer-legal-column))
     var(--footer-rail-column);
   column-gap: var(--footer-column-gap);
+  row-gap: var(--space-2);
   width: 100%;
   margin: clamp(10px, 1svh, 16px) 0 0;
   padding: 0;
@@ -2864,7 +2865,8 @@ html.has-open-dossier {
 
 .site-footer__meta,
 .site-footer__year,
-.site-footer__disclaimer {
+.site-footer__disclaimer,
+.site-footer__credits {
   margin: 0;
   text-align: left;
 }
@@ -2879,6 +2881,17 @@ html.has-open-dossier {
 
 .site-footer__year {
   margin: 0;
+}
+
+.site-footer__credits {
+  grid-column: 2 / 4;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-2);
+  color: var(--muted-text);
+  font-size: 13px;
+  line-height: 1.15;
 }
 
 .site-footer__privacy,
@@ -3129,7 +3142,8 @@ html.has-open-dossier {
     grid-column: 2;
   }
 
-  .site-footer__disclaimer {
+  .site-footer__disclaimer,
+  .site-footer__credits {
     grid-column: 2;
   }
 
@@ -3549,8 +3563,11 @@ html.has-open-dossier {
     line-height: 1.2;
   }
 
-  .site-footer__design-credit {
-    flex-basis: 100%;
+  .site-footer__credits {
+    grid-column: 1;
+    gap: var(--space-2);
+    font-size: 13px;
+    line-height: 1.2;
   }
 
   .site-footer__disclaimer {
