@@ -64,6 +64,7 @@
         daylightDay: 'Световой день',
         daylightNight: 'Ночь',
         weatherCredit: 'Погода: Open-Meteo',
+        designCredit: 'Дизайн и разработка',
         motionLabel: 'Движение',
         motionMode: 'Интенсивность движения',
         motionSystem: 'Системный',
@@ -218,6 +219,7 @@
         daylightDay: 'Daylight',
         daylightNight: 'Night',
         weatherCredit: 'Weather: Open-Meteo',
+        designCredit: 'Design and development',
         motionLabel: 'Motion',
         motionMode: 'Motion intensity',
         motionSystem: 'System',
@@ -470,6 +472,7 @@
         daylightDay: '昼',
         daylightNight: '夜',
         weatherCredit: '天気：Open-Meteo',
+        designCredit: 'デザイン・開発',
         motionLabel: '動き',
         motionMode: 'モーションの強さ',
         motionSystem: 'システム',
@@ -894,6 +897,7 @@
     setAttr(document.querySelector('[data-mobile-service-panel]'), 'aria-label', data.ui.serviceSettings);
     setAttr(document.querySelector('[data-daylight-widget]'), 'aria-label', data.ui.daylightWidget);
     setText(document.querySelector('[data-weather-credit]'), data.ui.weatherCredit);
+    setText(document.querySelector('[data-design-credit]'), data.ui.designCredit);
     document.querySelectorAll('[data-theme-mode-group]').forEach((group) => {
       setAttr(group, 'aria-label', data.ui.themeMode);
     });
