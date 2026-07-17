@@ -1241,9 +1241,11 @@ test('mobile archipelago stays opaque while entering at both scroll placements',
   ));
 
   await page.evaluate((top) => window.scrollTo(0, top), threshold);
-  await expect(menu).toHaveClass(/is-visible/);
-  await expect(menu).toHaveClass(/is-docking/);
-  await expect(menu).toHaveAttribute('data-placement-motion-phase', 'dock');
+  await expect.poll(() => menu.evaluate((element) => ({
+    visible: element.classList.contains('is-visible'),
+    moving: element.classList.contains('is-docking'),
+    phase: element.dataset.placementMotionPhase || null
+  }))).toEqual({ visible: true, moving: true, phase: 'dock' });
 
   const dockingMotion = await menu.evaluate((element) => {
     const animation = element.getAnimations()[0];
@@ -1267,9 +1269,11 @@ test('mobile archipelago stays opaque while entering at both scroll placements',
   await expect(menu).not.toHaveClass(/is-docking/);
   await expect.poll(() => menu.getAttribute('data-placement-motion-phase')).toBeNull();
   await page.evaluate(() => window.scrollTo(0, 0));
-  await expect(menu).not.toHaveClass(/is-visible/);
-  await expect(menu).toHaveClass(/is-returning-home/);
-  await expect(menu).toHaveAttribute('data-placement-motion-phase', 'return-home');
+  await expect.poll(() => menu.evaluate((element) => ({
+    visible: element.classList.contains('is-visible'),
+    moving: element.classList.contains('is-returning-home'),
+    phase: element.dataset.placementMotionPhase || null
+  }))).toEqual({ visible: false, moving: true, phase: 'return-home' });
 
   const homeMotion = await menu.evaluate((element) => {
     const animation = element.getAnimations()[0];
