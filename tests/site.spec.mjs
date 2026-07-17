@@ -173,8 +173,8 @@ test('footer credits keep the tablet bottom inset', async ({ page }) => {
     };
   });
 
-  expect(geometry.creditsGap).toBeCloseTo(8, 0);
-  expect(geometry.bottomInset).toBeCloseTo(24, 0);
+  expect(geometry.creditsGap).toBeCloseTo(12, 0);
+  expect(geometry.bottomInset).toBeCloseTo(32, 0);
   expect(geometry.leftDelta).toBeLessThanOrEqual(0.5);
 });
 
