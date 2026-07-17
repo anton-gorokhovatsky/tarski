@@ -2800,6 +2800,12 @@ html.has-open-dossier {
   transition: transform var(--duration-fast) var(--ease-smooth);
 }
 
+@media (min-width: 961px) {
+  .site-footer__cta > span {
+    margin-left: -6px;
+  }
+}
+
 .site-footer__cta-arrow {
   flex: 0 0 auto;
   width: 0.42em;
