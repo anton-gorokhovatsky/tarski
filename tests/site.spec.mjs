@@ -12,6 +12,7 @@ const languages = {
     artistsContext: 'Сеть',
     footerContext: 'Участие',
     footerCta: 'Написать нам',
+    designCredit: 'Дизайн и разработка',
     footerRoutes: ['Предложить проект', 'Стать партнёром', 'Задать вопрос']
   },
   en: {
@@ -25,6 +26,7 @@ const languages = {
     artistsContext: 'Network',
     footerContext: 'Participation',
     footerCta: 'Contact us',
+    designCredit: 'Design and development',
     footerRoutes: ['Propose a project', 'Become a partner', 'Ask a question']
   },
   ja: {
@@ -38,6 +40,7 @@ const languages = {
     artistsContext: 'ネットワーク',
     footerContext: '参加',
     footerCta: 'お問い合わせ',
+    designCredit: 'デザイン・開発',
     footerRoutes: ['プロジェクトを提案', 'パートナーになる', '質問する']
   }
 };
@@ -121,6 +124,9 @@ for (const [language, copy] of Object.entries(languages)) {
     await expect(page.locator('[data-footer-cta-label]')).toHaveText(copy.footerCta);
     await expect(page.locator('[data-footer-route] > span:first-child')).toHaveText(copy.footerRoutes);
     await expect(page.locator('[data-footer-route]')).toHaveCount(3);
+    await expect(page.locator('[data-design-credit]')).toHaveText(copy.designCredit);
+    await expect(page.locator('[data-design-credit]')).toHaveAttribute('href', 'https://anton-gorokhovatsky.github.io/design/');
+    await expect(page.locator('[data-design-credit]')).toHaveAttribute('rel', 'author');
   });
 
   test(`${language}: privacy page is localized and canonical`, async ({ page }) => {

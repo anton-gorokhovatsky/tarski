@@ -2882,7 +2882,8 @@ html.has-open-dossier {
 }
 
 .site-footer__privacy,
-.site-footer__weather {
+.site-footer__weather,
+.site-footer__design-credit {
   color: var(--muted-text);
   text-decoration-thickness: 1px;
   text-underline-offset: 0.16em;
@@ -2914,7 +2915,8 @@ html.has-open-dossier {
   }
 
   .site-footer__privacy:hover,
-  .site-footer__weather:hover {
+  .site-footer__weather:hover,
+  .site-footer__design-credit:hover {
     color: var(--text);
     text-decoration-style: solid;
   }
@@ -2941,12 +2943,14 @@ html.has-open-dossier {
 }
 
 .site-footer__privacy:active,
-.site-footer__weather:active {
+.site-footer__weather:active,
+.site-footer__design-credit:active {
   opacity: 0.68;
 }
 
 .site-footer__privacy:focus-visible,
-.site-footer__weather:focus-visible {
+.site-footer__weather:focus-visible,
+.site-footer__design-credit:focus-visible {
   outline: 0;
   border-radius: 2px;
   box-shadow: var(--focus-ring-soft);
@@ -3543,6 +3547,10 @@ html.has-open-dossier {
     margin-bottom: 0;
     font-size: 13px;
     line-height: 1.2;
+  }
+
+  .site-footer__design-credit {
+    flex-basis: 100%;
   }
 
   .site-footer__disclaimer {
