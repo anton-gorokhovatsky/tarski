@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <meta name="robots" content="noindex, follow" />
+    <title>Страница не найдена — Tarski</title>
+    <meta
+      name="description"
+      content="Такой страницы нет. Вернитесь на главную Tarski или перейдите к художникам."
+    />
+    <meta name="theme-color" content="#f2f2f2" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#101010" media="(prefers-color-scheme: dark)" />
+    <script type="text/javascript">
+      (() => {
+        try {
+          const theme = window.localStorage.getItem('tarski-theme');
+          const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+          const activeTheme = theme === 'dark' || theme === 'light' ? theme : systemTheme;
+
+          if (theme === 'dark' || theme === 'light') {
+            document.documentElement.dataset.theme = theme;
+          }
+
+          document.documentElement.dataset.effectiveTheme = activeTheme;
+          document
+            .querySelectorAll('meta[name="theme-color"]')
+            .forEach((meta) => meta.setAttribute('content', activeTheme === 'dark' ? '#101010' : '#f2f2f2'));
+        } catch (error) {
+          document.documentElement.dataset.effectiveTheme = 'light';
+        }
+      })();
+    </script>
+    <link rel="icon" href="assets/favicon.svg?v=20260701-caps-favicon" type="image/svg+xml" sizes="any" />
+    <link rel="stylesheet" href="styles.css?v=20260719-custom-404-1" />
+    <script src="404-i18n.js?v=20260719-custom-404-1" defer></script>
+  </head>
+  <body class="not-found-page">
+    <a class="skip-link" href="#not-found-title" data-not-found-skip>Перейти к содержанию</a>
+
+    <main class="not-found">
+      <header class="not-found__header">
+        <a class="not-found__brand" href="/" aria-label="На главную Tarski" data-not-found-brand>
+          <img src="assets/logo.svg" alt="Tarski" />
+        </a>
+
+        <div class="not-found__languages" role="group" aria-label="Выбор языка" data-not-found-languages>
+          <button type="button" data-language-option="ru" lang="ru" aria-pressed="true">RU</button>
+          <button type="button" data-language-option="en" lang="en" aria-pressed="false">EN</button>
+          <button type="button" data-language-option="ja" lang="ja" aria-pressed="false">JP</button>
+        </div>
+      </header>
+
+      <section class="not-found__stage" aria-labelledby="not-found-title">
+        <div class="not-found__number" aria-hidden="true">
+          <img src="assets/404.svg" alt="" />
+        </div>
+
+        <div class="not-found__content">
+          <p class="not-found__eyebrow" data-not-found-eyebrow>ошибка 404</p>
+          <h1 id="not-found-title" data-not-found-title>Такой страницы нет</h1>
+          <p class="not-found__copy" data-not-found-copy>
+            Возможно, ссылка устарела или адрес набран с ошибкой.
+          </p>
+
+          <nav class="not-found__routes" aria-label="Куда перейти" data-not-found-routes>
+            <a href="/" data-not-found-home>
+              <span data-not-found-home-label>На главную</span>
+              <span class="not-found__route-arrow" aria-hidden="true">↗</span>
+            </a>
+            <a href="/#artists" data-not-found-artists>
+              <span data-not-found-artists-label>Художники</span>
+              <span class="not-found__route-arrow" aria-hidden="true">↗</span>
+            </a>
+          </nav>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>
