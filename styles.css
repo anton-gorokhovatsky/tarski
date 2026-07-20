@@ -6348,62 +6348,39 @@ html.has-open-dossier {
 
 :root[data-effective-motion="calm"] {
   scroll-behavior: auto;
+  --ease-smooth: cubic-bezier(0.37, 0, 0.63, 1);
+  --ease-enter: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --ease-exit: cubic-bezier(0.4, 0, 0.6, 1);
+  --ease-move: cubic-bezier(0.37, 0, 0.63, 1);
+  --ease-spring: var(--ease-move);
+  --duration-fast: 220ms;
+  --duration-normal: 320ms;
+  --duration-slow: 480ms;
+  --duration-focus: 720ms;
+  --duration-indicator: 560ms;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  /* Manual Calm mode follows the same short, delay-free lifecycle as the JS
-     coordinator instead of leaving the island on its full-motion timings. */
-  :root[data-effective-motion="calm"] .mobile-island-depth,
-  :root[data-effective-motion="calm"] .mobile-island-surface,
-  :root[data-effective-motion="calm"] .mobile-service-depth,
-  :root[data-effective-motion="calm"] .mobile-service-depth::before,
-  :root[data-effective-motion="calm"] .mobile-service-surface,
-  :root[data-effective-motion="calm"] .mobile-menu-toggle,
-  :root[data-effective-motion="calm"] .mobile-mail-pill,
-  :root[data-effective-motion="calm"] .mobile-service,
-  :root[data-effective-motion="calm"] .mobile-service-toggle,
-  :root[data-effective-motion="calm"] .mobile-service-toggle span,
-  :root[data-effective-motion="calm"] .mobile-service-toggle::after,
-  :root[data-effective-motion="calm"] .mobile-service-panel,
-  :root[data-effective-motion="calm"] .daylight-widget,
-  :root[data-effective-motion="calm"] .daylight-widget__settings,
-  :root[data-effective-motion="calm"] .daylight-widget__empathy,
-  :root[data-effective-motion="calm"] .daylight-widget__modes::before,
-  :root[data-effective-motion="calm"] .daylight-widget__motion-options::before,
-  :root[data-effective-motion="calm"] .site-settings,
-  :root[data-effective-motion="calm"] .site-settings__panel,
-  :root[data-effective-motion="calm"] .site-settings__segmented::before,
-  :root[data-effective-motion="calm"] .mobile-menu-expanded,
-  :root[data-effective-motion="calm"] .mobile-menu-expanded-depth,
-  :root[data-effective-motion="calm"] .mobile-menu-expanded-depth::before,
-  :root[data-effective-motion="calm"] .mobile-menu-expanded > * {
-    transition-duration: 80ms !important;
-    transition-delay: 0ms !important;
-  }
-
-  :root[data-effective-motion="calm"] .mobile-menu-toggle span {
-    animation-duration: 80ms !important;
-  }
-
-  /* The control that selects Calm must remain legible while it applies the
-     shorter motion system; otherwise its own capsule collapses to an 80ms jump. */
-  :root[data-effective-motion="calm"] [data-motion-mode-group]::before {
-    transition-duration: 320ms !important;
+@media (max-width: 720px) and (prefers-reduced-motion: no-preference) {
+  :root[data-effective-motion="calm"] .mobile-floating-menu {
+    --island-motion-phase-content-out: 180ms;
+    --island-motion-phase-surface: 600ms;
+    --island-motion-phase-content-in: 280ms;
+    --island-motion-phase-content-delay: 120ms;
+    --island-motion-phase-return: 300ms;
+    --island-motion-phase-return-delay: 100ms;
+    --island-motion-placement-initial: 560ms;
+    --island-motion-placement-dock: 540ms;
+    --island-motion-placement-home: 460ms;
+    --island-motion-menu-compact-in-delay: 180ms;
+    --island-motion-menu-compact-content-in-delay: 280ms;
+    --island-motion-menu-panel-out-delay: 100ms;
+    --island-motion-menu-panel-out-duration: 360ms;
+    --empathy-motion-layout-shift: 480ms;
+    --empathy-motion-controls-in: 320ms;
+    --empathy-motion-controls-delay: 120ms;
   }
 }
 
 :root[data-effective-motion="calm"] .daylight-widget.is-marker-arriving .daylight-widget__marker-halo {
   animation: none;
-}
-
-:root[data-effective-motion="calm"] .artist-card__image,
-:root[data-effective-motion="calm"] .artist-card__body,
-:root[data-effective-motion="calm"] .artist-index a,
-:root[data-effective-motion="calm"] .site-footer__cta,
-:root[data-effective-motion="calm"] .site-footer__cta > span,
-:root[data-effective-motion="calm"] .site-footer__cta-arrow,
-:root[data-effective-motion="calm"] .site-footer__routes a,
-:root[data-effective-motion="calm"] .site-footer__privacy,
-:root[data-effective-motion="calm"] .site-footer__weather {
-  transition-duration: 80ms !important;
 }
