@@ -59,6 +59,34 @@
     });
   });
 
+  const previewLinks = Array.from(artistIndex.querySelectorAll('.artist-index__link'));
+  let previewIntentTimerId = null;
+  let previewIntentLink = null;
+
+  const clearPreviewIntent = () => {
+    window.clearTimeout(previewIntentTimerId);
+    previewIntentTimerId = null;
+    previewIntentLink = null;
+    artistIndex.classList.remove('is-preview-intent');
+  };
+
+  previewLinks.forEach((link) => {
+    link.addEventListener('pointerenter', (event) => {
+      if (event.pointerType && event.pointerType !== 'mouse') return;
+
+      clearPreviewIntent();
+      previewIntentLink = link;
+      previewIntentTimerId = window.setTimeout(() => {
+        if (previewIntentLink !== link || !link.matches(':hover')) return;
+        artistIndex.classList.add('is-preview-intent');
+      }, window.tarskiMotion?.isCalm?.() ? 170 : 100);
+    });
+
+    link.addEventListener('pointerleave', () => {
+      if (previewIntentLink === link) clearPreviewIntent();
+    });
+  });
+
   setView('cloud');
 })();
 

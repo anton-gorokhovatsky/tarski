@@ -45,7 +45,7 @@
       root.hidden = true;
       restoreFocus?.focus?.({ preventScroll: true });
       restoreFocus = null;
-    }, window.tarskiMotion?.isCalm?.() ? 0 : 320);
+    }, window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 320);
   };
 
   openControls.forEach((control) => {

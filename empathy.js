@@ -134,10 +134,8 @@
     }
 
     const style = window.getComputedStyle(widget);
-    const isAlreadyCalm = window.tarskiMotion?.isCalm?.() === true;
-    const scale = isAlreadyCalm ? 0.48 : 1;
     const read = (property, fallback) => (
-      parseDuration(style.getPropertyValue(property), fallback) * scale
+      parseDuration(style.getPropertyValue(property), fallback)
     );
 
     return {

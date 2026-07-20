@@ -49,7 +49,7 @@ All menu states share one physical model: a stable material changes its extent w
   - `--ease-exit` for content leaving the interface;
   - `--ease-move` for a surface, capsule or indicator travelling between two visible states.
 - Durations describe distance and hierarchy; easing describes direction. Do not change both merely to make one transition feel different.
-- `prefers-reduced-motion: reduce` and the manual Calm mode must remove non-essential travel and trail animation without removing access to any content.
+- `prefers-reduced-motion: reduce` removes transition travel almost entirely. Manual Calm remains a complete, pleasant motion profile: use gentle no-overshoot curves, readable durations and continuous surfaces, while reducing only distracting ambient motion. Never implement Calm as blanket sub-100 ms transitions.
 
 ## Controls
 
