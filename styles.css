@@ -50,6 +50,9 @@
 
   /* Motion */
   --ease-smooth: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-enter: var(--ease-smooth);
+  --ease-exit: cubic-bezier(0.64, 0, 0.78, 0);
+  --ease-move: cubic-bezier(0.65, 0, 0.35, 1);
   --ease-spring: cubic-bezier(0.18, 1.32, 0.32, 1);
   --duration-fast: 180ms;
   --duration-normal: 260ms;
@@ -1467,7 +1470,7 @@ li::before {
   box-shadow: var(--gutter-active-shadow);
   transform: translate3d(calc(var(--artists-view-index) * 100%), 0, 0);
   transition:
-    transform 560ms cubic-bezier(0.16, 1, 0.3, 1),
+    transform 560ms var(--ease-move),
     background 280ms var(--ease-smooth),
     border-color 280ms var(--ease-smooth),
     box-shadow 280ms var(--ease-smooth);
@@ -4119,7 +4122,10 @@ html.has-open-dossier {
     --empathy-motion-feedback-in: var(--island-motion-phase-content-in);
     --empathy-motion-controls-in: 260ms;
     --empathy-motion-controls-delay: 100ms;
-    --island-motion-ease: var(--ease-smooth);
+    --island-motion-ease-enter: var(--ease-enter);
+    --island-motion-ease-exit: var(--ease-exit);
+    --island-motion-ease-move: var(--ease-move);
+    --island-motion-ease: var(--island-motion-ease-enter);
     --island-motion-handoff-shift: none;
     --island-motion-return-shift: none;
     --island-motion-menu-shift: none;
@@ -4163,22 +4169,22 @@ html.has-open-dossier {
     --mobile-island-return-shift: var(--island-motion-return-shift);
     --mobile-island-menu-shift: var(--island-motion-menu-shift);
     --mobile-island-shell-transition:
-      opacity var(--mobile-island-content-fade) var(--island-motion-ease),
-      transform var(--mobile-island-morph) var(--island-motion-ease);
+      opacity var(--mobile-island-content-fade) var(--island-motion-ease-enter),
+      transform var(--mobile-island-morph) var(--island-motion-ease-move);
     --mobile-island-content-transition:
-      opacity var(--mobile-island-content-fade) var(--ease-smooth),
-      transform var(--mobile-island-content-shift) var(--ease-smooth),
-      width var(--mobile-island-content-collapse) var(--ease-smooth),
-      max-width var(--mobile-island-content-collapse) var(--ease-smooth),
-      min-width var(--mobile-island-content-collapse) var(--ease-smooth),
-      padding var(--mobile-island-content-collapse) var(--ease-smooth);
+      opacity var(--mobile-island-content-fade) var(--island-motion-ease-enter),
+      transform var(--mobile-island-content-shift) var(--island-motion-ease-move),
+      width var(--mobile-island-content-collapse) var(--island-motion-ease-move),
+      max-width var(--mobile-island-content-collapse) var(--island-motion-ease-move),
+      min-width var(--mobile-island-content-collapse) var(--island-motion-ease-move),
+      padding var(--mobile-island-content-collapse) var(--island-motion-ease-move);
     --mobile-island-content-transition-delayed:
-      opacity var(--mobile-island-content-fade) var(--ease-smooth),
-      transform var(--mobile-island-content-shift) var(--ease-smooth),
-      width var(--mobile-island-content-collapse) var(--ease-smooth) var(--mobile-island-collapse-delay),
-      max-width var(--mobile-island-content-collapse) var(--ease-smooth) var(--mobile-island-collapse-delay),
-      min-width var(--mobile-island-content-collapse) var(--ease-smooth) var(--mobile-island-collapse-delay),
-      padding var(--mobile-island-content-collapse) var(--ease-smooth) var(--mobile-island-collapse-delay);
+      opacity var(--mobile-island-content-fade) var(--island-motion-ease-enter),
+      transform var(--mobile-island-content-shift) var(--island-motion-ease-move),
+      width var(--mobile-island-content-collapse) var(--island-motion-ease-move) var(--mobile-island-collapse-delay),
+      max-width var(--mobile-island-content-collapse) var(--island-motion-ease-move) var(--mobile-island-collapse-delay),
+      min-width var(--mobile-island-content-collapse) var(--island-motion-ease-move) var(--mobile-island-collapse-delay),
+      padding var(--mobile-island-content-collapse) var(--island-motion-ease-move) var(--mobile-island-collapse-delay);
     position: relative;
     left: auto;
     right: auto;
@@ -4228,7 +4234,7 @@ html.has-open-dossier {
     height: var(--island-cluster-height);
     pointer-events: none;
     opacity: 1;
-    transition: opacity 220ms var(--island-motion-ease);
+    transition: opacity 220ms var(--island-motion-ease-enter);
     will-change: opacity;
   }
 
@@ -4268,12 +4274,12 @@ html.has-open-dossier {
     box-shadow: none;
     opacity: 0;
     transition:
-      opacity 140ms var(--island-motion-ease),
-      left var(--mobile-service-motion) var(--island-motion-ease),
-      top var(--mobile-service-motion) var(--island-motion-ease),
-      width var(--mobile-service-motion) var(--island-motion-ease),
-      height var(--mobile-service-motion) var(--island-motion-ease),
-      border-radius var(--mobile-service-motion) var(--island-motion-ease);
+      opacity 140ms var(--island-motion-ease-enter),
+      left var(--mobile-service-motion) var(--island-motion-ease-move),
+      top var(--mobile-service-motion) var(--island-motion-ease-move),
+      width var(--mobile-service-motion) var(--island-motion-ease-move),
+      height var(--mobile-service-motion) var(--island-motion-ease-move),
+      border-radius var(--mobile-service-motion) var(--island-motion-ease-move);
     will-change: opacity, left, top, width, height;
   }
 
@@ -4292,7 +4298,7 @@ html.has-open-dossier {
     inset: 0;
     border-radius: inherit;
     background: var(--island-depth-fill);
-    transition: clip-path var(--mobile-service-motion) var(--island-motion-ease);
+    transition: clip-path var(--mobile-service-motion) var(--island-motion-ease-move);
   }
 
   .mobile-service-surface {
@@ -4300,13 +4306,13 @@ html.has-open-dossier {
     overflow: hidden;
     filter: var(--island-edge-filter);
     transition:
-      opacity 140ms var(--island-motion-ease),
-      clip-path var(--mobile-service-motion) var(--island-motion-ease),
-      left var(--mobile-service-motion) var(--island-motion-ease),
-      top var(--mobile-service-motion) var(--island-motion-ease),
-      width var(--mobile-service-motion) var(--island-motion-ease),
-      height var(--mobile-service-motion) var(--island-motion-ease),
-      border-radius var(--mobile-service-motion) var(--island-motion-ease);
+      opacity 140ms var(--island-motion-ease-enter),
+      clip-path var(--mobile-service-motion) var(--island-motion-ease-move),
+      left var(--mobile-service-motion) var(--island-motion-ease-move),
+      top var(--mobile-service-motion) var(--island-motion-ease-move),
+      width var(--mobile-service-motion) var(--island-motion-ease-move),
+      height var(--mobile-service-motion) var(--island-motion-ease-move),
+      border-radius var(--mobile-service-motion) var(--island-motion-ease-move);
   }
 
   .mobile-floating-menu.is-visible {
@@ -4385,15 +4391,15 @@ html.has-open-dossier {
   }
 
   .mobile-floating-menu.is-home-arriving {
-    animation: mobile-island-home-arrival var(--island-motion-placement-initial) cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation: mobile-island-home-arrival var(--island-motion-placement-initial) var(--island-motion-ease-enter) both;
   }
 
   .mobile-floating-menu.is-docking {
-    animation: mobile-island-dock-in var(--island-motion-placement-dock) cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation: mobile-island-dock-in var(--island-motion-placement-dock) var(--island-motion-ease-enter) both;
   }
 
   .mobile-floating-menu.is-returning-home {
-    animation: mobile-island-home-in var(--island-motion-placement-home) cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation: mobile-island-home-in var(--island-motion-placement-home) var(--island-motion-ease-enter) both;
   }
 
   :root[data-effective-theme="light"] .mobile-floating-menu {
@@ -4457,12 +4463,14 @@ html.has-open-dossier {
     opacity: 0;
     transition-duration: 100ms;
     transition-delay: 80ms;
+    transition-timing-function: var(--island-motion-ease-exit);
   }
 
   .mobile-floating-menu.is-menu-open .mobile-island-surface {
     opacity: 0;
     transition-duration: 220ms;
     transition-delay: 100ms;
+    transition-timing-function: var(--island-motion-ease-exit);
   }
 
   .mobile-floating-menu.is-menu-compacting .mobile-island-surface {
@@ -4481,12 +4489,14 @@ html.has-open-dossier {
     opacity: 0;
     transition-duration: 100ms;
     transition-delay: 60ms;
+    transition-timing-function: var(--island-motion-ease-exit);
   }
 
   .mobile-floating-menu.is-service-open .mobile-island-surface {
     opacity: 0;
     transition-duration: 220ms;
     transition-delay: 80ms;
+    transition-timing-function: var(--island-motion-ease-exit);
   }
 
   .mobile-floating-menu.is-service-closing .mobile-island-surface {
@@ -4612,6 +4622,13 @@ html.has-open-dossier {
       var(--mobile-service-motion),
       var(--mobile-service-motion);
     transition-delay: 0ms;
+    transition-timing-function:
+      var(--island-motion-ease-exit),
+      var(--island-motion-ease-move),
+      var(--island-motion-ease-move),
+      var(--island-motion-ease-move),
+      var(--island-motion-ease-move),
+      var(--island-motion-ease-move);
   }
 
   .mobile-floating-menu.is-service-closing .mobile-service-depth::before {
@@ -4629,6 +4646,14 @@ html.has-open-dossier {
       var(--mobile-service-motion),
       var(--mobile-service-motion);
     transition-delay: 60ms, 0ms, 0ms, 0ms, 0ms, 0ms, 0ms;
+    transition-timing-function:
+      var(--island-motion-ease-exit),
+      var(--island-motion-ease-move),
+      var(--island-motion-ease-move),
+      var(--island-motion-ease-move),
+      var(--island-motion-ease-move),
+      var(--island-motion-ease-move),
+      var(--island-motion-ease-move);
   }
 
   .mobile-menu-toggle,
@@ -4692,15 +4717,15 @@ html.has-open-dossier {
     transform: translate3d(0, 0, 0);
     transform-origin: 50% 50%;
     transition:
-      color var(--duration-fast) var(--ease-smooth),
-      opacity var(--mobile-island-content-fade) var(--ease-smooth),
-      transform var(--mobile-island-content-shift) var(--ease-smooth),
-      left var(--mobile-island-morph) var(--ease-smooth),
-      top var(--mobile-island-morph) var(--ease-smooth),
-      width var(--mobile-island-content-collapse) var(--ease-smooth),
-      max-width var(--mobile-island-content-collapse) var(--ease-smooth),
-      min-width var(--mobile-island-content-collapse) var(--ease-smooth),
-      padding var(--mobile-island-content-collapse) var(--ease-smooth);
+      color var(--duration-fast) var(--island-motion-ease-enter),
+      opacity var(--mobile-island-content-fade) var(--island-motion-ease-enter),
+      transform var(--mobile-island-content-shift) var(--island-motion-ease-move),
+      left var(--mobile-island-morph) var(--island-motion-ease-move),
+      top var(--mobile-island-morph) var(--island-motion-ease-move),
+      width var(--mobile-island-content-collapse) var(--island-motion-ease-move),
+      max-width var(--mobile-island-content-collapse) var(--island-motion-ease-move),
+      min-width var(--mobile-island-content-collapse) var(--island-motion-ease-move),
+      padding var(--mobile-island-content-collapse) var(--island-motion-ease-move);
     will-change: opacity, transform, width, left, top;
   }
 
@@ -4774,14 +4799,14 @@ html.has-open-dossier {
     transform: translate3d(0, 0, 0);
     transform-origin: 50% 50%;
     transition:
-      opacity var(--mobile-island-content-fade) var(--ease-smooth),
-      transform var(--mobile-island-content-shift) var(--ease-smooth),
-      left var(--mobile-island-morph) var(--ease-smooth),
-      top var(--mobile-island-morph) var(--ease-smooth),
-      width var(--mobile-island-content-collapse) var(--ease-smooth),
-      max-width var(--mobile-island-content-collapse) var(--ease-smooth),
-      min-width var(--mobile-island-content-collapse) var(--ease-smooth),
-      padding var(--mobile-island-content-collapse) var(--ease-smooth);
+      opacity var(--mobile-island-content-fade) var(--island-motion-ease-enter),
+      transform var(--mobile-island-content-shift) var(--island-motion-ease-move),
+      left var(--mobile-island-morph) var(--island-motion-ease-move),
+      top var(--mobile-island-morph) var(--island-motion-ease-move),
+      width var(--mobile-island-content-collapse) var(--island-motion-ease-move),
+      max-width var(--mobile-island-content-collapse) var(--island-motion-ease-move),
+      min-width var(--mobile-island-content-collapse) var(--island-motion-ease-move),
+      padding var(--mobile-island-content-collapse) var(--island-motion-ease-move);
     will-change: width, opacity, transform, left, top;
   }
 
@@ -4789,7 +4814,7 @@ html.has-open-dossier {
   .mobile-floating-menu.is-service-open .mobile-mail-pill {
     opacity: 0;
     pointer-events: none;
-    transition: opacity 220ms var(--island-motion-ease);
+    transition: opacity 220ms var(--island-motion-ease-exit);
   }
 
   .mobile-floating-menu.is-service-closing .mobile-menu-toggle,
@@ -4801,7 +4826,7 @@ html.has-open-dossier {
   .mobile-floating-menu.is-menu-open .mobile-service {
     opacity: 0;
     pointer-events: none;
-    transition: opacity var(--mobile-island-content-fade) var(--island-motion-ease);
+    transition: opacity var(--mobile-island-content-fade) var(--island-motion-ease-exit);
   }
 
   .mobile-floating-menu.is-menu-open .mobile-menu-toggle {
@@ -4822,11 +4847,11 @@ html.has-open-dossier {
   }
 
   .mobile-floating-menu.is-menu-open .mobile-menu-toggle span {
-    animation: mobile-menu-label-open var(--mobile-island-morph) var(--island-motion-ease) both;
+    animation: mobile-menu-label-open var(--mobile-island-morph) var(--island-motion-ease-exit) both;
   }
 
   .mobile-floating-menu.is-menu-compacting .mobile-menu-toggle span {
-    animation: mobile-menu-label-close var(--mobile-island-morph) var(--island-motion-ease) both;
+    animation: mobile-menu-label-close var(--mobile-island-morph) var(--island-motion-ease-enter) both;
   }
 
   .mobile-mail-pill:active {
@@ -4865,11 +4890,11 @@ html.has-open-dossier {
     min-width: 0;
     pointer-events: auto;
     transition:
-      opacity var(--mobile-island-content-fade) var(--island-motion-ease),
-      left var(--mobile-service-motion) var(--island-motion-ease),
-      top var(--mobile-service-motion) var(--island-motion-ease),
-      width var(--mobile-service-motion) var(--island-motion-ease),
-      height var(--mobile-service-motion) var(--island-motion-ease);
+      opacity var(--mobile-island-content-fade) var(--island-motion-ease-enter),
+      left var(--mobile-service-motion) var(--island-motion-ease-move),
+      top var(--mobile-service-motion) var(--island-motion-ease-move),
+      width var(--mobile-service-motion) var(--island-motion-ease-move),
+      height var(--mobile-service-motion) var(--island-motion-ease-move);
     will-change: opacity, left, top, width, height;
   }
 
@@ -4941,11 +4966,11 @@ html.has-open-dossier {
     z-index: 1;
     pointer-events: auto;
     transition:
-      opacity var(--duration-fast) var(--ease-smooth),
-      transform var(--duration-fast) var(--ease-smooth),
-      left var(--mobile-service-motion) var(--island-motion-ease),
-      top var(--mobile-service-motion) var(--island-motion-ease),
-      width var(--mobile-service-motion) var(--island-motion-ease);
+      opacity var(--duration-fast) var(--island-motion-ease-enter),
+      transform var(--duration-fast) var(--island-motion-ease-move),
+      left var(--mobile-service-motion) var(--island-motion-ease-move),
+      top var(--mobile-service-motion) var(--island-motion-ease-move),
+      width var(--mobile-service-motion) var(--island-motion-ease-move);
   }
 
   .mobile-floating-menu.is-service-open .mobile-service-toggle::before {
@@ -4980,8 +5005,8 @@ html.has-open-dossier {
     width: 21px;
     overflow: hidden;
     transition:
-      width 260ms var(--island-motion-ease),
-      opacity 180ms var(--island-motion-ease);
+      width 260ms var(--island-motion-ease-move),
+      opacity 180ms var(--island-motion-ease-enter);
   }
 
   .mobile-service.is-open .mobile-service-toggle {
@@ -5002,6 +5027,9 @@ html.has-open-dossier {
   .mobile-service.is-open .mobile-service-toggle span {
     width: 0;
     opacity: 0;
+    transition-timing-function:
+      var(--island-motion-ease-move),
+      var(--island-motion-ease-exit);
   }
 
   .mobile-service.is-open .mobile-service-toggle::after {
@@ -5032,8 +5060,8 @@ html.has-open-dossier {
     opacity: 0;
     pointer-events: none;
     transition:
-      opacity 240ms var(--island-motion-ease),
-      transform 420ms var(--island-motion-ease);
+      opacity 240ms var(--island-motion-ease-enter),
+      transform 420ms var(--island-motion-ease-enter);
     will-change: opacity, transform;
   }
 
@@ -5078,6 +5106,9 @@ html.has-open-dossier {
     pointer-events: none;
     transition-duration: 200ms, 360ms;
     transition-delay: 0ms;
+    transition-timing-function:
+      var(--island-motion-ease-exit),
+      var(--island-motion-ease-exit);
   }
 
   .mobile-service.is-closing .mobile-service-toggle {
@@ -5132,8 +5163,8 @@ html.has-open-dossier {
     pointer-events: none;
     transform: translate3d(0, 10px, 0);
     transition:
-      opacity 360ms var(--island-motion-ease),
-      transform 420ms var(--island-motion-ease);
+      opacity 360ms var(--island-motion-ease-enter),
+      transform 420ms var(--island-motion-ease-enter);
     will-change: opacity, transform;
   }
 
@@ -5146,6 +5177,12 @@ html.has-open-dossier {
     pointer-events: auto;
     transform: translate3d(0, 0, 0);
     transition-delay: 100ms;
+  }
+
+  .mobile-floating-menu.is-daylight-closing .daylight-widget {
+    transition-timing-function:
+      var(--island-motion-ease-exit),
+      var(--island-motion-ease-exit);
   }
 
   .daylight-widget__meta {
@@ -5302,8 +5339,8 @@ html.has-open-dossier {
   .daylight-widget__empathy {
     grid-area: 1 / 1;
     transition:
-      opacity 260ms var(--island-motion-ease),
-      transform 420ms var(--island-motion-ease);
+      opacity 260ms var(--island-motion-ease-enter),
+      transform 420ms var(--island-motion-ease-move);
   }
 
   .daylight-widget__settings {
@@ -5594,7 +5631,7 @@ html.has-open-dossier {
       0
     );
     transition:
-      transform 560ms cubic-bezier(0.16, 1, 0.3, 1),
+      transform 560ms var(--island-motion-ease-move),
       background 280ms var(--island-motion-ease),
       border-color 280ms var(--island-motion-ease),
       box-shadow 280ms var(--island-motion-ease);
@@ -5685,7 +5722,7 @@ html.has-open-dossier {
       0 2px 6px color-mix(in srgb, #000 10%, transparent);
     transform: translate3d(calc(var(--motion-mode-index) * 100%), 0, 0);
     transition:
-      transform 560ms cubic-bezier(0.16, 1, 0.3, 1),
+      transform 560ms var(--island-motion-ease-move),
       background 280ms var(--island-motion-ease),
       border-color 280ms var(--island-motion-ease),
       box-shadow 280ms var(--island-motion-ease);
@@ -5817,8 +5854,8 @@ html.has-open-dossier {
       round var(--corner-panel-mobile)
     );
     transition:
-      opacity 140ms var(--island-motion-ease),
-      clip-path var(--mobile-island-morph) var(--island-motion-ease);
+      opacity 140ms var(--island-motion-ease-enter),
+      clip-path var(--mobile-island-morph) var(--island-motion-ease-move);
     will-change: opacity, clip-path;
     scrollbar-width: none;
   }
@@ -5839,7 +5876,7 @@ html.has-open-dossier {
     filter: var(--island-depth-filter);
     opacity: 0;
     pointer-events: none;
-    transition: opacity 180ms var(--island-motion-ease);
+    transition: opacity 180ms var(--island-motion-ease-enter);
     will-change: opacity;
   }
 
@@ -5863,7 +5900,7 @@ html.has-open-dossier {
       var(--mobile-menu-compact-side)
       round var(--corner-panel-mobile)
     );
-    transition: clip-path var(--mobile-island-morph) var(--island-motion-ease);
+    transition: clip-path var(--mobile-island-morph) var(--island-motion-ease-move);
     will-change: clip-path;
   }
 
@@ -5876,7 +5913,7 @@ html.has-open-dossier {
     z-index: 1;
     opacity: 0;
     transform: none;
-    transition: opacity var(--island-motion-panel-content) var(--island-motion-ease);
+    transition: opacity var(--island-motion-panel-content) var(--island-motion-ease-enter);
     will-change: opacity;
   }
 
@@ -5952,12 +5989,16 @@ html.has-open-dossier {
     );
     transition-duration: var(--island-motion-menu-panel-out-duration), var(--mobile-island-morph);
     transition-delay: var(--island-motion-menu-panel-out-delay), 0ms;
+    transition-timing-function:
+      var(--island-motion-ease-exit),
+      var(--island-motion-ease-move);
   }
 
   .mobile-floating-menu.is-menu-compacting .mobile-menu-expanded-depth {
     opacity: 0;
     transition-duration: 100ms;
     transition-delay: 0ms;
+    transition-timing-function: var(--island-motion-ease-exit);
   }
 
   .mobile-floating-menu.is-menu-compacting .mobile-menu-expanded-depth::before {
@@ -5982,6 +6023,7 @@ html.has-open-dossier {
     opacity: 0;
     transition-delay: 0ms;
     transition-duration: var(--island-motion-menu-content-out);
+    transition-timing-function: var(--island-motion-ease-exit);
   }
 
   .mobile-floating-menu.is-menu-closing .mobile-menu-expanded {
@@ -6328,6 +6370,9 @@ html.has-open-dossier {
   :root[data-effective-motion="calm"] .daylight-widget__empathy,
   :root[data-effective-motion="calm"] .daylight-widget__modes::before,
   :root[data-effective-motion="calm"] .daylight-widget__motion-options::before,
+  :root[data-effective-motion="calm"] .site-settings,
+  :root[data-effective-motion="calm"] .site-settings__panel,
+  :root[data-effective-motion="calm"] .site-settings__segmented::before,
   :root[data-effective-motion="calm"] .mobile-menu-expanded,
   :root[data-effective-motion="calm"] .mobile-menu-expanded-depth,
   :root[data-effective-motion="calm"] .mobile-menu-expanded-depth::before,
@@ -6338,6 +6383,12 @@ html.has-open-dossier {
 
   :root[data-effective-motion="calm"] .mobile-menu-toggle span {
     animation-duration: 80ms !important;
+  }
+
+  /* The control that selects Calm must remain legible while it applies the
+     shorter motion system; otherwise its own capsule collapses to an 80ms jump. */
+  :root[data-effective-motion="calm"] [data-motion-mode-group]::before {
+    transition-duration: 320ms !important;
   }
 }
 
