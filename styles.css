@@ -1847,13 +1847,13 @@ html[data-scene="artists"]:has(.artist-index__link:nth-child(7):is(:hover, :focu
     box-shadow: var(--nav-control-shadow);
   }
 
-  .artist-index:has(.artist-index__link:hover)::before,
+  .artist-index.is-preview-intent:has(.artist-index__link:hover)::before,
   .artist-index:has(.artist-index__link:focus-visible)::before {
     opacity: 0.92;
     transform: translate3d(-50%, -48%, 0) scale(1);
   }
 
-  .artist-index:has(.artist-index__link:hover)::after,
+  .artist-index.is-preview-intent:has(.artist-index__link:hover)::after,
   .artist-index:has(.artist-index__link:focus-visible)::after {
     opacity: 1;
   }
