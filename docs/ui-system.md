@@ -44,7 +44,11 @@ All menu states share one physical model: a stable material changes its extent w
 - Hide outgoing content only when incoming content has begun to establish the destination state.
 - Avoid empty intermediate ovals, rectangles, white points and delayed labels.
 - Compact top and bottom archipelagos enter vertically into their working position; they do not slide in from the sides.
-- Motion should feel calm and deliberate. Reuse the existing island easing and duration tokens.
+- Motion should feel calm and deliberate. Match easing to the physical role instead of reusing one curve everywhere:
+  - `--ease-enter` for content or controls arriving into view;
+  - `--ease-exit` for content leaving the interface;
+  - `--ease-move` for a surface, capsule or indicator travelling between two visible states.
+- Durations describe distance and hierarchy; easing describes direction. Do not change both merely to make one transition feel different.
 - `prefers-reduced-motion: reduce` and the manual Calm mode must remove non-essential travel and trail animation without removing access to any content.
 
 ## Controls
