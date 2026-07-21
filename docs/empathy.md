@@ -39,6 +39,8 @@ Any future personalisation requires a separate privacy review, an explicit expla
 
 This is the editorial inventory for the daylight, weather and daily check-in surfaces. The runtime source of truth remains `i18n.js`; update this registry whenever any of these strings or display rules change.
 
+Weather and daylight are calculated for the fixed Moscow coordinates in `script.js` (`55.7558, 37.6173`, `Europe/Moscow`). The desktop settings card makes that location explicit in its eyebrow: `Сегодня · Москва` / `Today · Moscow` / `今日・モスクワ`.
+
 ### Daily questions
 
 One question is selected deterministically for each local calendar day. The same question is used in the mobile daylight widget and the desktop “Today” settings block.
