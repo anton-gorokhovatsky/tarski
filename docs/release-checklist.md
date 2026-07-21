@@ -9,6 +9,8 @@ Passing automated tests is necessary but does not make a visual release ready by
 - Run syntax checks for every changed JavaScript file.
 - If media changed, run `pnpm test:media` and keep assets within the documented limits.
 - Run `pnpm test`.
+- For visual changes, review the affected state locally and let the Linux `Visual` CI job perform the canonical pixel comparison.
+- Update committed visual baselines only on Linux with `pnpm test:visual:update:linux`, and inspect every changed PNG before committing it.
 
 ## Visual Definition of Done
 
@@ -41,10 +43,11 @@ For modal changes, also preserve direct artist hashes and all dialog semantics d
 ## Manual browser pass
 
 - Chromium mobile emulation for the complete state matrix.
+- The focused automated WebKit smoke for menu, settings, reflow and reduced motion.
 - A real or simulated mobile Safari pass for safe-area and browser chrome collisions.
 - Desktop Chromium for navigation, footer and pointer behaviour.
 - VoiceOver plus Safari for changed dialogs, controls or live regions when preparing a public release.
 
 ## Publishing
 
-Only publish after the intended local result has been shown and approved. When the user explicitly asks to push, commit only the approved files directly to `main` and push `origin main` as described in `AGENTS.md`.
+Only publish after the intended local result has been shown and approved. When the user explicitly asks to push, commit only the approved files to a short-lived `agent/<description>` branch and open a draft pull request as described in `AGENTS.md`. Push directly to `main` only when the user explicitly asks to bypass the pull-request workflow.

@@ -1,5 +1,6 @@
 .DS_Store
 node_modules/
+.pnpm-store/
 playwright-report/
 test-results/
 assets/fonts/*

@@ -5,6 +5,7 @@ const testOrigin = `http://127.0.0.1:${testPort}`;
 
 export default defineConfig({
   testDir: './tests',
+  snapshotPathTemplate: '{testDir}/{testFilePath}-snapshots/{arg}-{projectName}-linux{ext}',
   fullyParallel: false,
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 2 : 0,
@@ -23,7 +24,13 @@ export default defineConfig({
   projects: [
     {
       name: 'chromium',
+      testIgnore: /webkit-smoke\.spec\.mjs/,
       use: { ...devices['Desktop Chrome'] }
+    },
+    {
+      name: 'webkit-smoke',
+      testMatch: /webkit-smoke\.spec\.mjs/,
+      use: { ...devices['iPhone 13'] }
     }
   ]
 });

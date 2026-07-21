@@ -8,29 +8,59 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: site-checks-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  test:
+  suite:
+    name: ${{ matrix.label }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - label: Core
+            id: core
+            browser: chromium
+            script: test
+          - label: Visual
+            id: visual
+            browser: chromium
+            script: test:visual
+          - label: WebKit smoke
+            id: webkit
+            browser: webkit
+            script: test:webkit
     steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
         with:
           version: 10
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 24
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm exec playwright install --with-deps chromium
-      - run: pnpm test
+      - run: pnpm exec playwright install --with-deps ${{ matrix.browser }}
+      - run: pnpm run ${{ matrix.script }}
       - name: Upload Playwright diagnostics
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
-          name: playwright-diagnostics
+          name: playwright-diagnostics-${{ matrix.id }}
           path: |
             playwright-report/
             test-results/
           if-no-files-found: ignore
           retention-days: 7
+
+  test:
+    name: test
+    if: always()
+    needs: suite
+    runs-on: ubuntu-latest
+    steps:
+      - name: Confirm every required suite passed
+        run: test "${{ needs.suite.result }}" = "success"
