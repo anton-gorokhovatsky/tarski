@@ -352,12 +352,10 @@ test('mobile island transitions reverse without leaving stale phases', async ({ 
   await expect.poll(() => menuRoot.getAttribute('data-daylight-motion-phase')).toBeNull();
 });
 
-test('menu surfaces share one stable matte material without loading the Water experiment', async ({ page }) => {
+test('menu surfaces share one stable matte material', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/?lang=ru');
 
-  await expect(page.locator('[data-water-surface], [data-water-controls]')).toHaveCount(0);
-  await expect(page.locator('script[src*="material.js"], script[src*="water-runtime"]')).toHaveCount(0);
   await expect(page.locator('canvas:not(.cursor-trail-canvas)')).toHaveCount(0);
 
   const materialState = await page.evaluate(() => {

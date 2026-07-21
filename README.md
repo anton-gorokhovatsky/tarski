@@ -19,6 +19,7 @@ Static GitHub Pages site for Tarski.
 - `tests/empathy.spec.mjs` — daily empathy question, persistence, adaptation and geometry checks.
 - `tests/performance.spec.mjs` — critical byte budget, deferred media and lazy trail allocation checks.
 - `tests/visual.spec.mjs` — visual state matrix for mobile and desktop across themes and locales.
+- `tests/webkit-smoke.spec.mjs` — focused iPhone/WebKit check for the menu, settings surface, reflow and reduced motion.
 - `docs/` — UI-system, release, empathy and performance rules.
 
 The site supports Russian, English and Japanese versions, automatic light/dark theme selection via `prefers-color-scheme`, and a manual theme switcher.
@@ -35,7 +36,23 @@ pnpm exec playwright install chromium
 pnpm test
 ```
 
-The test suite starts its own local server and checks all three languages at 320 px, the localized privacy page, mobile menu and service-panel focus return, artist-card semantics, and responsive lazy gallery loading.
+The core suite starts its own local server and checks all three languages at 320 px, the localized privacy page, mobile menu and service-panel focus return, artist-card semantics, and responsive lazy gallery loading.
+
+The release visual baselines are Linux-only. CI runs them in a separate parallel job so a screenshot mismatch does not hide semantic or accessibility results. On a Linux machine or container, run:
+
+```text
+pnpm test:visual
+pnpm test:visual:update:linux
+```
+
+Only use the update command after reviewing an intentional visual change. macOS screenshots are not committed; use the real local browser for visual review and let Linux CI remain the canonical pixel comparison.
+
+The small Safari-compatible smoke pass is independent from the Chromium matrix:
+
+```text
+pnpm exec playwright install webkit
+pnpm test:webkit
+```
 
 See `docs/release-checklist.md` before publishing visual or copy changes. Automated checks are followed by matched visual comparisons and a manual accessibility pass.
 

@@ -3,9 +3,13 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node tools/check-media-assets.mjs && playwright test",
-    "test:e2e": "playwright test",
-    "test:media": "node tools/check-media-assets.mjs"
+    "test": "pnpm test:media && pnpm test:core",
+    "test:core": "playwright test --project=chromium tests/accessibility.spec.mjs tests/empathy.spec.mjs tests/performance.spec.mjs tests/site.spec.mjs",
+    "test:e2e": "pnpm test:core",
+    "test:media": "node tools/check-media-assets.mjs",
+    "test:visual": "node tools/require-linux.mjs && playwright test --project=chromium tests/visual.spec.mjs",
+    "test:visual:update:linux": "node tools/require-linux.mjs && playwright test --project=chromium tests/visual.spec.mjs --update-snapshots",
+    "test:webkit": "playwright test --project=webkit-smoke tests/webkit-smoke.spec.mjs"
   },
   "devDependencies": {
     "@playwright/test": "1.61.1"
