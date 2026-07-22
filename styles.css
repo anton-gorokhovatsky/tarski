@@ -75,10 +75,15 @@
   --matte-panel-border:
     inset 0 0 0 1px color-mix(in srgb, var(--text) 8%, transparent),
     inset 0 1px 0 rgba(255, 255, 255, 0.38);
-  --corner-panel: clamp(26px, 2vw, 34px);
+  /* Corner geometry: circular fallback first, continuous curvature where supported. */
+  --corner-card: 24px;
   --corner-panel-compact: 26px;
   --corner-panel-mobile: 30px;
+  --corner-daylight: 32px;
+  --corner-sheet-mobile: 34px;
+  --corner-panel: clamp(var(--corner-panel-compact), 2vw, var(--corner-sheet-mobile));
   --corner-dossier: clamp(22px, 1.8vw, 30px);
+  --corner-shape-continuous: squircle;
   --shadow-indicator:
     drop-shadow(0 2px 1px rgba(0, 0, 0, 0.24))
     drop-shadow(0 9px 12px rgba(0, 0, 0, 0.14));
@@ -530,7 +535,6 @@ a:hover {
   max-width: calc(100vw - (var(--page-padding-x) * 2));
   padding: var(--nav-shell-padding-y) var(--nav-shell-padding-x);
   border-radius: 0;
-  corner-shape: squircle;
   background: transparent;
   box-shadow: none;
   color: var(--text);
@@ -2355,7 +2359,7 @@ html[data-scene="artists"]:has(.artist-index__link:nth-child(7):is(:hover, :focu
   scrollbar-width: none;
   border: 0;
   border-radius: var(--corner-dossier);
-  corner-shape: squircle;
+  corner-shape: var(--corner-shape-continuous);
   outline: 0;
   background: var(--matte-panel-bg);
   box-shadow:
@@ -4555,7 +4559,7 @@ html.has-open-dossier {
     top: var(--island-daylight-top);
     width: var(--island-daylight-width);
     height: var(--island-daylight-height);
-    border-radius: 32px;
+    border-radius: var(--corner-daylight);
     transition-delay: 0ms;
   }
 
@@ -4565,20 +4569,20 @@ html.has-open-dossier {
 
   .mobile-floating-menu.is-daylight-open .mobile-service-depth::before,
   .mobile-floating-menu.is-daylight-open .mobile-service-surface {
-    -webkit-clip-path: inset(0 round 32px);
-    clip-path: inset(0 round 32px);
+    -webkit-clip-path: inset(0 round var(--corner-daylight));
+    clip-path: inset(0 round var(--corner-daylight));
   }
 
   .mobile-floating-menu:is(.is-daylight-transitioning, .is-daylight-closing) .mobile-service-depth::before,
   .mobile-floating-menu:is(.is-daylight-transitioning, .is-daylight-closing) .mobile-service-surface {
-    -webkit-clip-path: inset(0 round 32px);
-    clip-path: inset(0 round 32px);
+    -webkit-clip-path: inset(0 round var(--corner-daylight));
+    clip-path: inset(0 round var(--corner-daylight));
     transition-duration: 0ms;
   }
 
   .mobile-floating-menu:is(.is-daylight-transitioning, .is-daylight-closing) .mobile-service-depth,
   .mobile-floating-menu:is(.is-daylight-transitioning, .is-daylight-closing) .mobile-service-surface {
-    border-radius: 32px;
+    border-radius: var(--corner-daylight);
   }
 
   .mobile-floating-menu:is(.is-daylight-transitioning, .is-daylight-closing) .mobile-service-depth {
@@ -5830,6 +5834,7 @@ html.has-open-dossier {
     isolation: isolate;
     border: 0;
     border-radius: var(--corner-panel-mobile);
+    corner-shape: var(--corner-shape-continuous);
     background: var(--island-sheet-bg);
     box-shadow: var(--island-glass-shadow);
     filter: var(--island-edge-filter);
@@ -5873,6 +5878,7 @@ html.has-open-dossier {
     max-width: var(--mobile-island-max-width);
     max-height: calc(100dvh - 24px - env(safe-area-inset-bottom));
     border-radius: var(--corner-panel-mobile);
+    corner-shape: var(--corner-shape-continuous);
     filter: var(--island-depth-filter);
     opacity: 0;
     pointer-events: none;
@@ -5885,6 +5891,7 @@ html.has-open-dossier {
     position: absolute;
     inset: 0;
     border-radius: inherit;
+    corner-shape: inherit;
     background: var(--island-depth-fill);
     -webkit-clip-path: inset(
       var(--mobile-menu-compact-top)
@@ -6088,7 +6095,7 @@ html.has-open-dossier {
     padding: 0;
     border: 0;
     border-radius: 999px;
-    corner-shape: squircle;
+    corner-shape: var(--corner-shape-continuous);
     background: transparent;
     color: inherit;
     cursor: pointer;

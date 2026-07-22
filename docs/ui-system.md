@@ -25,6 +25,18 @@ Spacing is a global contract, not a value chosen separately for each screenshot.
 - A value outside the scale requires a nearby code comment explaining the source geometry, safe-area calculation or optical exception. Unexplained literals are a review failure.
 - Review computed geometry, not only declarations: compare outer edges, sibling gaps and the final row against the semantic token at every changed breakpoint.
 
+## Corner geometry and curvature
+
+A radius describes size; it does not by itself guarantee a visually smooth join between a straight edge and a corner. For exposed panels and cards, follow the continuous-curvature principle described in Sergey Nikolaev's [article on smooth corner rounding](https://kefiijrw.medium.com/illustrator-corner-rounding-7c485e7fed67): curvature should build gradually instead of jumping from a straight line into a circular arc.
+
+- Large exposed surfaces use the shared `--corner-*` radius tokens and `corner-shape: var(--corner-shape-continuous)` as a progressive enhancement. The ordinary `border-radius` contour remains the required fallback for browsers without `corner-shape` support.
+- `--corner-card`, `--corner-panel-compact`, `--corner-panel-mobile`, `--corner-daylight`, `--corner-sheet-mobile`, `--corner-panel` and `--corner-dossier` are the available surface radii. Do not introduce another panel or card radius without adding a named geometric role here first.
+- `50%` and `999px` are reserved for intentional circles and full capsules. A pill is a distinct control geometry, not a shortcut for making a panel feel smoother.
+- When two rounded contours follow the same edge, keep them concentric: the inner radius is `max(outer radius - inset, 0)`. A full capsule may express this through the same `999px` sentinel because the browser clamps each contour to half its own height.
+- Branded SVG contours and animated `clip-path` morphs are geometry sources in their own right. Judge their curvature visually and edit the shared contour when necessary; do not replace them with an approximate `border-radius` or add a second masking layer.
+- Do not add `corner-shape` to zero-radius or visually absent geometry. Every declaration should affect a visible contour.
+- Review both the enhanced contour in a supporting browser and the circular fallback in Safari/WebKit. A smooth corner must not change hit targets, focus rings, overflow, scroll clipping or the shared material.
+
 ## Depth and edges
 
 Depth has three jobs: separate a control from content, clarify the active layer and preserve the object contour. It must not become a black outline in the light theme or a large grey cloud around the object.
