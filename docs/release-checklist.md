@@ -7,6 +7,7 @@ Passing automated tests is necessary but does not make a visual release ready by
 - Inspect `git status` and the complete diff. Preserve unrelated user work.
 - Run `git diff --check`.
 - Run syntax checks for every changed JavaScript file.
+- Run `pnpm test:generated` after artist-registry changes and `pnpm test:versions` after CSS or JavaScript changes.
 - If media changed, run `pnpm test:media` and keep assets within the documented limits.
 - Run `pnpm test`.
 - For visual changes, review the affected state locally and let the Linux `Visual` CI job perform the canonical pixel comparison.

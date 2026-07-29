@@ -63,6 +63,25 @@
   let previewIntentTimerId = null;
   let previewIntentLink = null;
 
+  const setPreviewSource = (link) => {
+    if (!(link instanceof HTMLElement)) return;
+
+    const preview = link.dataset.previewSrc;
+    if (preview) {
+      artistIndex.style.setProperty('--artist-index-preview', `url(${JSON.stringify(preview)})`);
+    }
+    [
+      ['previewFit', '--artist-index-preview-fit'],
+      ['previewRatio', '--artist-index-preview-ratio'],
+      ['previewWidth', '--artist-index-preview-width'],
+      ['previewWashLight', '--artist-index-wash-light'],
+      ['previewWashDark', '--artist-index-wash-dark']
+    ].forEach(([key, property]) => {
+      const value = link.dataset[key];
+      if (value) artistIndex.style.setProperty(property, value);
+    });
+  };
+
   const clearPreviewIntent = () => {
     window.clearTimeout(previewIntentTimerId);
     previewIntentTimerId = null;
@@ -75,6 +94,7 @@
       if (event.pointerType && event.pointerType !== 'mouse') return;
 
       clearPreviewIntent();
+      setPreviewSource(link);
       previewIntentLink = link;
       previewIntentTimerId = window.setTimeout(() => {
         if (previewIntentLink !== link || !link.matches(':hover')) return;
@@ -85,6 +105,7 @@
     link.addEventListener('pointerleave', () => {
       if (previewIntentLink === link) clearPreviewIntent();
     });
+    link.addEventListener('focus', () => setPreviewSource(link));
   });
 
   setView('cloud');
@@ -284,13 +305,6 @@
   const closeControls = Array.from(dossier?.querySelectorAll('[data-artist-dossier-close]') || []);
   const cards = Array.from(document.querySelectorAll('.artist-card'));
   const indexLinks = Array.from(document.querySelectorAll('.artist-index__link[href^="#artist-"]'));
-  const preferredImages = {
-    'artist-anastasia-dahl': 'assets/artist-index/330551584_215344677620530_5433914055885423503_n.jpg',
-    'artist-nadezhda-ishkinyaeva': 'assets/artist-index/nadezhda-ishkinyaeva.jpg',
-    'artist-elena-kolesnikova': 'assets/artist-index/Елена Колесникова.webp',
-    'artist-alina-kugush': 'assets/artist-index/izobrazhenie-dsc05043-1-1500x.jpg',
-    'artist-no-excuse-group': 'assets/artist-index/0015.jpg.webp'
-  };
   const captionKeys = {
     ru: 'caption',
     en: 'captionEn',
@@ -305,6 +319,11 @@
     ru: 'label',
     en: 'labelEn',
     ja: 'labelJa'
+  };
+  const altKeys = {
+    ru: 'alt',
+    en: 'altEn',
+    ja: 'altJa'
   };
 
   if (!dossier || !panel || !image || !galleryBlock || !gallery || !credit || !name || !role || !text || !links || !cards.length) return;
@@ -331,6 +350,12 @@
     const labelKey = labelKeys[language] || labelKeys.ru;
 
     return item.dataset[labelKey] || item.dataset.label || '';
+  };
+  const getLocalizedAlt = (item) => {
+    const language = window.tarskiI18n?.getLanguage?.() || document.documentElement.dataset.language || 'ru';
+    const altKey = altKeys[language] || altKeys.ru;
+
+    return item.dataset[altKey] || item.dataset.alt || item.getAttribute('alt') || '';
   };
   const getLocalizedCredit = (item) => {
     const language = window.tarskiI18n?.getLanguage?.() || document.documentElement.dataset.language || 'ru';
@@ -372,7 +397,7 @@
         return {
           src,
           avifSrcset,
-          alt: item.getAttribute('alt') || '',
+          alt: getLocalizedAlt(item),
           width: item.getAttribute('width') || '',
           height: item.getAttribute('height') || '',
           caption: getLocalizedCaption(item),
@@ -385,7 +410,7 @@
 
     return {
       id: card.id,
-      imageSrc: preferredImages[card.id] || cardImage?.getAttribute('src') || '',
+      imageSrc: card.dataset.dossierImage || cardImage?.getAttribute('src') || '',
       imageAlt: cardImage?.getAttribute('alt') || cardName?.textContent.trim() || '',
       name: cardName?.textContent.trim() || '',
       role: cardRole?.textContent.trim() || '',
