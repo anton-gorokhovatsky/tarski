@@ -2,15 +2,6 @@
   const storageKey = 'tarski-language';
   const siteBaseUrl = 'https://tarski.ru/';
   const supportedLanguages = ['ru', 'en', 'ja'];
-  const artistKeys = {
-    'artist-anastasia-dahl': 'anastasia',
-    'artist-irhs': 'irhs',
-    'artist-nadezhda-ishkinyaeva': 'nadezhda',
-    'artist-elena-kolesnikova': 'elena',
-    'artist-alina-kugush': 'alina',
-    'artist-no-excuse-group': 'noExcuse',
-    'artist-daria-orlova': 'daria'
-  };
 
   const translations = {
     ru: {
@@ -376,49 +367,6 @@
             ['Tarski Foundation Club', 'A programme for participation in contemporary art through experience, interaction, and direct contact with artists and the professional community.']
           ]
         }
-      },
-      artists: {
-        label: 'Network',
-        title: 'A Network of Like-Minded Artists',
-        items: {
-          anastasia: {
-            name: 'Anastasia Dahl',
-            role: 'Dance and performance artist',
-            text: 'She works with dance performance and, beyond this medium, is interested in how the particular subtlety of attention trained through dance improvisation can manifest itself in other contexts. She is close to sociology and cultural anthropology. She also leads art mediations in art galleries and curates a community of interdisciplinary artists in Bristol.'
-          },
-          irhs: {
-            name: 'Institute for the Development of Artistic Situations /IDAS/',
-            index: 'IDAS',
-            role: 'A self-proclaimed independent institute dedicated to the preservation, analysis, and support of artistic situations',
-            text: 'IDAS focuses on participatory, process-based, and parafictional practices in contemporary art in Russia and internationally. By an artistic situation, we broadly understand a form of social interaction initiated by an artist or a group of artists, which serves as an alternative to established forms of communication.'
-          },
-          nadezhda: {
-            name: 'Nadezhda Ishkinyaeva',
-            role: 'Artist and researcher working at the intersection of visual art and inclusion',
-            text: 'In her projects, she uses an interdisciplinary approach, combining academic education with practices of care for artists living in psychoneurological residential institutions. Nadezhda’s work is built around two directions: observing reality, which she records through writing and plein-air practice, and creating educational programmes for city residents.'
-          },
-          elena: {
-            name: 'Elena Kolesnikova',
-            role: 'Artist, architect, curator of a home residency',
-            text: 'She researches residential spaces and architecture as socially embedded environments. As a curator, she works with the local artistic community, collectively creating horizontal connections and engaging with contexts that are meaningful to them. As an artist, she creates social sculptures, installations, and graphic works.'
-          },
-          alina: {
-            name: 'Alina Kugush',
-            role: 'Artist',
-            text: 'Her artistic practice is built around the manifestation of inappropriateness, tricksterism, and the acquisition of strength by those who are inherently powerless.'
-          },
-          noExcuse: {
-            name: 'No Excuses',
-            index: 'No Excuses',
-            role: 'A close-knit team of professionals and an artistic collective',
-            text: 'They enjoy life and art, and practise rich leisure, the joy of collectivity, participatory practices, gardening, and cooking dishes made from potatoes.'
-          },
-          daria: {
-            name: 'Daria Orlova',
-            role: 'Transdisciplinary artist, performer, and curator. Works with sound and practices of attentive listening',
-            text: 'Her artistic, research, and pedagogical work is aimed at reassembling and co-tuning cultural communities and micro-groups in Saint Petersburg through the organisation of sound events — concerts, performances, workshops, lectures, and walks. These practices help create a more inclusive auditory space, strengthening trust and developing a sense of belonging.'
-          }
-        }
       }
     },
     ja: {
@@ -629,49 +577,6 @@
             ['Tarski財団クラブ', '経験、交流、アーティストや専門コミュニティとの直接的な接点を通じて現代アートに参加するためのプログラムです。']
           ]
         }
-      },
-      artists: {
-        label: 'ネットワーク',
-        title: '志を共有するアーティストたちのネットワーク',
-        items: {
-          anastasia: {
-            name: 'アナスタシア・ダール',
-            role: 'ダンス／パフォーマンス・アーティスト',
-            text: 'ダンス・パフォーマンスに取り組んでいます。また、このメディウムでの作品制作に加えて、ダンス・インプロヴィゼーションの実践によって養われる繊細な注意のあり方が、他の文脈においてどのように現れるのかに関心を寄せています。社会学や文化人類学とも近い関係にあります。アートギャラリーでのアート・メディエーションを行うほか、ブリストルで学際的なアーティストのコミュニティをキュレーションしています。'
-          },
-          irhs: {
-            name: '芸術的状況発展研究所／IDAS',
-            index: 'IDAS',
-            role: '芸術的状況の保存、分析、支援に取り組む、自称・独立機関',
-            text: 'IDASは、ロシアおよび国際的な現代アートにおける、参加型、プロセス型、パラフィクショナルな実践に焦点を当てています。私たちは「芸術的状況」を、アーティストまたはアーティストのグループによって始められる社会的相互作用の形式として広く捉えています。それは、既存のコミュニケーションの形式に対するオルタナティブとして機能するものです。'
-          },
-          nadezhda: {
-            name: 'ナジェージダ・イシュキニャエワ',
-            role: 'ビジュアルアートとインクルージョンの交差点で活動するアーティスト／研究者',
-            text: '彼女のプロジェクトでは、学術的な教育と、精神神経系の入所型福祉施設で暮らすアーティストたちへのケアの実践を結びつける、学際的なアプローチが用いられています。ナジェージダの活動は、二つの方向性を中心に展開されています。一つは、現実を観察し、それを文章やプレネールの実践を通じて記録すること。もう一つは、市民のための教育プログラムをつくることです。'
-          },
-          elena: {
-            name: 'エレーナ・コレスニコワ',
-            role: 'アーティスト、建築家、ホーム・レジデンスのキュレーター',
-            text: '居住空間と建築を、社会的な環境として研究しています。キュレーターとしては、地域のアート・コミュニティと協働し、水平的なつながりを共につくりながら、自分たちにとって意味のある文脈に取り組んでいます。アーティストとしては、ソーシャル・スカルプチャー、インスタレーション、グラフィック作品を制作しています。'
-          },
-          alina: {
-            name: 'アリーナ・クグシュ',
-            role: 'アーティスト',
-            text: '彼女の芸術実践は、不適切さの表明、トリックスター性、そしてあらかじめ力を持たないとされる者たちが力を獲得していくことをめぐって構成されています。'
-          },
-          noExcuse: {
-            name: 'アーティスティック・コレクティブ「No Excuses」',
-            index: 'No Excuses',
-            role: '専門家による結束したチームであり、アーティスト・コレクティブ',
-            text: '生活とアートを楽しみ、豊かな余暇、集団性の喜び、参加型の実践、ガーデニング、そしてジャガイモ料理づくりを実践しています。'
-          },
-          daria: {
-            name: 'ダリア・オルロワ',
-            role: 'トランスディシプリナリー・アーティスト、パフォーマー、キュレーター。音と、注意深く聴く実践に取り組む',
-            text: '彼女の芸術、研究、教育に関わる活動は、サンクトペテルブルクの文化的コミュニティやマイクロ・グループを再構成し、共に調律していくことを目指しています。そのために、コンサート、パフォーマンス、ワークショップ、レクチャー、散歩といった音の出来事を企画しています。これらの実践は、よりインクルーシブな聴覚的空間をつくり、信頼を強め、帰属感を育てることに寄与しています。'
-          }
-        }
       }
     }
   };
@@ -681,6 +586,19 @@
   const originalAttrs = new WeakMap();
   const originalSectionLabels = new WeakMap();
   let currentLanguage = 'ru';
+  let artistLocales = null;
+
+  const getArtistLocales = () => {
+    if (artistLocales) return artistLocales;
+
+    try {
+      artistLocales = JSON.parse(document.getElementById('artists-locales')?.textContent || '{}');
+    } catch (error) {
+      artistLocales = {};
+    }
+
+    return artistLocales;
+  };
 
   const getPath = (source, path) => path.split('.').reduce((value, key) => value?.[key], source);
   const getCurrentData = () => translations[currentLanguage] || translations.ru;
@@ -1056,17 +974,16 @@
     ]);
   };
 
-  const setArtists = (data) => {
-    const artists = data.artists || {};
+  const setArtists = (data, language) => {
+    const artists = getArtistLocales()[language] || getArtistLocales().ru || {};
     const items = artists.items || {};
 
     setText(document.querySelector('#artists-title'), artists.title);
 
-    Object.entries(artistKeys).forEach(([id, key]) => {
+    document.querySelectorAll('.artist-card[data-artist-key]').forEach((card) => {
+      const key = card.dataset.artistKey;
       const artist = items[key];
-      const card = document.getElementById(id);
-      const indexLink = document.querySelector(`.artist-index__link[href="#${id}"]`);
-      if (!card) return;
+      const indexLink = document.querySelector(`.artist-index__link[data-artist-key="${key}"]`);
 
       const displayName = artist?.name;
       setText(indexLink, artist?.index || displayName);
@@ -1081,10 +998,11 @@
     });
   };
 
-  const setSectionLabels = (data) => {
+  const setSectionLabels = (data, language) => {
+    const artists = getArtistLocales()[language] || getArtistLocales().ru || {};
     const labels = {
       about: data.about?.label,
-      artists: data.artists?.label
+      artists: artists.label
     };
 
     document.querySelectorAll('[data-i18n-section]').forEach((intro) => {
@@ -1115,8 +1033,8 @@
     setLanguageControls(data);
     setInterface(data);
     setAbout(data);
-    setArtists(data);
-    setSectionLabels(data);
+    setArtists(data, language);
+    setSectionLabels(data, language);
 
     if (options.persist) {
       try {

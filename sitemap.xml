@@ -5,7 +5,7 @@
 >
   <url>
     <loc>https://tarski.ru/</loc>
-    <lastmod>2026-07-11</lastmod>
+    <lastmod>2026-07-29</lastmod>
     <xhtml:link rel="alternate" hreflang="ru" href="https://tarski.ru/" />
     <xhtml:link rel="alternate" hreflang="en" href="https://tarski.ru/?lang=en" />
     <xhtml:link rel="alternate" hreflang="ja" href="https://tarski.ru/?lang=ja" />
@@ -13,7 +13,7 @@
   </url>
   <url>
     <loc>https://tarski.ru/?lang=en</loc>
-    <lastmod>2026-07-11</lastmod>
+    <lastmod>2026-07-29</lastmod>
     <xhtml:link rel="alternate" hreflang="ru" href="https://tarski.ru/" />
     <xhtml:link rel="alternate" hreflang="en" href="https://tarski.ru/?lang=en" />
     <xhtml:link rel="alternate" hreflang="ja" href="https://tarski.ru/?lang=ja" />
@@ -21,7 +21,7 @@
   </url>
   <url>
     <loc>https://tarski.ru/?lang=ja</loc>
-    <lastmod>2026-07-11</lastmod>
+    <lastmod>2026-07-29</lastmod>
     <xhtml:link rel="alternate" hreflang="ru" href="https://tarski.ru/" />
     <xhtml:link rel="alternate" hreflang="en" href="https://tarski.ru/?lang=en" />
     <xhtml:link rel="alternate" hreflang="ja" href="https://tarski.ru/?lang=ja" />
@@ -50,5 +50,197 @@
     <xhtml:link rel="alternate" hreflang="en" href="https://tarski.ru/privacy.html?lang=en" />
     <xhtml:link rel="alternate" hreflang="ja" href="https://tarski.ru/privacy.html?lang=ja" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://tarski.ru/privacy.html" />
+  </url>
+  <url>
+    <loc>https://tarski.ru/artists/</loc>
+    <lastmod>2026-07-29</lastmod>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://tarski.ru/artists/" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://tarski.ru/artists/en/" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://tarski.ru/artists/ja/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://tarski.ru/artists/" />
+  </url>
+  <url>
+    <loc>https://tarski.ru/artists/en/</loc>
+    <lastmod>2026-07-29</lastmod>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://tarski.ru/artists/" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://tarski.ru/artists/en/" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://tarski.ru/artists/ja/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://tarski.ru/artists/" />
+  </url>
+  <url>
+    <loc>https://tarski.ru/artists/ja/</loc>
+    <lastmod>2026-07-29</lastmod>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://tarski.ru/artists/" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://tarski.ru/artists/en/" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://tarski.ru/artists/ja/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://tarski.ru/artists/" />
+  </url>
+  <url>
+    <loc>https://tarski.ru/artists/anastasia-dahl/</loc>
+    <lastmod>2026-07-29</lastmod>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://tarski.ru/artists/anastasia-dahl/" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://tarski.ru/artists/anastasia-dahl/en/" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://tarski.ru/artists/anastasia-dahl/ja/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://tarski.ru/artists/anastasia-dahl/" />
+  </url>
+  <url>
+    <loc>https://tarski.ru/artists/anastasia-dahl/en/</loc>
+    <lastmod>2026-07-29</lastmod>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://tarski.ru/artists/anastasia-dahl/" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://tarski.ru/artists/anastasia-dahl/en/" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://tarski.ru/artists/anastasia-dahl/ja/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://tarski.ru/artists/anastasia-dahl/" />
+  </url>
+  <url>
+    <loc>https://tarski.ru/artists/anastasia-dahl/ja/</loc>
+    <lastmod>2026-07-29</lastmod>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://tarski.ru/artists/anastasia-dahl/" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://tarski.ru/artists/anastasia-dahl/en/" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://tarski.ru/artists/anastasia-dahl/ja/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://tarski.ru/artists/anastasia-dahl/" />
+  </url>
+  <url>
+    <loc>https://tarski.ru/artists/idas/</loc>
+    <lastmod>2026-07-29</lastmod>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://tarski.ru/artists/idas/" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://tarski.ru/artists/idas/en/" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://tarski.ru/artists/idas/ja/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://tarski.ru/artists/idas/" />
+  </url>
+  <url>
+    <loc>https://tarski.ru/artists/idas/en/</loc>
+    <lastmod>2026-07-29</lastmod>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://tarski.ru/artists/idas/" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://tarski.ru/artists/idas/en/" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://tarski.ru/artists/idas/ja/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://tarski.ru/artists/idas/" />
+  </url>
+  <url>
+    <loc>https://tarski.ru/artists/idas/ja/</loc>
+    <lastmod>2026-07-29</lastmod>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://tarski.ru/artists/idas/" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://tarski.ru/artists/idas/en/" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://tarski.ru/artists/idas/ja/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://tarski.ru/artists/idas/" />
+  </url>
+  <url>
+    <loc>https://tarski.ru/artists/nadezhda-ishkinyaeva/</loc>
+    <lastmod>2026-07-29</lastmod>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://tarski.ru/artists/nadezhda-ishkinyaeva/" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://tarski.ru/artists/nadezhda-ishkinyaeva/en/" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://tarski.ru/artists/nadezhda-ishkinyaeva/ja/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://tarski.ru/artists/nadezhda-ishkinyaeva/" />
+  </url>
+  <url>
+    <loc>https://tarski.ru/artists/nadezhda-ishkinyaeva/en/</loc>
+    <lastmod>2026-07-29</lastmod>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://tarski.ru/artists/nadezhda-ishkinyaeva/" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://tarski.ru/artists/nadezhda-ishkinyaeva/en/" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://tarski.ru/artists/nadezhda-ishkinyaeva/ja/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://tarski.ru/artists/nadezhda-ishkinyaeva/" />
+  </url>
+  <url>
+    <loc>https://tarski.ru/artists/nadezhda-ishkinyaeva/ja/</loc>
+    <lastmod>2026-07-29</lastmod>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://tarski.ru/artists/nadezhda-ishkinyaeva/" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://tarski.ru/artists/nadezhda-ishkinyaeva/en/" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://tarski.ru/artists/nadezhda-ishkinyaeva/ja/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://tarski.ru/artists/nadezhda-ishkinyaeva/" />
+  </url>
+  <url>
+    <loc>https://tarski.ru/artists/elena-kolesnikova/</loc>
+    <lastmod>2026-07-29</lastmod>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://tarski.ru/artists/elena-kolesnikova/" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://tarski.ru/artists/elena-kolesnikova/en/" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://tarski.ru/artists/elena-kolesnikova/ja/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://tarski.ru/artists/elena-kolesnikova/" />
+  </url>
+  <url>
+    <loc>https://tarski.ru/artists/elena-kolesnikova/en/</loc>
+    <lastmod>2026-07-29</lastmod>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://tarski.ru/artists/elena-kolesnikova/" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://tarski.ru/artists/elena-kolesnikova/en/" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://tarski.ru/artists/elena-kolesnikova/ja/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://tarski.ru/artists/elena-kolesnikova/" />
+  </url>
+  <url>
+    <loc>https://tarski.ru/artists/elena-kolesnikova/ja/</loc>
+    <lastmod>2026-07-29</lastmod>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://tarski.ru/artists/elena-kolesnikova/" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://tarski.ru/artists/elena-kolesnikova/en/" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://tarski.ru/artists/elena-kolesnikova/ja/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://tarski.ru/artists/elena-kolesnikova/" />
+  </url>
+  <url>
+    <loc>https://tarski.ru/artists/alina-kugush/</loc>
+    <lastmod>2026-07-29</lastmod>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://tarski.ru/artists/alina-kugush/" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://tarski.ru/artists/alina-kugush/en/" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://tarski.ru/artists/alina-kugush/ja/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://tarski.ru/artists/alina-kugush/" />
+  </url>
+  <url>
+    <loc>https://tarski.ru/artists/alina-kugush/en/</loc>
+    <lastmod>2026-07-29</lastmod>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://tarski.ru/artists/alina-kugush/" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://tarski.ru/artists/alina-kugush/en/" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://tarski.ru/artists/alina-kugush/ja/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://tarski.ru/artists/alina-kugush/" />
+  </url>
+  <url>
+    <loc>https://tarski.ru/artists/alina-kugush/ja/</loc>
+    <lastmod>2026-07-29</lastmod>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://tarski.ru/artists/alina-kugush/" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://tarski.ru/artists/alina-kugush/en/" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://tarski.ru/artists/alina-kugush/ja/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://tarski.ru/artists/alina-kugush/" />
+  </url>
+  <url>
+    <loc>https://tarski.ru/artists/no-excuses/</loc>
+    <lastmod>2026-07-29</lastmod>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://tarski.ru/artists/no-excuses/" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://tarski.ru/artists/no-excuses/en/" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://tarski.ru/artists/no-excuses/ja/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://tarski.ru/artists/no-excuses/" />
+  </url>
+  <url>
+    <loc>https://tarski.ru/artists/no-excuses/en/</loc>
+    <lastmod>2026-07-29</lastmod>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://tarski.ru/artists/no-excuses/" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://tarski.ru/artists/no-excuses/en/" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://tarski.ru/artists/no-excuses/ja/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://tarski.ru/artists/no-excuses/" />
+  </url>
+  <url>
+    <loc>https://tarski.ru/artists/no-excuses/ja/</loc>
+    <lastmod>2026-07-29</lastmod>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://tarski.ru/artists/no-excuses/" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://tarski.ru/artists/no-excuses/en/" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://tarski.ru/artists/no-excuses/ja/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://tarski.ru/artists/no-excuses/" />
+  </url>
+  <url>
+    <loc>https://tarski.ru/artists/daria-orlova/</loc>
+    <lastmod>2026-07-29</lastmod>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://tarski.ru/artists/daria-orlova/" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://tarski.ru/artists/daria-orlova/en/" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://tarski.ru/artists/daria-orlova/ja/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://tarski.ru/artists/daria-orlova/" />
+  </url>
+  <url>
+    <loc>https://tarski.ru/artists/daria-orlova/en/</loc>
+    <lastmod>2026-07-29</lastmod>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://tarski.ru/artists/daria-orlova/" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://tarski.ru/artists/daria-orlova/en/" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://tarski.ru/artists/daria-orlova/ja/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://tarski.ru/artists/daria-orlova/" />
+  </url>
+  <url>
+    <loc>https://tarski.ru/artists/daria-orlova/ja/</loc>
+    <lastmod>2026-07-29</lastmod>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://tarski.ru/artists/daria-orlova/" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://tarski.ru/artists/daria-orlova/en/" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://tarski.ru/artists/daria-orlova/ja/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://tarski.ru/artists/daria-orlova/" />
   </url>
 </urlset>

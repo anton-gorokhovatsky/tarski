@@ -5,6 +5,7 @@ Tarski is a static site. Interaction richness must not turn into permanent work 
 ## Current rules
 
 - Critical local scripts and styles stay below 360 KB uncompressed in aggregate.
+- Artist translations live as inert generated JSON in the page instead of enlarging executable JavaScript, and standalone artist pages ship without the homepage interaction bundle.
 - Artist dossier media is not requested on initial load.
 - The pointer trail creates no canvas and runs no animation loop until an eligible mouse interaction occurs.
 - The pointer-trail code itself loads only after the first eligible mouse movement.

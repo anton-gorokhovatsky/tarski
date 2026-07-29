@@ -14,6 +14,8 @@ This repository is the production source for https://tarski.ru/.
 ## Verification
 
 - This is a static GitHub Pages site with no build step.
+- Treat `content/artists.mjs` as the single source for artist cards, translations, previews and static artist pages. After editing it, run `pnpm artists:generate`; do not hand-edit generated markup between the artist markers in `index.html` or files listed in `artists/.generated-files.json`.
+- Run `pnpm assets:versions` after changing a local CSS or JavaScript asset so every HTML entry point receives the same content-hash cache key.
 - For HTML/CSS changes, run `git diff --check`.
 - For JavaScript changes, run a syntax check on `script.js` and/or `i18n.js` when those files changed.
 - When adding or replacing image assets, run `node tools/check-media-assets.mjs` and keep artist images below the documented hard limit.

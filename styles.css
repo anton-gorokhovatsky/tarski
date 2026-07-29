@@ -1533,7 +1533,9 @@ li::before {
   --artist-index-preview-fit: contain;
   --artist-index-preview-ratio: 0.72;
   --artist-index-preview-width: min(36vw, 470px);
-  --artist-index-wash: rgba(0, 0, 0, 0);
+  --artist-index-wash-light: rgba(0, 0, 0, 0);
+  --artist-index-wash-dark: rgba(0, 0, 0, 0);
+  --artist-index-wash: var(--artist-index-wash-light);
   position: relative;
   z-index: 2;
   isolation: isolate;
@@ -1548,6 +1550,10 @@ li::before {
   font-size: clamp(42px, 5.15vw, 78px);
   line-height: 0.92;
   text-align: center;
+}
+
+:root[data-effective-theme="dark"] .artist-index {
+  --artist-index-wash: var(--artist-index-wash-dark);
 }
 
 .artist-index::before {
@@ -1862,56 +1868,6 @@ html[data-scene="artists"]:has(.artist-index__link:nth-child(7):is(:hover, :focu
     opacity: 1;
   }
 
-  .artist-index:has(.artist-index__link:nth-child(1):is(:hover, :focus-visible)) {
-    --artist-index-preview: url("assets/artist-index/330551584_215344677620530_5433914055885423503_n.jpg");
-    --artist-index-preview-fit: cover;
-    --artist-index-preview-ratio: 1;
-    --artist-index-preview-width: min(36vw, 560px);
-    --artist-index-wash: rgba(176, 170, 154, 0.42);
-  }
-
-  .artist-index:has(.artist-index__link:nth-child(2):is(:hover, :focus-visible)) {
-    --artist-index-preview: url("assets/irhs.png");
-    --artist-index-wash: rgba(232, 232, 224, 0.44);
-  }
-
-  .artist-index:has(.artist-index__link:nth-child(3):is(:hover, :focus-visible)) {
-    --artist-index-preview: url("assets/artist-index/nadezhda-ishkinyaeva.jpg");
-    --artist-index-preview-fit: cover;
-    --artist-index-preview-ratio: 0.711;
-    --artist-index-preview-width: min(30vw, 430px);
-    --artist-index-wash: rgba(206, 197, 183, 0.4);
-  }
-
-  .artist-index:has(.artist-index__link:nth-child(4):is(:hover, :focus-visible)) {
-    --artist-index-preview: url("assets/artist-index/Елена Колесникова.webp");
-    --artist-index-preview-fit: cover;
-    --artist-index-preview-ratio: 0.667;
-    --artist-index-preview-width: min(30vw, 430px);
-    --artist-index-wash: rgba(205, 207, 199, 0.42);
-  }
-
-  .artist-index:has(.artist-index__link:nth-child(5):is(:hover, :focus-visible)) {
-    --artist-index-preview: url("assets/artist-index/izobrazhenie-dsc05043-1-1500x.jpg");
-    --artist-index-preview-fit: cover;
-    --artist-index-preview-ratio: 0.75;
-    --artist-index-preview-width: min(32vw, 460px);
-    --artist-index-wash: rgba(205, 184, 158, 0.4);
-  }
-
-  .artist-index:has(.artist-index__link:nth-child(6):is(:hover, :focus-visible)) {
-    --artist-index-preview: url("assets/artist-index/0015.jpg.webp");
-    --artist-index-preview-fit: cover;
-    --artist-index-preview-ratio: 1.5;
-    --artist-index-preview-width: min(56vw, 760px);
-    --artist-index-wash: rgba(118, 126, 118, 0.34);
-  }
-
-  .artist-index:has(.artist-index__link:nth-child(7):is(:hover, :focus-visible)) {
-    --artist-index-preview: url("assets/orlova.png");
-    --artist-index-wash: rgba(202, 202, 196, 0.4);
-  }
-
   .artist-index:has(.artist-index__link:hover) .artist-index__link:not(:hover),
   .artist-index:has(.artist-index__link:focus-visible) .artist-index__link:not(:focus-visible) {
     opacity: 0.18;
@@ -1925,33 +1881,6 @@ html[data-scene="artists"]:has(.artist-index__link:nth-child(7):is(:hover, :focu
     transform: translate3d(var(--artist-link-x), -0.04em, 0) scale(1.025);
   }
 
-  :root[data-effective-theme="dark"] .artist-index:has(.artist-index__link:nth-child(1):is(:hover, :focus-visible)) {
-    --artist-index-wash: rgba(176, 170, 154, 0.18);
-  }
-
-  :root[data-effective-theme="dark"] .artist-index:has(.artist-index__link:nth-child(2):is(:hover, :focus-visible)) {
-    --artist-index-wash: rgba(232, 232, 224, 0.16);
-  }
-
-  :root[data-effective-theme="dark"] .artist-index:has(.artist-index__link:nth-child(3):is(:hover, :focus-visible)) {
-    --artist-index-wash: rgba(206, 197, 183, 0.16);
-  }
-
-  :root[data-effective-theme="dark"] .artist-index:has(.artist-index__link:nth-child(4):is(:hover, :focus-visible)) {
-    --artist-index-wash: rgba(205, 207, 199, 0.16);
-  }
-
-  :root[data-effective-theme="dark"] .artist-index:has(.artist-index__link:nth-child(5):is(:hover, :focus-visible)) {
-    --artist-index-wash: rgba(205, 184, 158, 0.16);
-  }
-
-  :root[data-effective-theme="dark"] .artist-index:has(.artist-index__link:nth-child(6):is(:hover, :focus-visible)) {
-    --artist-index-wash: rgba(118, 126, 118, 0.16);
-  }
-
-  :root[data-effective-theme="dark"] .artist-index:has(.artist-index__link:nth-child(7):is(:hover, :focus-visible)) {
-    --artist-index-wash: rgba(202, 202, 196, 0.16);
-  }
 }
 
 .artists-list {

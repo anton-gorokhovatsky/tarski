@@ -3,15 +3,19 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "pnpm test:media && pnpm test:core",
-    "test:core": "playwright test --project=chromium tests/accessibility.spec.mjs tests/empathy.spec.mjs tests/performance.spec.mjs tests/site.spec.mjs",
+    "artists:generate": "node tools/generate-artists.mjs",
+    "assets:versions": "node tools/sync-asset-versions.mjs",
+    "test": "pnpm test:media && pnpm test:generated && pnpm test:versions && pnpm test:core",
+    "test:core": "playwright test --project=chromium tests/accessibility.spec.mjs tests/artists-registry.spec.mjs tests/empathy.spec.mjs tests/performance.spec.mjs tests/site.spec.mjs",
     "test:e2e": "pnpm test:core",
+    "test:generated": "node tools/generate-artists.mjs --check",
     "test:media": "node tools/check-media-assets.mjs",
+    "test:versions": "node tools/sync-asset-versions.mjs --check",
     "test:visual": "node tools/require-linux.mjs && playwright test --project=chromium tests/visual.spec.mjs",
     "test:visual:update:linux": "node tools/require-linux.mjs && playwright test --project=chromium tests/visual.spec.mjs --update-snapshots",
     "test:webkit": "playwright test --project=webkit-smoke tests/webkit-smoke.spec.mjs"
   },
   "devDependencies": {
-    "@playwright/test": "1.61.1"
+    "@playwright/test": "1.62.0"
   }
 }

@@ -4,7 +4,10 @@ Static GitHub Pages site for Tarski.
 
 ## Project structure
 
-- `index.html` — page content and metadata.
+- `index.html` — page content and metadata; its artist region is generated.
+- `content/artists.mjs` — the single artist registry for cards, translations, previews and profile pages.
+- `artists/` — generated localized catalog and profile pages.
+- `artist-page.css` — shared styles for the generated artist pages.
 - `styles.css` — layout, typography and responsive styles.
 - `i18n.js` — Russian, English and Japanese text versions.
 - `script.js` — scroll-spy navigation, theme controls, mobile menu and artist detail behavior.
@@ -14,6 +17,8 @@ Static GitHub Pages site for Tarski.
 - `yandex_887484d1e6af8b3b.html` — Yandex Webmaster verification file.
 - `.nojekyll` — keeps GitHub Pages from running Jekyll over the site.
 - `tools/check-media-assets.mjs` — lightweight media-size guard for new images.
+- `tools/generate-artists.mjs` — validates the artist registry and generates the homepage artist region, sitemap and localized artist pages.
+- `tools/sync-asset-versions.mjs` — keeps local CSS/JavaScript cache keys aligned with file contents.
 - `tests/site.spec.mjs` — Playwright regression checks for locales, reflow, menu focus and gallery loading.
 - `tests/accessibility.spec.mjs` — semantic, keyboard, reflow, reduced-motion and localized-copy checks.
 - `tests/empathy.spec.mjs` — daily empathy question, persistence, adaptation and geometry checks.
@@ -37,6 +42,19 @@ pnpm test
 ```
 
 The core suite starts its own local server and checks all three languages at 320 px, the localized privacy page, mobile menu and service-panel focus return, artist-card semantics, and responsive lazy gallery loading.
+
+## Artist content workflow
+
+Edit artist content only in `content/artists.mjs`, then regenerate the static output:
+
+```text
+pnpm artists:generate
+pnpm assets:versions
+pnpm test:generated
+pnpm test:versions
+```
+
+The generator validates stable keys, slugs, DOM IDs, all three locales and referenced assets. Do not hand-edit the generated artist region in `index.html` or files listed in `artists/.generated-files.json`.
 
 The release visual baselines are Linux-only. CI runs them in a separate parallel job so a screenshot mismatch does not hide semantic or accessibility results. On a Linux machine or container, run:
 
