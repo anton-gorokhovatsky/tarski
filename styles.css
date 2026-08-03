@@ -167,6 +167,12 @@
   --font-ui-latin: "CoFo Robert Sans", "CoFo Sans", Arial, Helvetica, sans-serif;
   --font-sans: var(--font-ui-latin);
   --font-serif-display: "Noto Serif Tarski", Georgia, "Times New Roman", serif;
+  /* Editorial type roles. Breakpoints change roles, not individual selectors. */
+  --type-display: 46px;
+  --type-heading: 36px;
+  --type-lead: 26px;
+  --type-body: 20px;
+  --type-meta: 13px;
 }
 
 .visually-hidden {
@@ -385,7 +391,7 @@ body {
   background: var(--page-bg);
   color: var(--text);
   font-family: var(--font-sans);
-  font-size: 20px;
+  font-size: var(--type-body);
   line-height: 1.3;
   text-rendering: geometricPrecision;
   -webkit-font-smoothing: antialiased;
@@ -965,10 +971,14 @@ a:hover {
 }
 
 .theme-toggle__icon {
+  --theme-icon-size: 20px;
+  --theme-icon-modifier-size: 5px;
+  --theme-icon-modifier-inset: 1px;
+  --theme-icon-modifier-dark-inset: 3px;
   position: relative;
   display: block;
-  width: 20px;
-  height: 20px;
+  width: var(--theme-icon-size);
+  height: var(--theme-icon-size);
   border: 1.7px solid currentColor;
   border-radius: 999px;
   background: transparent;
@@ -1041,20 +1051,16 @@ a:hover {
 }
 
 .nav-service-panel .theme-toggle__icon {
-  width: 18px;
-  height: 18px;
+  --theme-icon-size: 18px;
+  --theme-icon-modifier-size: 4.5px;
+  --theme-icon-modifier-inset: 0.5px;
+  --theme-icon-modifier-dark-inset: 2.5px;
   border-width: 1.55px;
 }
 
 .nav-service-panel .theme-toggle__icon::before {
-  width: 4.5px;
-  height: 4.5px;
-  right: 0.5px;
-  top: 0.5px;
-}
-
-:root[data-effective-theme="dark"] .nav-service-panel .theme-toggle__icon::before {
-  left: 2.5px;
+  right: var(--theme-icon-modifier-inset);
+  top: var(--theme-icon-modifier-inset);
 }
 
 .nav-service-panel .theme-toggle:focus-visible .theme-toggle__icon {
@@ -1072,10 +1078,10 @@ a:hover {
 }
 
 .theme-toggle__icon::before {
-  width: 5px;
-  height: 5px;
-  right: 1px;
-  top: 1px;
+  width: var(--theme-icon-modifier-size);
+  height: var(--theme-icon-modifier-size);
+  right: var(--theme-icon-modifier-inset);
+  top: var(--theme-icon-modifier-inset);
   background: currentColor;
   opacity: 1;
   transform: none;
@@ -1087,7 +1093,7 @@ a:hover {
 
 :root[data-effective-theme="dark"] .theme-toggle__icon::before {
   right: auto;
-  left: 3px;
+  left: var(--theme-icon-modifier-dark-inset);
   top: 50%;
   transform: translateY(-50%);
 }
@@ -1104,7 +1110,7 @@ a:hover {
 .superlead p {
   max-width: var(--content-width);
   margin: 0;
-  font-size: 46px;
+  font-size: var(--type-display);
   line-height: 1.16;
   font-weight: 400;
   letter-spacing: 0;
@@ -1136,7 +1142,7 @@ a:hover {
   align-self: start;
   padding-top: 11px;
   color: var(--muted-text);
-  font-size: 13px;
+  font-size: var(--type-meta);
   line-height: 1.15;
   text-transform: lowercase;
   opacity: var(--scene-label-opacity);
@@ -1181,7 +1187,7 @@ ul {
 
 h1 {
   margin: 0 0 20px;
-  font-size: 46px;
+  font-size: var(--type-display);
   line-height: 1.16;
   font-weight: 400;
   letter-spacing: 0;
@@ -1189,7 +1195,7 @@ h1 {
 
 h2 {
   margin: 80px 0 40px;
-  font-size: 36px;
+  font-size: var(--type-heading);
   line-height: 1.18;
   font-weight: 400;
   letter-spacing: 0;
@@ -1209,7 +1215,7 @@ p + ul {
 }
 
 .lead {
-  font-size: 26px;
+  font-size: var(--type-lead);
   line-height: 1.23;
   font-weight: 400;
   letter-spacing: 0;
@@ -1302,6 +1308,7 @@ li::before {
 .editorial-disclosure__content {
   max-width: 34em;
   margin-top: 18px;
+  text-wrap: pretty;
 }
 
 .editorial-disclosure__content p + p {
@@ -1343,7 +1350,7 @@ li::before {
   top: 27px;
   align-self: start;
   color: var(--muted-text);
-  font-size: 13px;
+  font-size: var(--type-meta);
   line-height: 1.15;
   font-weight: 400;
   text-transform: lowercase;
@@ -1369,6 +1376,11 @@ li::before {
 .editorial-block__content > ul,
 .editorial-disclosure__content {
   max-width: 35em;
+}
+
+.editorial-block__content > p,
+.editorial-index__item p {
+  text-wrap: pretty;
 }
 
 .editorial-block h2 {
@@ -1948,6 +1960,7 @@ html[data-scene="artists"]:has(.artist-index__link:nth-child(7):is(:hover, :focu
   font-size: clamp(14px, 1.08vw, 16px);
   line-height: 1.2;
   font-weight: 500;
+  text-wrap: balance;
 }
 
 .artists-section[data-artists-view="list"] .artist-card__body > p:not(.artist-card__role) {
@@ -1955,6 +1968,7 @@ html[data-scene="artists"]:has(.artist-index__link:nth-child(7):is(:hover, :focu
   color: var(--text);
   font-size: clamp(16px, 1.42vw, 19px);
   line-height: 1.28;
+  text-wrap: pretty;
 }
 
 .artists-section[data-artists-view="list"] .artist-card__links {
@@ -2110,6 +2124,7 @@ html[data-scene="artists"]:has(.artist-index__link:nth-child(7):is(:hover, :focu
   color: var(--muted-text);
   font-size: 20px;
   font-weight: 500;
+  text-wrap: balance;
 }
 
 .artist-card__links {
@@ -2641,12 +2656,14 @@ html[data-scene="artists"]:has(.artist-index__link:nth-child(7):is(:hover, :focu
   font-size: 20px;
   line-height: 1.16;
   font-weight: 500;
+  text-wrap: balance;
 }
 
 .artist-dossier__text p {
   margin: 0;
   font-size: 23px;
   line-height: 1.18;
+  text-wrap: pretty;
 }
 
 .artist-dossier__links {
@@ -3194,6 +3211,7 @@ html.has-open-dossier {
 @media (max-width: 960px) {
   :root {
     --page-padding-x: 24px;
+    --type-display: 42px;
   }
 
   .site-header {
@@ -3214,7 +3232,7 @@ html.has-open-dossier {
 
   .superlead p,
   h1 {
-    font-size: 42px;
+    font-size: var(--type-display);
   }
 
   .section-intro {
@@ -3278,10 +3296,14 @@ html.has-open-dossier {
   :root {
     --page-padding-x: 20px;
     --mobile-cover-island-overlap: clamp(-62px, -11vw, -44px);
+    --type-display: 40px;
+    --type-heading: 32px;
+    --type-lead: 23px;
+    --type-body: 18px;
   }
 
   body {
-    font-size: 18px;
+    font-size: var(--type-body);
   }
 
   .page {
@@ -3481,13 +3503,13 @@ html.has-open-dossier {
 
   .superlead p,
   h1 {
-    font-size: 40px;
+    font-size: var(--type-display);
     line-height: 1.1;
   }
 
   h2 {
     margin: 64px 0 28px;
-    font-size: 32px;
+    font-size: var(--type-heading);
     line-height: 1.12;
   }
 
@@ -3544,7 +3566,7 @@ html.has-open-dossier {
   }
 
   .lead {
-    font-size: 23px;
+    font-size: var(--type-lead);
     line-height: 1.18;
   }
 
@@ -3892,6 +3914,11 @@ html.has-open-dossier {
 }
 
 @media (max-width: 420px) {
+  :root {
+    --type-display: 34px;
+    --type-lead: 22px;
+  }
+
   .privacy-page h1 {
     font-size: clamp(32px, 9vw, 36px);
   }
@@ -3902,7 +3929,7 @@ html.has-open-dossier {
 
   .superlead p,
   h1 {
-    font-size: 34px;
+    font-size: var(--type-display);
   }
 
   .section-intro h1 {
@@ -3915,7 +3942,7 @@ html.has-open-dossier {
   }
 
   .lead {
-    font-size: 22px;
+    font-size: var(--type-lead);
   }
 
   .artist-card__image {
@@ -5027,8 +5054,7 @@ html.has-open-dossier {
   }
 
   .mobile-service.is-daylight-open .mobile-service-panel .theme-toggle__icon {
-    width: 23px;
-    height: 23px;
+    --theme-icon-size: 23px;
   }
 
   .mobile-service:not(.is-open):not(.is-closing) .mobile-service-panel {
@@ -6148,8 +6174,7 @@ html.has-open-dossier {
   }
 
   .mobile-menu-expanded .theme-toggle__icon {
-    width: 23px;
-    height: 23px;
+    --theme-icon-size: 23px;
   }
 
   @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {

@@ -37,6 +37,25 @@ A radius describes size; it does not by itself guarantee a visually smooth join 
 - Do not add `corner-shape` to zero-radius or visually absent geometry. Every declaration should affect a visible contour.
 - Review both the enhanced contour in a supporting browser and the circular fallback in Safari/WebKit. A smooth corner must not change hit targets, focus rings, overflow, scroll clipping or the shared material.
 
+## Editorial typography
+
+Use the role-based type scales in `styles.css` and `artist-page.css` instead of assigning an isolated size to every selector. The implementation follows the progressive, content-aware approach in Carmen Ansio's [editorial typography guide](https://www.carmenansio.com/articles/editorial-typography-css/).
+
+- A type role keeps its semantic job across breakpoints: display, heading, lead, body or metadata. Responsive changes redefine the role token rather than patching each selector independently.
+- Use `text-wrap: balance` for short headings and compact descriptive roles. Keep long names on normal wrapping when balancing would add lines or force extra hyphenation. Use `text-wrap: pretty` only for selected long-form editorial copy where preventing a final orphan improves reading. Do not apply either mode globally to every paragraph.
+- Preserve meaningful no-break spaces in names, dates, units and short Russian preposition groups. Do not add `&nbsp;`, soft hyphens or `<br>` solely to reproduce one screenshot; verify RU, EN and JA at the real container width instead.
+- Drop caps, hanging punctuation and optical sizing are progressive editorial tools, not defaults. Introduce them only with a clear content role, a safe fallback and a RU/EN/JA browser review.
+- A typography change is accepted from rendered line breaks, hierarchy and reflow at mobile and desktop sizes, not from token presence alone.
+
+## Icon grammar
+
+Treat a compound icon as a readable base concept plus a smaller modifier that adds state, action or qualification. This follows Helena Zhang's [compound-icon guidance](https://minoraxis.medium.com/advanced-icon-design-compound-icons-modifiers-a747e028ad7b).
+
+- The base icon remains recognisable without the modifier; the modifier stays secondary, uses a repeatable position and occupies no more than roughly one quarter of the base.
+- Keep enough cutout or contrast between both shapes that the modifier does not muddy the base silhouette. Do not stack two familiar symbols merely to decorate a control.
+- Tarski's theme control is the reference compound icon: a stable circle plus one small state dot, scaled through shared icon variables. The settings sliders are one atomic glyph, not a base icon with two badges.
+- A modifier may reinforce state but must never be its only accessible signal. The control's accessible name describes the complete action, and visible selected state must not depend on colour alone.
+
 ## Depth and edges
 
 Depth has three jobs: separate a control from content, clarify the active layer and preserve the object contour. It must not become a black outline in the light theme or a large grey cloud around the object.
