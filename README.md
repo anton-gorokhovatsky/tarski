@@ -25,7 +25,7 @@ Static GitHub Pages site for Tarski.
 - `tests/performance.spec.mjs` — critical byte budget, deferred media and lazy trail allocation checks.
 - `tests/visual.spec.mjs` — visual state matrix for mobile and desktop across themes and locales.
 - `tests/webkit-smoke.spec.mjs` — focused iPhone/WebKit check for the menu, settings surface, reflow and reduced motion.
-- `docs/` — UI-system, release, empathy and performance rules.
+- `docs/` — UI-system, release, empathy and performance rules, plus the [artist expansion decision record](docs/artists-expansion.md).
 
 The site supports Russian, English and Japanese versions, automatic light/dark theme selection via `prefers-color-scheme`, and a manual theme switcher.
 

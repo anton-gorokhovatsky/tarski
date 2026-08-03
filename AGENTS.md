@@ -22,3 +22,9 @@ This repository is the production source for https://tarski.ru/.
 - For visual changes, verify the affected mobile and desktop states in a local browser before publishing.
 - Treat the spacing scale and invariants in `docs/ui-system.md` as a release rule. Every changed margin, padding, gap and inset must map to a spacing token or carry a documented geometry, safe-area or optical exception; verify the resulting computed edges in the browser or an automated geometry assertion.
 - For modal changes, verify Escape close, Tab focus trapping, focus return, and direct artist hashes.
+
+## Artist expansion
+
+- Before bulk artist onboarding, promoting `/artists/`, or introducing work/project pages, read `docs/artists-expansion.md` and resolve its blocking team decisions.
+- For structural artist work, use the focused Layers sequence `orient → domain → conceptual model → interaction flow`; do not run it for micro visual fixes.
+- Keep `/artists/` published but unpromoted until the user explicitly approves the scaled route.
