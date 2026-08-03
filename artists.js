@@ -336,6 +336,8 @@
   let galleryImageObserver = null;
 
   const reducedMotion = () => prefersCalmMotion();
+  const getLanguage = () => window.tarskiI18n?.getLanguage?.() || document.documentElement.dataset.language || 'ru';
+  const typeset = (value) => window.tarskiTypography?.text(value, getLanguage()) ?? value;
   const getOpenDetailsPrefix = () => window.tarskiI18n?.t('ui.openDetails') || 'Открыть подробности: ';
   const getLinksGroupLabel = () => window.tarskiI18n?.t('ui.links.group') || 'Ссылки';
   const getCardName = (card) => card.querySelector('.artist-card__name')?.textContent.trim() || 'художника';
@@ -653,7 +655,7 @@
 
       if (galleryLabel) {
         galleryLabel.className = 'artist-dossier__gallery-label';
-        galleryLabel.textContent = item.label;
+        galleryLabel.textContent = typeset(item.label);
         galleryItem.append(galleryLabel);
       }
 
@@ -662,7 +664,7 @@
 
       if (galleryCaption) {
         galleryCaption.className = 'artist-dossier__gallery-caption';
-        galleryCaption.textContent = item.caption;
+        galleryCaption.textContent = typeset(item.caption);
         galleryItem.append(galleryCaption);
       }
 
@@ -681,11 +683,11 @@
     gallery.replaceChildren(...galleryItems);
     observeGalleryImages();
     gallery.hidden = galleryItems.length === 0;
-    credit.textContent = data.galleryCredit;
+    credit.textContent = typeset(data.galleryCredit);
     credit.hidden = !data.galleryCredit;
     galleryBlock.hidden = galleryItems.length === 0 && !data.galleryCredit;
-    name.textContent = data.name;
-    role.textContent = data.role;
+    name.textContent = typeset(data.name);
+    role.textContent = typeset(data.role);
     text.replaceChildren(...data.copy.map((item) => item.cloneNode(true)));
     links.replaceChildren(...data.links.map((item) => item.cloneNode(true)));
     if (data.links.length) {

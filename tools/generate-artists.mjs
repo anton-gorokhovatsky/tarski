@@ -21,6 +21,27 @@ const escapeHtml = (value = '') => String(value)
   .replaceAll("'", '&#39;');
 
 const escapeAttr = escapeHtml;
+const typographicEntities = {
+  amp: '&',
+  laquo: '«',
+  mdash: '—',
+  nbsp: '\u00a0',
+  ndash: '–',
+  raquo: '»',
+  shy: '\u00ad'
+};
+const typographicText = (data, field) => {
+  const markup = data?.[`${field}Html`];
+  if (!markup) return data?.[field] ?? '';
+  if (/[<>]/.test(markup)) {
+    throw new Error(`${field}Html must contain text and supported character entities only`);
+  }
+
+  return String(markup).replace(
+    /&(amp|laquo|mdash|nbsp|ndash|raquo|shy);/g,
+    (_, entity) => typographicEntities[entity]
+  );
+};
 const indent = (value, spaces) => value
   .split('\n')
   .map((line) => line ? `${' '.repeat(spaces)}${line}` : '')
@@ -192,10 +213,10 @@ const renderLocaleRegistry = () => Object.fromEntries(artistLocales.map((locale)
     items: Object.fromEntries(artists.map((artist) => {
       const data = artist.locales[locale];
       return [artist.key, {
-        name: data.name,
-        index: data.index || data.name,
-        role: data.role,
-        text: data.bio
+        name: typographicText(data, 'name'),
+        index: data.index || typographicText(data, 'name'),
+        role: typographicText(data, 'role'),
+        text: typographicText(data, 'bio')
       }];
     }))
   }
@@ -256,7 +277,8 @@ const renderHead = ({
   description,
   canonicalPath,
   alternateBase,
-  stylesheet
+  stylesheet,
+  typographyScript
 }) => {
   const canonical = `https://tarski.ru${canonicalPath}`;
   const alternates = artistLocales
@@ -283,6 +305,7 @@ ${alternates}
     <meta property="og:image" content="https://tarski.ru/assets/og-image.png" />
     <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" sizes="any" />
     <link rel="stylesheet" href="${stylesheet}" />
+    <script src="${typographyScript}" defer></script>
   </head>`;
 };
 
@@ -302,9 +325,11 @@ const renderCatalogPage = async (locale) => {
   const base = '/artists/';
   const route = localeRoute(base, locale);
   const stylesheet = await assetHref('artist-page.css');
+  const typographyScript = await assetHref('typography.js');
   const cards = artists.map((artist) => {
     const data = artist.locales[locale];
     const nameMarkup = locale === 'ru' && data.nameHtml ? data.nameHtml : escapeHtml(data.name);
+    const roleMarkup = locale === 'ru' && data.roleHtml ? data.roleHtml : escapeHtml(data.role);
     const profileBase = `/artists/${artist.slug}/`;
     const href = localeRoute(profileBase, locale);
     return `<li class="artist-directory__item">
@@ -312,7 +337,7 @@ const renderCatalogPage = async (locale) => {
     <img src="${toRootAsset(artist.image.card)}" alt="" width="${artist.image.width}" height="${artist.image.height}" loading="lazy" decoding="async" />
     <span class="artist-directory__copy">
       <span class="artist-directory__name">${nameMarkup}</span>
-      <span class="artist-directory__role">${escapeHtml(data.role)}</span>
+      <span class="artist-directory__role">${roleMarkup}</span>
       <span class="artist-directory__action">${escapeHtml(ui.openProfile)} <span aria-hidden="true">↗</span></span>
     </span>
   </a>
@@ -327,7 +352,8 @@ ${renderHead({
     description: ui.catalogDescription,
     canonicalPath: route,
     alternateBase: base,
-    stylesheet
+    stylesheet,
+    typographyScript
   })}
   <body class="artist-page artist-page--directory">
     <a class="artist-page__skip" href="#content">${escapeHtml(ui.skip)}</a>
@@ -401,10 +427,13 @@ const renderProfilePage = async (artist, locale) => {
   const ui = artistPageUi[locale];
   const data = artist.locales[locale];
   const nameMarkup = locale === 'ru' && data.nameHtml ? data.nameHtml : escapeHtml(data.name);
+  const roleMarkup = locale === 'ru' && data.roleHtml ? data.roleHtml : escapeHtml(data.role);
+  const bioMarkup = locale === 'ru' && data.bioHtml ? data.bioHtml : escapeHtml(data.bio);
   const base = `/artists/${artist.slug}/`;
   const route = localeRoute(base, locale);
   const catalogRoute = localeRoute('/artists/', locale);
   const stylesheet = await assetHref('artist-page.css');
+  const typographyScript = await assetHref('typography.js');
   const gallery = renderProfileGallery(artist, locale);
   const links = renderProfileLinks(artist, locale);
   const description = data.bio.length > 155 ? `${data.bio.slice(0, 152).trimEnd()}…` : data.bio;
@@ -426,7 +455,8 @@ ${renderHead({
     description,
     canonicalPath: route,
     alternateBase: base,
-    stylesheet
+    stylesheet,
+    typographyScript
   })}
   <body class="artist-page artist-page--profile">
     <a class="artist-page__skip" href="#content">${escapeHtml(ui.skip)}</a>
@@ -439,12 +469,12 @@ ${indent(renderLanguageNav(base, locale), 6)}
     <main id="content" class="artist-page__main artist-profile">
       <p class="artist-page__eyebrow">${escapeHtml(ui.profileEyebrow)}</p>
       <h1>${nameMarkup}</h1>
-      <p class="artist-profile__role">${escapeHtml(data.role)}</p>
+      <p class="artist-profile__role">${roleMarkup}</p>
       <div class="artist-profile__hero">
         <img src="${toRootAsset(artist.image.dossier)}" alt="" width="${artist.image.width}" height="${artist.image.height}" decoding="async" />
       </div>
       <div class="artist-profile__body">
-        <p>${escapeHtml(data.bio)}</p>
+        <p>${bioMarkup}</p>
 ${links ? indent(links, 8) : ''}
       </div>
 ${gallery ? indent(gallery, 6) : ''}

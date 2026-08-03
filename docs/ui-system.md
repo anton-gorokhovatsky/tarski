@@ -44,6 +44,7 @@ Use the role-based type scales in `styles.css` and `artist-page.css` instead of 
 - A type role keeps its semantic job across breakpoints: display, heading, lead, body or metadata. Responsive changes redefine the role token rather than patching each selector independently.
 - Use `text-wrap: balance` for short headings and compact descriptive roles. Keep long names on normal wrapping when balancing would add lines or force extra hyphenation. Use `text-wrap: pretty` only for selected long-form editorial copy where preventing a final orphan improves reading. Do not apply either mode globally to every paragraph.
 - Preserve meaningful no-break spaces in names, dates, units and short Russian preposition groups. Do not add `&nbsp;`, soft hyphens or `<br>` solely to reproduce one screenshot; verify RU, EN and JA at the real container width instead.
+- Route every rendered Russian interface string through `typography.js`. It keeps short service words with the following word without replacing element markup; static, localized and asynchronously updated copy must use the same path.
 - Drop caps, hanging punctuation and optical sizing are progressive editorial tools, not defaults. Introduce them only with a clear content role, a safe fallback and a RU/EN/JA browser review.
 - A typography change is accepted from rendered line breaks, hierarchy and reflow at mobile and desktop sizes, not from token presence alone.
 
