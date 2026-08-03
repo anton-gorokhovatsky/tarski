@@ -213,3 +213,37 @@ test('320 CSS-pixel reflow keeps reading order and fixed controls inside the vie
   expect(widgetGeometry.width).toBeLessThanOrEqual(widgetGeometry.viewport);
   expect(widgetGeometry.scrollWidth).toBeLessThanOrEqual(widgetGeometry.viewport);
 });
+
+test('Russian typography survives localization across site surfaces', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 800 });
+  const expectTextWith = async (locator, fragment) => {
+    expect(await locator.evaluate((element) => element.textContent)).toContain(fragment);
+  };
+  await page.goto('/?lang=ru#artists');
+
+  const alinaCardCopy = page.locator('#artist-alina-kugush .artist-card__body > p:not(.artist-card__role)');
+  await expectTextWith(alinaCardCopy, `плутовства и\u00a0обретения силы у\u00a0заведомо`);
+  await page.locator('[data-artists-view-option="list"]').click();
+  await page.locator('#artist-alina-kugush .artist-card__detail-trigger').click();
+  await expectTextWith(
+    page.locator('[data-artist-dossier-text]'),
+    `плутовства и\u00a0обретения силы у\u00a0заведомо`
+  );
+  await page.locator('.artist-dossier__close').click();
+
+  await expectTextWith(page.locator('[data-settings-intro]'), `как\u00a0сайт`);
+  await expectTextWith(page.locator('#about [data-i18n-block="focus"] .lead'), `Мы\u00a0работаем`);
+
+  await page.goto('/privacy.html?lang=ru');
+  await expectTextWith(page.locator('[data-privacy-copy="intro"]'), `На\u00a0сайте`);
+  await expectTextWith(page.locator('[data-privacy-copy="intro"]'), `как\u00a0работает`);
+
+  await page.goto('/404.html?lang=ru');
+  await expectTextWith(page.locator('[data-not-found-copy]'), `с\u00a0ошибкой`);
+
+  await page.goto('/artists/alina-kugush/');
+  await expectTextWith(
+    page.locator('.artist-profile__body'),
+    `плутовства и\u00a0обретения силы у\u00a0заведомо`
+  );
+});

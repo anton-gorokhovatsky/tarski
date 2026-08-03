@@ -124,4 +124,5 @@
     if (paragraph) paragraph.textContent = data.paragraphs[key];
   });
   setContact(document.querySelector('[data-privacy-copy="contact"]'), data.paragraphs.contact);
+  window.tarskiTypography?.apply(document.body, language);
 })();

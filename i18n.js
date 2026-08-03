@@ -587,6 +587,7 @@
   const originalSectionLabels = new WeakMap();
   let currentLanguage = 'ru';
   let artistLocales = null;
+  const typeset = (value) => window.tarskiTypography?.value(value, currentLanguage) ?? value;
 
   const getArtistLocales = () => {
     if (artistLocales) return artistLocales;
@@ -628,7 +629,7 @@
       return;
     }
 
-    element.textContent = value;
+    element.textContent = typeset(value);
   };
 
   const setTexts = (elements, values) => {
@@ -692,7 +693,7 @@
       return;
     }
 
-    const text = value.replace(/^\*/, '');
+    const text = typeset(value.replace(/^\*/, ''));
     const mark = document.createElement('sup');
     mark.textContent = '*';
     element.replaceChildren(mark, text);
@@ -1035,6 +1036,7 @@
     setAbout(data);
     setArtists(data, language);
     setSectionLabels(data, language);
+    window.tarskiTypography?.apply(document.body, currentLanguage);
 
     if (options.persist) {
       try {
@@ -1073,7 +1075,7 @@
     applyLanguage,
     getLanguage: () => currentLanguage,
     getSceneLabels: () => getCurrentData().ui.scenes,
-    t: (path) => getPath(getCurrentData(), path) ?? getPath(translations.ru, path)
+    t: (path) => typeset(getPath(getCurrentData(), path) ?? getPath(translations.ru, path))
   };
 
   applyLanguage(getInitialLanguage(), { syncUrl: true });

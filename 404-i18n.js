@@ -124,6 +124,8 @@
       button.setAttribute('aria-label', data.languageNames[option]);
     });
 
+    window.tarskiTypography?.apply(document.body, language);
+
     if (persist) {
       try {
         window.localStorage.setItem(storageKey, language);
