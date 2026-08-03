@@ -716,9 +716,9 @@ test('daily empathy check-in stays local and exposes reversible motion adaptatio
   await expect(widget.locator('[data-theme-mode-group]')).toBeVisible();
   await expect(widget.locator('[data-motion-mode-group]')).toBeHidden();
   expect([
-    'Как вы сегодня?',
-    'Какой у вас сегодня внутренний ритм?',
-    'Что вы замечаете в своём состоянии сегодня?'
+    'Как\u00a0вы\u00a0сегодня?',
+    'Какой у\u00a0вас сегодня внутренний ритм?',
+    'Что вы\u00a0замечаете в\u00a0своём состоянии сегодня?'
   ]).toContain(await panel.locator('[data-empathy-question]').textContent());
   await expect(panel.locator('[data-empathy-storage-confirmation]')).toBeHidden();
 
@@ -995,9 +995,9 @@ test('motion preference is available on desktop and shares one state', async ({ 
   await expect(settingsLanguages).toBeVisible();
   await expect(settingsLanguages.locator('[data-language-option="ru"]')).toHaveAttribute('aria-pressed', 'true');
   const questionIndex = [
-    'Как вы сегодня?',
-    'Какой у вас сегодня внутренний ритм?',
-    'Что вы замечаете в своём состоянии сегодня?',
+    'Как\u00a0вы\u00a0сегодня?',
+    'Какой у\u00a0вас сегодня внутренний ритм?',
+    'Что вы\u00a0замечаете в\u00a0своём состоянии сегодня?',
   ].indexOf(await siteSettings.locator('[data-empathy-question]').innerText());
   expect(questionIndex).toBeGreaterThanOrEqual(0);
   await settingsLanguages.locator('[data-language-option="en"]').click();
