@@ -704,6 +704,7 @@ test('stored mobile settings keep the final control row on the global bottom ins
 });
 
 test('daily empathy check-in stays local and exposes reversible motion adaptation', async ({ page }) => {
+  await page.clock.setFixedTime(new Date('2026-09-04T12:00:00+03:00'));
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/?lang=ru');
 
@@ -718,7 +719,7 @@ test('daily empathy check-in stays local and exposes reversible motion adaptatio
   expect([
     'Как\u00a0вы\u00a0сегодня?',
     'Какой у\u00a0вас сегодня внутренний ритм?',
-    'Что вы\u00a0замечаете в\u00a0своём состоянии сегодня?'
+    'Что\u00a0вы\u00a0замечаете в\u00a0своём состоянии сегодня?'
   ]).toContain(await panel.locator('[data-empathy-question]').textContent());
   await expect(panel.locator('[data-empathy-storage-confirmation]')).toBeHidden();
 
@@ -895,6 +896,7 @@ test('text controls stay vertically centered across mobile and desktop settings'
 });
 
 test('motion preference is available on desktop and shares one state', async ({ page }) => {
+  await page.clock.setFixedTime(new Date('2026-09-04T12:00:00+03:00'));
   await page.setViewportSize({ width: 1280, height: 800 });
   await page.goto('/?lang=ru');
 
@@ -997,7 +999,7 @@ test('motion preference is available on desktop and shares one state', async ({ 
   const questionIndex = [
     'Как\u00a0вы\u00a0сегодня?',
     'Какой у\u00a0вас сегодня внутренний ритм?',
-    'Что вы\u00a0замечаете в\u00a0своём состоянии сегодня?',
+    'Что\u00a0вы\u00a0замечаете в\u00a0своём состоянии сегодня?',
   ].indexOf(await siteSettings.locator('[data-empathy-question]').innerText());
   expect(questionIndex).toBeGreaterThanOrEqual(0);
   await settingsLanguages.locator('[data-language-option="en"]').click();

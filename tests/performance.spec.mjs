@@ -1,7 +1,5 @@
 import { expect, test } from '@playwright/test';
 
-const localOrigin = 'http://127.0.0.1:4183';
-
 test.beforeEach(async ({ page }) => {
   await page.route('https://mc.yandex.ru/**', (route) => route.abort());
   await page.route('https://api.open-meteo.com/**', (route) => route.fulfill({
@@ -20,9 +18,9 @@ test('initial route keeps critical code within budget and defers dossier media',
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto('/?lang=ru&review=performance', { waitUntil: 'networkidle' });
 
-  const metrics = await page.evaluate((origin) => {
+  const metrics = await page.evaluate(() => {
     const resources = performance.getEntriesByType('resource')
-      .filter((entry) => entry.name.startsWith(origin));
+      .filter((entry) => new URL(entry.name).origin === window.location.origin);
     const criticalTypes = new Set(['script', 'link']);
     const criticalBytes = resources
       .filter((entry) => criticalTypes.has(entry.initiatorType))
@@ -37,8 +35,9 @@ test('initial route keeps critical code within budget and defers dossier media',
       canvases: document.querySelectorAll('canvas').length,
       trailLoaded: resources.some((entry) => new URL(entry.name).pathname === '/trail.js')
     };
-  }, localOrigin);
+  });
 
+  expect(metrics.criticalBytes).toBeGreaterThan(0);
   expect(metrics.criticalBytes).toBeLessThan(360_000);
   expect(metrics.galleryMedia).toEqual([]);
   expect(metrics.canvases).toBe(0);
