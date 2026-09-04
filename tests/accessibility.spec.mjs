@@ -238,8 +238,23 @@ test('Russian typography survives localization across site surfaces', async ({ p
   await expectTextWith(page.locator('[data-privacy-copy="intro"]'), `На\u00a0сайте`);
   await expectTextWith(page.locator('[data-privacy-copy="intro"]'), `как\u00a0работает`);
 
-  await page.goto('/404.html?lang=ru');
+  // GitHub Pages serves this document at the missing URL, not at /404.html.
+  await page.route('**/__missing__/nested/?lang=ru', async (route) => {
+    const response = await page.request.get('/404.html');
+    await route.fulfill({ response, status: 404 });
+  });
+  const notFoundResponse = await page.goto('/__missing__/nested/?lang=ru');
+  expect(notFoundResponse.status()).toBe(404);
+  await expect(page.locator('.not-found__stage')).toHaveCSS('display', 'grid');
+  await expect.poll(() => page.locator('.not-found img').evaluateAll((images) => (
+    images.length > 0 && images.every((image) => image.complete && image.naturalWidth > 0)
+  ))).toBe(true);
   await expectTextWith(page.locator('[data-not-found-copy]'), `с\u00a0ошибкой`);
+  await page.locator('[data-language-option="en"]').click();
+  await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+  await expect(page.locator('[data-not-found-home]')).toHaveAttribute('href', '/?lang=en');
+  await page.locator('[data-language-option="ja"]').click();
+  await expect(page.locator('html')).toHaveAttribute('lang', 'ja');
 
   await page.goto('/artists/alina-kugush/');
   await expectTextWith(

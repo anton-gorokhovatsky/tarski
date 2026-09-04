@@ -841,12 +841,13 @@ a:hover {
 }
 
 .nav-service-panel .language-switcher {
-  gap: 7px;
+  gap: var(--space-2);
 }
 
 .language-switcher button {
   -webkit-appearance: none;
   appearance: none;
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -858,26 +859,37 @@ a:hover {
   cursor: pointer;
   font: inherit;
   line-height: inherit;
-  opacity: 0.46;
+  opacity: 0.68;
   text-transform: uppercase;
   transition:
     opacity var(--duration-fast) var(--ease-smooth),
     transform var(--duration-fast) var(--ease-smooth);
 }
 
-:root[data-effective-theme="dark"] .nav-service-panel .language-switcher button {
-  opacity: 0.4;
+/* Enlarge hit areas without changing the visible controls or capsule geometry. */
+.language-switcher button::before,
+.theme-toggle::before,
+.nav-settings-toggle::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: max(100%, var(--space-6));
+  height: max(100%, var(--space-6));
+  transform: translate(-50%, -50%);
+}
+
+@media (pointer: coarse) {
+  .language-switcher button::before,
+  .theme-toggle::before,
+  .nav-settings-toggle::before {
+    height: max(100%, var(--space-10));
+  }
 }
 
 .language-switcher button:hover,
 .language-switcher button:focus-visible,
 .language-switcher button[aria-pressed="true"] {
-  opacity: 1;
-}
-
-:root[data-effective-theme="dark"] .nav-service-panel .language-switcher button:hover,
-:root[data-effective-theme="dark"] .nav-service-panel .language-switcher button:focus-visible,
-:root[data-effective-theme="dark"] .nav-service-panel .language-switcher button[aria-pressed="true"] {
   opacity: 1;
 }
 
