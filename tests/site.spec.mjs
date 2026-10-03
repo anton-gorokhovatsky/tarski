@@ -125,7 +125,7 @@ for (const [language, copy] of Object.entries(languages)) {
     await expect(page.locator('[data-footer-route] > span:first-child')).toHaveText(copy.footerRoutes);
     await expect(page.locator('[data-footer-route]')).toHaveCount(3);
     await expect(page.locator('[data-design-credit]')).toHaveText(copy.designCredit);
-    await expect(page.locator('[data-design-credit]')).toHaveAttribute('href', 'https://anton-gorokhovatsky.github.io/design/');
+    await expect(page.locator('[data-design-credit]')).toHaveAttribute('href', 'https://gorokhovatsky.tech/?point=tarski');
     await expect(page.locator('[data-design-credit]')).toHaveAttribute('rel', 'author');
   });
 
