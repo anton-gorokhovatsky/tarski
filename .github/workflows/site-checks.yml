@@ -29,7 +29,7 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm exec playwright install --with-deps chromium
-      - run: pnpm test:visual:update:linux --grep 'desktop footer'
+      - run: pnpm test:visual:update:linux --grep 'desktop footer' --update-snapshots=all
       - uses: actions/upload-artifact@v7
         with:
           name: footer-baselines
