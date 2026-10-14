@@ -109,7 +109,7 @@ for (const language of languages) {
       await settlePage(page);
 
       const signature = page.locator('ag-signature');
-      await expect(signature).toHaveAttribute('data-signature-version', '1.0.2');
+      await expect(signature).toHaveAttribute('data-signature-version', '1.0.3');
       // Freeze the decorative arc at its initial phase for repeatable pixels.
       await signature.evaluate((element) => element.setAttribute('paused', ''));
 

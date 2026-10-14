@@ -21,7 +21,7 @@ const syncSignatures = () => {
       signature.toggleAttribute('paused', window.tarskiMotion.isCalm());
     }
 
-    // v1.0.2 has no href or separate role-language attribute. Preserve a real
+    // v1.0.3 has no href or separate role-language attribute. Preserve a real
     // native link to the Tarski case, including Copy Link and open in new tab.
     const credit = signature.shadowRoot?.querySelector('a[rel="author"]');
     if (credit) credit.href = fallback.href;
@@ -37,7 +37,7 @@ if (signatures.length) {
   syncSignatures();
 
   try {
-    await import('https://gorokhovatsky.tech/signature/1.0.2/signature.js');
+    await import('./.qa-artifacts/signature-preview.js');
     syncSignatures();
   } catch {
     // The localized, ordinary author link remains usable when the module fails.

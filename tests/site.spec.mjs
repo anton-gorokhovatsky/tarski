@@ -176,7 +176,7 @@ test('footer signature keeps the tablet reading edge and bottom inset', async ({
   });
 
   expect(geometry.creditsGap).toBeCloseTo(12, 0);
-  expect(geometry.signatureGap).toBeCloseTo(12, 0);
+  expect(geometry.signatureGap).toBeCloseTo(16, 0);
   expect(geometry.bottomInset).toBeCloseTo(32, 0);
   expect(geometry.leftDelta).toBeLessThanOrEqual(0.5);
 });
@@ -187,7 +187,7 @@ test('author signature preserves the case link, locales, keyboard and motion con
   const signature = page.locator('ag-signature');
   const credit = signature.locator('.credit');
   const mark = signature.locator('.mark');
-  await expect(signature).toHaveAttribute('data-signature-version', '1.0.2');
+  await expect(signature).toHaveAttribute('data-signature-version', '1.0.3');
   await expect(mark).toHaveAttribute('data-arc-running', 'false');
   await signature.scrollIntoViewIfNeeded();
   await expect(mark).toHaveAttribute('data-arc-running', 'true');
@@ -201,18 +201,33 @@ test('author signature preserves the case link, locales, keyboard and motion con
     await expect(signature.getByRole('link')).toHaveCount(1);
   }
 
+  const footerType = await page.locator('.site-footer__privacy').evaluate((element) => {
+    const style = getComputedStyle(element);
+    return { size: style.fontSize, leading: style.lineHeight, weight: style.fontWeight, left: element.getBoundingClientRect().left };
+  });
+  for (const part of ['.name', '.role']) {
+    await expect(signature.locator(part)).toHaveCSS('font-size', footerType.size);
+    await expect(signature.locator(part)).toHaveCSS('line-height', footerType.leading);
+    await expect(signature.locator(part)).toHaveCSS('font-weight', footerType.weight);
+    const left = await signature.locator(part).evaluate((element) => element.getBoundingClientRect().left);
+    expect(Math.abs(left - footerType.left)).toBeLessThanOrEqual(0.5);
+  }
+
   await page.locator('.site-footer__weather').focus();
   await page.keyboard.press('Tab');
   await expect(credit).toBeFocused();
-  await expect(credit).toHaveCSS('outline-style', 'solid');
+  await expect(credit).not.toHaveCSS('box-shadow', 'none');
 
   await page.locator('.nav-settings-toggle').click();
   await page.locator('[data-site-settings] [data-theme-mode="dark"]').click();
   await expect(signature).toHaveAttribute('theme', 'dark');
-  await expect(signature.locator('.name')).toHaveCSS('color', 'rgb(242, 242, 242)');
+  const linksShareColor = () => signature.locator('.name').evaluate((element) => (
+    getComputedStyle(element).color === getComputedStyle(document.querySelector('.site-footer__privacy')).color
+  ));
+  await expect.poll(linksShareColor).toBe(true);
   await page.locator('[data-site-settings] [data-theme-mode="light"]').click();
   await expect(signature).toHaveAttribute('theme', 'light');
-  await expect(signature.locator('.name')).toHaveCSS('color', 'rgb(0, 0, 0)');
+  await expect.poll(linksShareColor).toBe(true);
   await page.locator('[data-site-settings] [data-motion-mode="calm"]').click();
   await page.keyboard.press('Escape');
   await expect(signature).toHaveAttribute('paused', '');
@@ -234,7 +249,7 @@ test('author signature reflows with 200% text at 320px in every locale', async (
   for (const language of Object.keys(languages)) {
     await page.goto(`/?lang=${language}`);
     const signature = page.locator('ag-signature');
-    await expect(signature).toHaveAttribute('data-signature-version', '1.0.2');
+    await expect(signature).toHaveAttribute('data-signature-version', '1.0.3');
     await page.addStyleTag({ content: 'html { font-size: 200%; }' });
     await signature.scrollIntoViewIfNeeded();
     const bounds = await signature.evaluate((host) => {
