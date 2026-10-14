@@ -13,6 +13,29 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  footer-baselines:
+    name: Prepare footer baselines
+    if: github.head_ref == 'agent/footer-author-signature'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 10
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm test:visual:update:linux --grep 'desktop footer'
+      - uses: actions/upload-artifact@v7
+        with:
+          name: footer-baselines
+          path: tests/visual.spec.mjs-snapshots/desktop-*-footer-*.png
+          retention-days: 3
+
   suite:
     name: ${{ matrix.label }}
     runs-on: ubuntu-latest

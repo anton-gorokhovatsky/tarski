@@ -2707,8 +2707,8 @@ html.has-open-dossier {
   --footer-rail-column: minmax(240px, 1fr);
   position: relative;
   box-sizing: border-box;
-  height: 100svh;
-  min-height: 720px;
+  height: auto;
+  min-height: max(720px, 100svh);
   margin-top: clamp(88px, 14vh, 168px);
   padding-top: clamp(48px, 6svh, 72px);
   padding-bottom: 32px;
@@ -2875,6 +2875,30 @@ html.has-open-dossier {
   transition:
     color var(--duration-fast) var(--ease-smooth),
     opacity var(--duration-fast) var(--ease-smooth);
+}
+
+.site-footer__signature {
+  grid-column: 2 / 4;
+  display: block;
+  inline-size: 100%;
+  max-inline-size: 100%;
+  margin-block-start: var(--space-0);
+  color: var(--text);
+  font-size: 1rem;
+  line-height: 1.4;
+  --ag-signature-size: 6rem;
+  --ag-signature-ink: var(--text);
+  --ag-signature-muted: var(--muted-text);
+  --ag-signature-accent: var(--text);
+  --ag-signature-node-ink: var(--text);
+  --ag-signature-name-size: 1rem;
+  --ag-signature-role-size: 0.875rem;
+  --ag-signature-gap: var(--space-4);
+}
+
+.site-footer__signature:not(:defined) > a {
+  display: inline-block;
+  min-block-size: 2.75rem;
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -3286,7 +3310,8 @@ html.has-open-dossier {
   }
 
   .site-footer__disclaimer,
-  .site-footer__credits {
+  .site-footer__credits,
+  .site-footer__signature {
     grid-column: 2;
   }
 
@@ -3780,6 +3805,10 @@ html.has-open-dossier {
     row-gap: 6px;
     font-size: 14px;
     line-height: 1.2;
+  }
+
+  .site-footer__signature {
+    grid-column: 1;
   }
 
   .site-footer__disclaimer {
