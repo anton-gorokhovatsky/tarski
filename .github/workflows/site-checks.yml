@@ -13,33 +13,6 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  footer-baselines:
-    name: Prepare footer baselines
-    if: github.head_ref == 'agent/footer-author-signature'
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v7
-      - uses: pnpm/action-setup@v6
-        with:
-          version: 10
-      - uses: actions/setup-node@v7
-        with:
-          node-version: 24
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm exec playwright install --with-deps chromium
-      - name: Use the exact shared-component candidate for preview
-        run: |
-          mkdir -p .qa-artifacts
-          curl -fsSL https://raw.githubusercontent.com/anton-gorokhovatsky/design/0f3ef5a458d04180b1114bfd90bc578179bf2099/signature/1.0.3/signature.js -o .qa-artifacts/signature-preview.js
-      - run: pnpm test:visual:update:linux --grep 'desktop footer' --update-snapshots=all
-      - uses: actions/upload-artifact@v7
-        with:
-          name: footer-baselines
-          path: tests/visual.spec.mjs-snapshots/desktop-*-footer-*.png
-          retention-days: 3
-
   suite:
     name: ${{ matrix.label }}
     runs-on: ubuntu-latest

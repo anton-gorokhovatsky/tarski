@@ -37,7 +37,7 @@ if (signatures.length) {
   syncSignatures();
 
   try {
-    await import('./.qa-artifacts/signature-preview.js');
+    await import('https://gorokhovatsky.tech/signature/1.0.3/signature.js');
     syncSignatures();
   } catch {
     // The localized, ordinary author link remains usable when the module fails.
