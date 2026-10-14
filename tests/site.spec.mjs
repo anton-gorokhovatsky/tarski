@@ -230,6 +230,7 @@ test('author signature preserves the case link, locales, keyboard and motion con
   await expect.poll(linksShareColor).toBe(true);
   await page.locator('[data-site-settings] [data-motion-mode="calm"]').click();
   await page.keyboard.press('Escape');
+  await expect(page.locator('[data-site-settings]')).toBeHidden();
   await expect(signature).toHaveAttribute('paused', '');
   await expect(mark).toHaveAttribute('data-arc-running', 'false');
   await expect(signature.locator('.arc-particle').first()).toHaveCSS('animation-play-state', 'paused');
@@ -238,6 +239,7 @@ test('author signature preserves the case link, locales, keyboard and motion con
   await page.locator('.nav-settings-toggle').click();
   await page.locator('[data-site-settings] [data-motion-mode="system"]').click();
   await page.keyboard.press('Escape');
+  await expect(page.locator('[data-site-settings]')).toBeHidden();
   await expect(mark).toHaveAttribute('data-arc-running', 'true');
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await expect(mark).toHaveAttribute('data-arc-running', 'false');
