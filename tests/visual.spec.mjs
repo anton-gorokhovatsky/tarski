@@ -108,6 +108,11 @@ for (const language of languages) {
       await page.goto(`/?lang=${language}&review=visual-footer`);
       await settlePage(page);
 
+      const signature = page.locator('ag-signature');
+      await expect(signature).toHaveAttribute('data-signature-version', '1.0.3');
+      // Freeze the decorative arc at its initial phase for repeatable pixels.
+      await signature.evaluate((element) => element.setAttribute('paused', ''));
+
       const footer = page.locator('[data-semantic-footer]');
       await footer.scrollIntoViewIfNeeded();
       await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));

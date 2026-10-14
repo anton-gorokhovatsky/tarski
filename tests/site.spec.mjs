@@ -125,8 +125,8 @@ for (const [language, copy] of Object.entries(languages)) {
     await expect(page.locator('[data-footer-route] > span:first-child')).toHaveText(copy.footerRoutes);
     await expect(page.locator('[data-footer-route]')).toHaveCount(3);
     await expect(page.locator('[data-design-credit]')).toHaveText(copy.designCredit);
-    await expect(page.locator('[data-design-credit]')).toHaveAttribute('href', 'https://gorokhovatsky.tech/?point=tarski');
-    await expect(page.locator('[data-design-credit]')).toHaveAttribute('rel', 'author');
+    await expect(page.locator('[data-author-signature-fallback]')).toHaveAttribute('href', 'https://gorokhovatsky.tech/?point=tarski');
+    await expect(page.locator('[data-author-signature-fallback]')).toHaveAttribute('rel', 'author');
   });
 
   test(`${language}: privacy page is localized and canonical`, async ({ page }) => {
@@ -158,24 +158,131 @@ test('desktop context label follows the artists section into participation', asy
   }
 });
 
-test('footer credits keep the tablet bottom inset', async ({ page }) => {
+test('footer signature keeps the tablet reading edge and bottom inset', async ({ page }) => {
   await page.setViewportSize({ width: 879, height: 530 });
   await page.goto('/?lang=ru');
 
   const geometry = await page.locator('.site-footer').evaluate((footer) => {
     const disclaimer = footer.querySelector('.site-footer__disclaimer').getBoundingClientRect();
     const credits = footer.querySelector('.site-footer__credits').getBoundingClientRect();
+    const signature = footer.querySelector('ag-signature').getBoundingClientRect();
     const footerRect = footer.getBoundingClientRect();
     return {
       creditsGap: credits.top - disclaimer.bottom,
-      bottomInset: footerRect.bottom - credits.bottom,
-      leftDelta: Math.abs(credits.left - disclaimer.left)
+      signatureGap: signature.top - credits.bottom,
+      bottomInset: footerRect.bottom - signature.bottom,
+      leftDelta: Math.abs(signature.left - disclaimer.left)
     };
   });
 
   expect(geometry.creditsGap).toBeCloseTo(12, 0);
+  expect(geometry.signatureGap).toBeCloseTo(16, 0);
   expect(geometry.bottomInset).toBeCloseTo(32, 0);
   expect(geometry.leftDelta).toBeLessThanOrEqual(0.5);
+});
+
+test('author signature preserves the case link, locales, keyboard and motion controls', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/?lang=ru');
+  const signature = page.locator('ag-signature');
+  const credit = signature.locator('.credit');
+  const mark = signature.locator('.mark');
+  await expect(signature).toHaveAttribute('data-signature-version', '1.0.3');
+  await expect(mark).toHaveAttribute('data-arc-running', 'false');
+  await signature.scrollIntoViewIfNeeded();
+  await expect(mark).toHaveAttribute('data-arc-running', 'true');
+
+  for (const [language, copy] of Object.entries(languages)) {
+    await page.locator(`.main-nav [data-language-option="${language}"]`).click();
+    await expect(signature.locator('.role')).toHaveText(copy.designCredit);
+    await expect(signature.locator('.role')).toHaveAttribute('lang', language);
+    await expect(signature.locator('.name')).toHaveText(language === 'ru' ? 'Антон Гороховатский' : 'Anton Gorokhovatsky');
+    await expect(credit).toHaveAttribute('href', 'https://gorokhovatsky.tech/?point=tarski');
+    await expect(signature.getByRole('link')).toHaveCount(1);
+  }
+
+  const footerType = await page.locator('.site-footer__privacy').evaluate((element) => {
+    const style = getComputedStyle(element);
+    return { size: style.fontSize, leading: style.lineHeight, weight: style.fontWeight, left: element.getBoundingClientRect().left };
+  });
+  for (const part of ['.name', '.role']) {
+    await expect(signature.locator(part)).toHaveCSS('font-size', footerType.size);
+    await expect(signature.locator(part)).toHaveCSS('line-height', footerType.leading);
+    await expect(signature.locator(part)).toHaveCSS('font-weight', footerType.weight);
+    const left = await signature.locator(part).evaluate((element) => element.getBoundingClientRect().left);
+    expect(Math.abs(left - footerType.left)).toBeLessThanOrEqual(0.5);
+  }
+
+  await page.locator('.site-footer__weather').focus();
+  await page.keyboard.press('Tab');
+  await expect(credit).toBeFocused();
+  await expect(credit).not.toHaveCSS('box-shadow', 'none');
+
+  await page.locator('.nav-settings-toggle').click();
+  await page.locator('[data-site-settings] [data-theme-mode="dark"]').click();
+  await expect(signature).toHaveAttribute('theme', 'dark');
+  const linksShareColor = () => signature.locator('.name').evaluate((element) => (
+    getComputedStyle(element).color === getComputedStyle(document.querySelector('.site-footer__privacy')).color
+  ));
+  await expect.poll(linksShareColor).toBe(true);
+  await page.locator('[data-site-settings] [data-theme-mode="light"]').click();
+  await expect(signature).toHaveAttribute('theme', 'light');
+  await expect.poll(linksShareColor).toBe(true);
+  await page.locator('[data-site-settings] [data-motion-mode="calm"]').click();
+  await page.keyboard.press('Escape');
+  await expect(page.locator('[data-site-settings]')).toBeHidden();
+  await expect(signature).toHaveAttribute('paused', '');
+  await expect(mark).toHaveAttribute('data-arc-running', 'false');
+  await expect(signature.locator('.arc-particle').first()).toHaveCSS('animation-play-state', 'paused');
+  await expect(signature.locator('.motion')).toBeHidden();
+
+  await page.locator('.nav-settings-toggle').click();
+  await page.locator('[data-site-settings] [data-motion-mode="system"]').click();
+  await page.keyboard.press('Escape');
+  await expect(page.locator('[data-site-settings]')).toBeHidden();
+  await expect(mark).toHaveAttribute('data-arc-running', 'true');
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await expect(mark).toHaveAttribute('data-arc-running', 'false');
+  await expect(signature.locator('.arc-particle').first()).toHaveCSS('animation-name', 'none');
+});
+
+test('author signature reflows with 200% text at 320px in every locale', async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 700 });
+  for (const language of Object.keys(languages)) {
+    await page.goto(`/?lang=${language}`);
+    const signature = page.locator('ag-signature');
+    await expect(signature).toHaveAttribute('data-signature-version', '1.0.3');
+    await page.addStyleTag({ content: 'html { font-size: 200%; }' });
+    await signature.scrollIntoViewIfNeeded();
+    const bounds = await signature.evaluate((host) => {
+      const rect = host.getBoundingClientRect();
+      return [...host.shadowRoot.querySelectorAll('.credit, .mark, .text, .name, .role')].map((element) => {
+        const child = element.getBoundingClientRect();
+        return { left: child.left - rect.left, right: rect.right - child.right, overflow: element.scrollWidth - element.clientWidth };
+      });
+    });
+    for (const bound of bounds) {
+      expect(bound.left).toBeGreaterThanOrEqual(-0.5);
+      expect(bound.right).toBeGreaterThanOrEqual(-0.5);
+      expect(bound.overflow).toBeLessThanOrEqual(1);
+    }
+    const screenshotPath = test.info().outputPath(`signature-${language}-320-text-200.png`);
+    await page.screenshot({ path: screenshotPath });
+    await test.info().attach(`signature-${language}-320-text-200`, { path: screenshotPath, contentType: 'image/png' });
+  }
+});
+
+test('author credit stays localized and usable when the shared module is unavailable', async ({ page }) => {
+  await page.route('https://gorokhovatsky.tech/signature/**', (route) => route.abort());
+  for (const [language, copy] of Object.entries(languages)) {
+    await page.goto(`/?lang=${language}`);
+    const fallback = page.locator('[data-author-signature-fallback]');
+    await expect(fallback).toBeVisible();
+    await expect(fallback).toContainText(language === 'ru' ? 'Антон Гороховатский' : 'Anton Gorokhovatsky');
+    await expect(fallback).toContainText(copy.designCredit);
+    await expect(fallback).toHaveAttribute('href', 'https://gorokhovatsky.tech/?point=tarski');
+    await expect(page.locator('ag-signature').getByRole('link')).toHaveCount(1);
+  }
 });
 
 test('mobile menu and service panel preserve state, Escape, and focus return', async ({ page }) => {
