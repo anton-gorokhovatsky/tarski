@@ -2882,7 +2882,7 @@ html.has-open-dossier {
 .site-footer__signature {
   display: block;
   inline-size: fit-content;
-  max-inline-size: 100%;
+  max-inline-size: calc(100% + var(--space-16) + var(--space-3));
   margin-block-start: var(--space-0);
   /* The mark occupies the metadata gutter; all text keeps the reading edge. */
   margin-inline-start: calc(-1 * (var(--space-16) + var(--space-3)));
@@ -2901,6 +2901,7 @@ html.has-open-dossier {
 .site-footer__signature::part(credit) {
   display: flex;
   flex-direction: row;
+  flex-wrap: nowrap;
   gap: var(--space-3);
   align-items: center;
 }
@@ -2921,7 +2922,7 @@ html.has-open-dossier {
 }
 
 .site-footer__signature::part(role) {
-  order: 1;
+  order: 0;
 }
 
 .site-footer__signature::part(name),
@@ -2933,7 +2934,7 @@ html.has-open-dossier {
 }
 
 .site-footer__signature::part(name) {
-  order: 0;
+  order: 1;
   min-inline-size: 0;
   color: var(--footer-link-ink);
   text-decoration-color: currentColor;
@@ -2957,6 +2958,11 @@ html.has-open-dossier {
 .site-footer__signature:not(:defined) > a {
   display: inline-block;
   min-block-size: 2.75rem;
+}
+
+.site-footer__signature:not(:defined) {
+  margin-inline-start: var(--space-0);
+  max-inline-size: 100%;
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -2987,6 +2993,7 @@ html.has-open-dossier {
   .site-footer__signature:hover::part(name) {
     color: var(--text);
     text-decoration-style: solid;
+    text-decoration-thickness: 2px;
   }
 }
 
@@ -3826,18 +3833,9 @@ html.has-open-dossier {
   }
 
   .site-footer__texts {
-    width: 100%;
-    margin-inline: var(--space-0);
-  }
-
-  .site-footer__signature {
-    margin-inline-start: var(--space-0);
-  }
-
-  .site-footer__signature::part(credit) {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: var(--space-1);
+    /* Keep one mark column on mobile too, with all footer text beside it. */
+    width: calc(100% - var(--space-16) - var(--space-3));
+    margin-inline: calc(var(--space-16) + var(--space-3)) var(--space-0);
   }
 
   .site-footer__credits {

@@ -193,14 +193,13 @@ test('footer colophon groups copyright with services and keeps the author lockup
         markWidth: mark.width,
         markTextGap: text.left - mark.right,
         markTextCenterDelta: Math.abs((mark.top + mark.height / 2) - (text.top + text.height / 2)),
-        markTextRowGap: text.top - mark.bottom,
-        markTextLeftDelta: Math.abs(mark.left - text.left),
+        roleBeforeNameGap: name.top - role.bottom,
         roleLeftDelta: Math.abs(role.left - credits.left)
       };
     });
 
     expect(geometry.blockGap).toBeCloseTo(24, 0);
-    expect(geometry.serviceLeftDelta).toBeLessThanOrEqual(0.5);
+    expect(geometry.serviceLeftDelta).toBeCloseTo(width > 720 ? 0 : 76, 0);
     expect(geometry.noteLeftDelta).toBeLessThanOrEqual(0.5);
     expect(geometry.noteGap).toBeCloseTo(8, 0);
     expect(geometry.yearInServices).toBe(true);
@@ -211,13 +210,9 @@ test('footer colophon groups copyright with services and keeps the author lockup
     expect(geometry.leftDelta).toBeLessThanOrEqual(0.5);
     expect(geometry.roleLeftDelta).toBeLessThanOrEqual(0.5);
     expect(geometry.markWidth).toBe(64);
-    if (width > 720) {
-      expect(geometry.markTextGap).toBeCloseTo(12, 0);
-      expect(geometry.markTextCenterDelta).toBeLessThanOrEqual(0.5);
-    } else {
-      expect(geometry.markTextRowGap).toBeCloseTo(4, 0);
-      expect(geometry.markTextLeftDelta).toBeLessThanOrEqual(0.5);
-    }
+    expect(geometry.markTextGap).toBeCloseTo(12, 0);
+    expect(geometry.markTextCenterDelta).toBeLessThanOrEqual(0.5);
+    expect(geometry.roleBeforeNameGap).toBeCloseTo(0, 0);
   }
 });
 
@@ -258,6 +253,27 @@ test('author signature preserves the case link, locales, keyboard and motion con
   await expect(credit).toBeFocused();
   await expect(credit).not.toHaveCSS('box-shadow', 'none');
 
+  const verifyFooterHovers = async (theme) => {
+    const hoverInk = await page.locator('.site-footer__cta').evaluate((element) => getComputedStyle(element).color);
+    for (const [label, trigger, text] of [
+      ['analytics', page.locator('.site-footer__privacy'), page.locator('.site-footer__privacy')],
+      ['weather', page.locator('.site-footer__weather'), page.locator('.site-footer__weather')],
+      ['author', credit, signature.locator('.name')]
+    ]) {
+      await page.mouse.move(5, 5);
+      const restInk = await text.evaluate((element) => getComputedStyle(element).color);
+      expect(restInk).not.toBe(hoverInk);
+      await trigger.hover();
+      await expect(text).toHaveCSS('color', hoverInk);
+      await expect(text).toHaveCSS('text-decoration-thickness', '2px');
+      const region = label === 'author' ? signature : page.locator('.site-footer__services');
+      await region.screenshot({ path: test.info().outputPath(`footer-hover-${theme}-${label}.png`) });
+      await page.mouse.move(5, 5);
+      await expect(text).toHaveCSS('color', restInk);
+      await expect(text).toHaveCSS('text-decoration-thickness', '1px');
+    }
+  };
+
   await page.locator('.nav-settings-toggle').click();
   await page.locator('[data-site-settings] [data-theme-mode="dark"]').click();
   await expect(signature).toHaveAttribute('theme', 'dark');
@@ -265,9 +281,17 @@ test('author signature preserves the case link, locales, keyboard and motion con
     getComputedStyle(element).color === getComputedStyle(document.querySelector('.site-footer__privacy')).color
   ));
   await expect.poll(linksShareColor).toBe(true);
+  await page.keyboard.press('Escape');
+  await expect(page.locator('[data-site-settings]')).toBeHidden();
+  await verifyFooterHovers('dark');
+  await page.locator('.nav-settings-toggle').click();
   await page.locator('[data-site-settings] [data-theme-mode="light"]').click();
   await expect(signature).toHaveAttribute('theme', 'light');
   await expect.poll(linksShareColor).toBe(true);
+  await page.keyboard.press('Escape');
+  await expect(page.locator('[data-site-settings]')).toBeHidden();
+  await verifyFooterHovers('light');
+  await page.locator('.nav-settings-toggle').click();
   await page.locator('[data-site-settings] [data-motion-mode="calm"]').click();
   await page.keyboard.press('Escape');
   await expect(page.locator('[data-site-settings]')).toBeHidden();
