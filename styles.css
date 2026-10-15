@@ -2890,7 +2890,7 @@ html.has-open-dossier {
   margin-block-start: var(--space-1);
   color: var(--footer-link-ink);
   font: inherit;
-  /* The 64px drawing keeps its detail beside two lines of service text. */
+  /* Keep the accepted drawing compact without indenting the text. */
   --ag-signature-size: var(--space-16);
   --ag-signature-ink: var(--footer-link-ink);
   --ag-signature-muted: var(--muted-text);
@@ -2898,26 +2898,37 @@ html.has-open-dossier {
   --ag-signature-node-ink: var(--footer-link-ink);
   --ag-signature-name-size: var(--footer-note-size);
   --ag-signature-role-size: var(--footer-note-size);
-  --ag-signature-gap: var(--space-3);
+  --ag-signature-gap: var(--space-1);
 }
 
 .site-footer__signature::part(credit) {
-  flex-direction: row;
+  position: relative;
+  flex-direction: column;
   flex-wrap: nowrap;
-  align-items: center;
-  gap: var(--space-3);
+  align-items: flex-start;
+  gap: var(--space-1);
 }
 
 .site-footer__signature::part(text) {
   order: 1;
-  flex: 1 1 auto;
+  flex: none;
   min-inline-size: 0;
   gap: var(--space-0);
 }
 
 .site-footer__signature::part(mark) {
   order: 0;
-  flex: 0 0 var(--ag-signature-size);
+  flex: none;
+}
+
+@media (min-width: 721px) {
+  .site-footer__signature::part(mark) {
+    /* Use the existing metadata gutter; centring follows the credit geometry. */
+    position: absolute;
+    inset-inline-end: calc(100% + var(--space-3));
+    inset-block-start: 50%;
+    transform: translateY(-50%);
+  }
 }
 
 .site-footer__signature::part(name),
