@@ -2887,18 +2887,17 @@ html.has-open-dossier {
   display: block;
   inline-size: 100%;
   max-inline-size: 100%;
-  margin-block-start: var(--space-1);
+  margin-block-start: var(--space-0);
   color: var(--footer-link-ink);
   font: inherit;
-  /* Preserve the drawing's accepted 128px size so the arc and nodes read. */
-  --ag-signature-size: calc(var(--space-16) * 2);
+  --ag-signature-size: var(--space-12);
   --ag-signature-ink: var(--footer-link-ink);
   --ag-signature-muted: var(--muted-text);
   --ag-signature-accent: var(--text);
   --ag-signature-node-ink: var(--footer-link-ink);
   --ag-signature-name-size: var(--footer-note-size);
   --ag-signature-role-size: var(--footer-note-size);
-  --ag-signature-gap: var(--space-3);
+  --ag-signature-gap: var(--space-2);
 }
 
 .site-footer__signature::part(credit) {
@@ -2906,12 +2905,12 @@ html.has-open-dossier {
   flex-direction: row;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--space-3);
+  gap: var(--space-2);
 }
 
 .site-footer__signature::part(text) {
   order: 0;
-  flex: 1 1 8em;
+  flex: 0 1 auto;
   min-inline-size: 0;
   gap: var(--space-0);
 }
@@ -2919,9 +2918,7 @@ html.has-open-dossier {
 .site-footer__signature::part(mark) {
   order: 1;
   flex: 0 0 var(--ag-signature-size);
-  /* Optical canvas bearings: keep the 128×92 drawing legible while its
-     visible arc follows the credit, clears service links and stays in flow. */
-  margin-block: calc(-1 * var(--space-4)) calc(-1 * var(--space-6));
+  margin-block: var(--space-0);
 }
 
 .site-footer__signature::part(name),
@@ -2939,30 +2936,6 @@ html.has-open-dossier {
 
 .site-footer__signature::part(arrow) {
   display: none;
-}
-
-@media (min-width: 721px) {
-  .site-footer__signature {
-    grid-column: 1 / 4;
-  }
-
-  .site-footer__signature::part(credit) {
-    display: grid;
-    grid-template-columns: var(--footer-meta-column) minmax(0, 1fr);
-    column-gap: var(--footer-column-gap);
-  }
-
-  .site-footer__signature::part(mark) {
-    order: 0;
-  }
-
-  .site-footer__signature::part(text) {
-    order: 1;
-  }
-
-  .site-footer__signature:not(:defined) > a {
-    margin-inline-start: calc(var(--footer-meta-column) + var(--footer-column-gap));
-  }
 }
 
 .site-footer__signature::part(credit):focus-visible {
@@ -3398,7 +3371,7 @@ html.has-open-dossier {
   }
 
   .site-footer__signature {
-    grid-column: 1 / -1;
+    grid-column: 2;
   }
 
   .editorial-block {
@@ -3896,24 +3869,6 @@ html.has-open-dossier {
 
   .site-footer__signature {
     grid-column: 1;
-    --ag-signature-size: var(--space-16);
-  }
-
-  .site-footer__signature::part(credit) {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: var(--space-0);
-  }
-
-  .site-footer__signature::part(mark) {
-    order: 0;
-    flex: none;
-    margin-block: var(--space-0);
-  }
-
-  .site-footer__signature::part(text) {
-    order: 1;
-    flex: none;
   }
 
   .site-footer__disclaimer {
