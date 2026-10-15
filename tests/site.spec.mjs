@@ -205,12 +205,15 @@ test('author signature preserves the case link, locales, keyboard and motion con
     const style = getComputedStyle(element);
     return { size: style.fontSize, leading: style.lineHeight, weight: style.fontWeight, left: element.getBoundingClientRect().left };
   });
+  const markLeft = await mark.evaluate((element) => element.getBoundingClientRect().left);
+  expect(Math.abs(markLeft - footerType.left)).toBeLessThanOrEqual(0.5);
+  const nameLeft = await signature.locator('.name').evaluate((element) => element.getBoundingClientRect().left);
   for (const part of ['.name', '.role']) {
     await expect(signature.locator(part)).toHaveCSS('font-size', footerType.size);
     await expect(signature.locator(part)).toHaveCSS('line-height', footerType.leading);
     await expect(signature.locator(part)).toHaveCSS('font-weight', footerType.weight);
     const left = await signature.locator(part).evaluate((element) => element.getBoundingClientRect().left);
-    expect(Math.abs(left - footerType.left)).toBeLessThanOrEqual(0.5);
+    expect(Math.abs(left - nameLeft)).toBeLessThanOrEqual(0.5);
   }
 
   await page.locator('.site-footer__weather').focus();
