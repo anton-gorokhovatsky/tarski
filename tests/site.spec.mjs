@@ -158,7 +158,7 @@ test('desktop context label follows the artists section into participation', asy
   }
 });
 
-test('footer closing rows share the participation edge and keep the mark beside the name', async ({ page }) => {
+test('footer colophon groups copyright with services and keeps the author lockup intact', async ({ page }) => {
   for (const width of [3010, 1440, 879, 390, 320]) {
     await page.setViewportSize({ width, height: width === 879 ? 530 : 900 });
     await page.goto('/?lang=ru');
@@ -167,6 +167,7 @@ test('footer closing rows share the participation edge and keep the mark beside 
     const geometry = await page.locator('.site-footer').evaluate((footer) => {
       const services = footer.querySelector('.site-footer__services').getBoundingClientRect();
       const year = footer.querySelector('.site-footer__year').getBoundingClientRect();
+      const weather = footer.querySelector('.site-footer__weather').getBoundingClientRect();
       const disclaimer = footer.querySelector('.site-footer__disclaimer').getBoundingClientRect();
       const block = footer.querySelector('.site-footer__texts').getBoundingClientRect();
       const routes = footer.querySelector('.site-footer__routes').getBoundingClientRect();
@@ -175,22 +176,25 @@ test('footer closing rows share the participation edge and keep the mark beside 
       const signature = host.getBoundingClientRect();
       const name = host.shadowRoot.querySelector('.name').getBoundingClientRect();
       const role = host.shadowRoot.querySelector('.role').getBoundingClientRect();
+      const text = host.shadowRoot.querySelector('.text').getBoundingClientRect();
       const mark = host.shadowRoot.querySelector('.mark').getBoundingClientRect();
       const footerRect = footer.getBoundingClientRect();
       return {
         blockGap: block.top - routes.bottom,
         serviceLeftDelta: Math.abs(services.left - routes.left),
         noteLeftDelta: Math.abs(disclaimer.left - services.left),
-        noteGap: disclaimer.top - services.bottom,
-        yearLeftDelta: Math.abs(year.left - footerRect.left),
-        yearTopDelta: Math.abs(year.top - services.top),
-        yearGap: year.top - disclaimer.bottom,
-        signatureGap: signature.top - credits.bottom,
+        noteGap: disclaimer.top - credits.bottom,
+        yearInServices: footer.querySelector('.site-footer__credits').contains(footer.querySelector('.site-footer__year')),
+        yearTopDelta: Math.abs(year.top - weather.top),
+        yearGap: year.left - weather.right,
+        signatureGap: signature.top - services.bottom,
         bottomInset: footerRect.bottom - block.bottom,
         leftDelta: Math.abs(name.left - credits.left),
         markWidth: mark.width,
-        markNameGap: mark.left - name.right,
-        markNameCenterDelta: Math.abs((mark.top + mark.height / 2) - (name.top + name.height / 2)),
+        markTextGap: text.left - mark.right,
+        markTextCenterDelta: Math.abs((mark.top + mark.height / 2) - (text.top + text.height / 2)),
+        markTextRowGap: text.top - mark.bottom,
+        markTextLeftDelta: Math.abs(mark.left - text.left),
         roleLeftDelta: Math.abs(role.left - credits.left)
       };
     });
@@ -198,20 +202,22 @@ test('footer closing rows share the participation edge and keep the mark beside 
     expect(geometry.blockGap).toBeCloseTo(24, 0);
     expect(geometry.serviceLeftDelta).toBeLessThanOrEqual(0.5);
     expect(geometry.noteLeftDelta).toBeLessThanOrEqual(0.5);
-    expect(geometry.noteGap).toBeCloseTo(16, 0);
-    expect(geometry.yearLeftDelta).toBeLessThanOrEqual(0.5);
-    if (width > 720) {
-      expect(geometry.yearTopDelta).toBeLessThanOrEqual(0.5);
-    } else {
-      expect(geometry.yearGap).toBeCloseTo(16, 0);
-    }
-    expect(geometry.signatureGap).toBeCloseTo(12, 0);
+    expect(geometry.noteGap).toBeCloseTo(8, 0);
+    expect(geometry.yearInServices).toBe(true);
+    expect(geometry.yearTopDelta).toBeLessThanOrEqual(0.5);
+    expect(geometry.yearGap).toBeCloseTo(12, 0);
+    expect(geometry.signatureGap).toBeCloseTo(20, 0);
     if (width === 879) expect(geometry.bottomInset).toBeCloseTo(32, 0);
     expect(geometry.leftDelta).toBeLessThanOrEqual(0.5);
     expect(geometry.roleLeftDelta).toBeLessThanOrEqual(0.5);
-    expect(geometry.markWidth).toBe(32);
-    expect(geometry.markNameGap).toBeCloseTo(8, 0);
-    expect(geometry.markNameCenterDelta).toBeLessThanOrEqual(0.5);
+    expect(geometry.markWidth).toBe(64);
+    if (width > 720) {
+      expect(geometry.markTextGap).toBeCloseTo(12, 0);
+      expect(geometry.markTextCenterDelta).toBeLessThanOrEqual(0.5);
+    } else {
+      expect(geometry.markTextRowGap).toBeCloseTo(4, 0);
+      expect(geometry.markTextLeftDelta).toBeLessThanOrEqual(0.5);
+    }
   }
 });
 
@@ -290,7 +296,7 @@ test('author signature reflows with 200% text at 320px in every locale', async (
     await signature.scrollIntoViewIfNeeded();
     const bounds = await signature.evaluate((host) => {
       const rect = host.getBoundingClientRect();
-      return [...host.shadowRoot.querySelectorAll('.credit, .mark, .name, .role')].map((element) => {
+      return [...host.shadowRoot.querySelectorAll('.credit, .mark, .text, .name, .role')].map((element) => {
         const child = element.getBoundingClientRect();
         return { left: child.left - rect.left, right: rect.right - child.right, overflow: element.scrollWidth - element.clientWidth };
       });

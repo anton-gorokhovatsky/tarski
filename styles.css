@@ -2825,13 +2825,12 @@ html.has-open-dossier {
 
 .site-footer__texts {
   display: grid;
-  /* Use the same metadata and reading columns as the participation block. */
-  grid-template-columns: var(--footer-meta-column) minmax(0, 1fr);
-  column-gap: var(--footer-column-gap);
-  row-gap: var(--space-4);
-  width: 100%;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-5);
+  /* Keep the colophon on the established participation reading edge. */
+  width: calc(100% - var(--footer-meta-column) - var(--footer-column-gap));
   margin-block: var(--space-6) var(--space-0);
-  margin-inline: var(--space-0);
+  margin-inline: calc(var(--footer-meta-column) + var(--footer-column-gap)) var(--space-0);
   padding: var(--space-0);
   align-items: start;
   font-size: var(--footer-note-size);
@@ -2847,25 +2846,22 @@ html.has-open-dossier {
 }
 
 .site-footer__services {
-  grid-column: 2;
   display: grid;
-  gap: var(--space-3);
+  gap: var(--space-2);
   min-width: 0;
 }
 
 .site-footer__year {
-  grid-column: 1;
-  grid-row: 1;
   color: var(--muted-text);
-  font-size: var(--footer-legal-size);
-  line-height: 1.75;
+  font: inherit;
+  white-space: nowrap;
 }
 
 .site-footer__credits {
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
-  column-gap: var(--space-4);
+  column-gap: var(--space-3);
   row-gap: var(--space-2);
   color: var(--muted-text);
   font-size: inherit;
@@ -2888,39 +2884,44 @@ html.has-open-dossier {
   inline-size: fit-content;
   max-inline-size: 100%;
   margin-block-start: var(--space-0);
+  /* The mark occupies the metadata gutter; all text keeps the reading edge. */
+  margin-inline-start: calc(-1 * (var(--space-16) + var(--space-3)));
   color: var(--footer-link-ink);
   font: inherit;
-  --ag-signature-size: var(--space-8);
-  --ag-signature-ink: var(--footer-link-ink);
+  --ag-signature-size: var(--space-16);
+  --ag-signature-ink: var(--text);
   --ag-signature-muted: var(--muted-text);
   --ag-signature-accent: var(--text);
-  --ag-signature-node-ink: var(--footer-link-ink);
+  --ag-signature-node-ink: var(--text);
   --ag-signature-name-size: var(--footer-note-size);
   --ag-signature-role-size: var(--footer-note-size);
-  --ag-signature-gap: var(--space-2);
+  --ag-signature-gap: var(--space-3);
 }
 
 .site-footer__signature::part(credit) {
-  display: inline-grid;
-  grid-template-columns: minmax(0, max-content) var(--space-8);
-  column-gap: var(--space-2);
-  row-gap: var(--space-0);
+  display: flex;
+  flex-direction: row;
+  gap: var(--space-3);
   align-items: center;
 }
 
 .site-footer__signature::part(text) {
-  display: contents;
+  display: flex;
+  flex-direction: column;
+  order: 1;
+  flex: 1 1 auto;
+  min-inline-size: 0;
+  gap: var(--space-0);
 }
 
 .site-footer__signature::part(mark) {
-  grid-column: 2;
-  grid-row: 1;
+  order: 0;
+  flex: none;
   margin-block: var(--space-0);
 }
 
 .site-footer__signature::part(role) {
-  grid-column: 1 / -1;
-  grid-row: 2;
+  order: 1;
 }
 
 .site-footer__signature::part(name),
@@ -2932,9 +2933,9 @@ html.has-open-dossier {
 }
 
 .site-footer__signature::part(name) {
-  grid-column: 1;
-  grid-row: 1;
+  order: 0;
   min-inline-size: 0;
+  color: var(--footer-link-ink);
   text-decoration-color: currentColor;
   transition: color var(--duration-fast) var(--ease-smooth);
 }
@@ -2982,7 +2983,8 @@ html.has-open-dossier {
 
   .site-footer__privacy:hover,
   .site-footer__weather:hover,
-  .site-footer__design-credit:hover {
+  .site-footer__design-credit:hover,
+  .site-footer__signature:hover::part(name) {
     color: var(--text);
     text-decoration-style: solid;
   }
@@ -3023,10 +3025,9 @@ html.has-open-dossier {
 }
 
 .site-footer__disclaimer {
-  grid-column: 2;
   position: relative;
   min-width: 0;
-  max-inline-size: none;
+  max-inline-size: 112ch;
   color: var(--muted-text);
   font-size: var(--footer-legal-size);
   line-height: 1.5;
@@ -3825,15 +3826,18 @@ html.has-open-dossier {
   }
 
   .site-footer__texts {
-    grid-template-columns: 1fr;
-    gap: var(--space-4);
+    width: 100%;
+    margin-inline: var(--space-0);
   }
 
-  .site-footer__services,
-  .site-footer__disclaimer,
-  .site-footer__year {
-    grid-column: 1;
-    grid-row: auto;
+  .site-footer__signature {
+    margin-inline-start: var(--space-0);
+  }
+
+  .site-footer__signature::part(credit) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-1);
   }
 
   .site-footer__credits {
