@@ -158,30 +158,41 @@ test('desktop context label follows the artists section into participation', asy
   }
 });
 
-test('footer signature keeps the tablet reading edge and bottom inset', async ({ page }) => {
-  await page.setViewportSize({ width: 879, height: 530 });
-  await page.goto('/?lang=ru');
+test('footer signature stays compact on the shared reading edge at every breakpoint', async ({ page }) => {
+  for (const width of [3010, 1440, 879, 390, 320]) {
+    await page.setViewportSize({ width, height: width === 879 ? 530 : 900 });
+    await page.goto('/?lang=ru');
 
-  await expect(page.locator('ag-signature')).toHaveAttribute('data-signature-version', '1.0.3');
-  const geometry = await page.locator('.site-footer').evaluate((footer) => {
-    const disclaimer = footer.querySelector('.site-footer__disclaimer').getBoundingClientRect();
-    const credits = footer.querySelector('.site-footer__credits').getBoundingClientRect();
-    const host = footer.querySelector('ag-signature');
-    const signature = host.getBoundingClientRect();
-    const name = host.shadowRoot.querySelector('.name').getBoundingClientRect();
-    const footerRect = footer.getBoundingClientRect();
-    return {
-      creditsGap: credits.top - disclaimer.bottom,
-      signatureGap: signature.top - credits.bottom,
-      bottomInset: footerRect.bottom - signature.bottom,
-      leftDelta: Math.abs(name.left - disclaimer.left)
-    };
-  });
+    await expect(page.locator('ag-signature')).toHaveAttribute('data-signature-version', '1.0.3');
+    const geometry = await page.locator('.site-footer').evaluate((footer) => {
+      const disclaimer = footer.querySelector('.site-footer__disclaimer').getBoundingClientRect();
+      const credits = footer.querySelector('.site-footer__credits').getBoundingClientRect();
+      const host = footer.querySelector('ag-signature');
+      const signature = host.getBoundingClientRect();
+      const name = host.shadowRoot.querySelector('.name').getBoundingClientRect();
+      const text = host.shadowRoot.querySelector('.text').getBoundingClientRect();
+      const mark = host.shadowRoot.querySelector('.mark').getBoundingClientRect();
+      const footerRect = footer.getBoundingClientRect();
+      return {
+        creditsGap: credits.top - disclaimer.bottom,
+        signatureGap: signature.top - credits.bottom,
+        bottomInset: footerRect.bottom - signature.bottom,
+        leftDelta: Math.abs(name.left - credits.left),
+        markWidth: mark.width,
+        markGap: mark.left - text.right,
+        markCenterDelta: Math.abs((mark.top + mark.bottom - text.top - text.bottom) / 2)
+      };
+    });
 
-  expect(geometry.creditsGap).toBeCloseTo(12, 0);
-  expect(geometry.signatureGap).toBeCloseTo(16, 0);
-  expect(geometry.bottomInset).toBeCloseTo(32, 0);
-  expect(geometry.leftDelta).toBeLessThanOrEqual(0.5);
+    expect(geometry.creditsGap).toBeCloseTo(12, 0);
+    expect(geometry.signatureGap).toBeCloseTo(12, 0);
+    if (width === 879) expect(geometry.bottomInset).toBeCloseTo(32, 0);
+    expect(geometry.leftDelta).toBeLessThanOrEqual(0.5);
+    expect(geometry.markWidth).toBeLessThanOrEqual(64);
+    expect(geometry.markGap).toBeGreaterThanOrEqual(0);
+    expect(geometry.markGap).toBeLessThanOrEqual(12);
+    expect(geometry.markCenterDelta).toBeLessThanOrEqual(0.5);
+  }
 });
 
 test('author signature preserves the case link, locales, keyboard and motion controls', async ({ page }) => {
