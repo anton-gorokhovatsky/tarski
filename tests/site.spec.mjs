@@ -190,8 +190,8 @@ test('footer colophon groups links and authorship apart from the legal note at e
         bottomInset: footerRect.bottom - block.bottom,
         leftDelta: Math.abs(name.left - credits.left),
         markWidth: mark.width,
-        markGap: mark.left - text.right,
-        markCenterDelta: Math.abs((mark.top + mark.bottom - text.top - text.bottom) / 2)
+        stampGap: text.top - mark.bottom,
+        stampLeftDelta: Math.abs(mark.left - text.left)
       };
     });
 
@@ -209,9 +209,8 @@ test('footer colophon groups links and authorship apart from the legal note at e
     if (width === 879) expect(geometry.bottomInset).toBeCloseTo(32, 0);
     expect(geometry.leftDelta).toBeLessThanOrEqual(0.5);
     expect(geometry.markWidth).toBeLessThanOrEqual(64);
-    expect(geometry.markGap).toBeGreaterThanOrEqual(0);
-    expect(geometry.markGap).toBeLessThanOrEqual(12);
-    expect(geometry.markCenterDelta).toBeLessThanOrEqual(0.5);
+    expect(geometry.stampGap).toBeCloseTo(0, 0);
+    expect(geometry.stampLeftDelta).toBeLessThanOrEqual(0.5);
   }
 });
 
