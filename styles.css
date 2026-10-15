@@ -3896,6 +3896,24 @@ html.has-open-dossier {
 
   .site-footer__signature {
     grid-column: 1;
+    --ag-signature-size: var(--space-16);
+  }
+
+  .site-footer__signature::part(credit) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-0);
+  }
+
+  .site-footer__signature::part(mark) {
+    order: 0;
+    flex: none;
+    margin-block: var(--space-0);
+  }
+
+  .site-footer__signature::part(text) {
+    order: 1;
+    flex: none;
   }
 
   .site-footer__disclaimer {
