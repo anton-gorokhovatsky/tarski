@@ -162,16 +162,19 @@ test('footer signature keeps the tablet reading edge and bottom inset', async ({
   await page.setViewportSize({ width: 879, height: 530 });
   await page.goto('/?lang=ru');
 
+  await expect(page.locator('ag-signature')).toHaveAttribute('data-signature-version', '1.0.3');
   const geometry = await page.locator('.site-footer').evaluate((footer) => {
     const disclaimer = footer.querySelector('.site-footer__disclaimer').getBoundingClientRect();
     const credits = footer.querySelector('.site-footer__credits').getBoundingClientRect();
-    const signature = footer.querySelector('ag-signature').getBoundingClientRect();
+    const host = footer.querySelector('ag-signature');
+    const signature = host.getBoundingClientRect();
+    const name = host.shadowRoot.querySelector('.name').getBoundingClientRect();
     const footerRect = footer.getBoundingClientRect();
     return {
       creditsGap: credits.top - disclaimer.bottom,
       signatureGap: signature.top - credits.bottom,
       bottomInset: footerRect.bottom - signature.bottom,
-      leftDelta: Math.abs(signature.left - disclaimer.left)
+      leftDelta: Math.abs(name.left - disclaimer.left)
     };
   });
 
@@ -216,7 +219,7 @@ test('author signature preserves the case link, locales, keyboard and motion con
   await page.locator('.site-footer__weather').focus();
   await page.keyboard.press('Tab');
   await expect(credit).toBeFocused();
-  await expect(credit).not.toHaveCSS('box-shadow', 'none');
+  await expect(signature.locator('.text')).not.toHaveCSS('box-shadow', 'none');
 
   await page.locator('.nav-settings-toggle').click();
   await page.locator('[data-site-settings] [data-theme-mode="dark"]').click();
