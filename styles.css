@@ -2825,12 +2825,13 @@ html.has-open-dossier {
 
 .site-footer__texts {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--space-8);
-  /* Continue the reading edge of the contact and participation rows above. */
-  width: calc(100% - var(--footer-meta-column) - var(--footer-column-gap));
+  /* Use the same metadata and reading columns as the participation block. */
+  grid-template-columns: var(--footer-meta-column) minmax(0, 1fr);
+  column-gap: var(--footer-column-gap);
+  row-gap: var(--space-4);
+  width: 100%;
   margin-block: var(--space-6) var(--space-0);
-  margin-inline: calc(var(--footer-meta-column) + var(--footer-column-gap)) var(--space-0);
+  margin-inline: var(--space-0);
   padding: var(--space-0);
   align-items: start;
   font-size: var(--footer-note-size);
@@ -2846,18 +2847,18 @@ html.has-open-dossier {
 }
 
 .site-footer__services {
+  grid-column: 2;
   display: grid;
-  gap: var(--space-4);
+  gap: var(--space-3);
   min-width: 0;
 }
 
-.site-footer__legal {
-  display: grid;
-  gap: var(--space-2);
-  min-width: 0;
+.site-footer__year {
+  grid-column: 1;
+  grid-row: 1;
   color: var(--muted-text);
   font-size: var(--footer-legal-size);
-  line-height: 1.5;
+  line-height: 1.75;
 }
 
 .site-footer__credits {
@@ -2884,12 +2885,12 @@ html.has-open-dossier {
 
 .site-footer__signature {
   display: block;
-  inline-size: 100%;
+  inline-size: fit-content;
   max-inline-size: 100%;
   margin-block-start: var(--space-0);
   color: var(--footer-link-ink);
   font: inherit;
-  --ag-signature-size: var(--space-12);
+  --ag-signature-size: var(--space-8);
   --ag-signature-ink: var(--footer-link-ink);
   --ag-signature-muted: var(--muted-text);
   --ag-signature-accent: var(--text);
@@ -2900,27 +2901,26 @@ html.has-open-dossier {
 }
 
 .site-footer__signature::part(credit) {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: var(--space-0);
+  display: inline-grid;
+  grid-template-columns: minmax(0, max-content) var(--space-8);
+  column-gap: var(--space-2);
+  row-gap: var(--space-0);
+  align-items: center;
 }
 
 .site-footer__signature::part(text) {
-  order: 1;
-  flex: none;
-  min-inline-size: 0;
-  gap: var(--space-0);
+  display: contents;
 }
 
 .site-footer__signature::part(mark) {
-  order: 0;
-  flex: none;
+  grid-column: 2;
+  grid-row: 1;
   margin-block: var(--space-0);
 }
 
 .site-footer__signature::part(role) {
-  order: 0;
+  grid-column: 1 / -1;
+  grid-row: 2;
 }
 
 .site-footer__signature::part(name),
@@ -2932,7 +2932,9 @@ html.has-open-dossier {
 }
 
 .site-footer__signature::part(name) {
-  order: 1;
+  grid-column: 1;
+  grid-row: 1;
+  min-inline-size: 0;
   text-decoration-color: currentColor;
   transition: color var(--duration-fast) var(--ease-smooth);
 }
@@ -2943,10 +2945,6 @@ html.has-open-dossier {
 
 .site-footer__signature::part(credit):focus-visible {
   outline: 0;
-  box-shadow: none;
-}
-
-.site-footer__signature:focus-within::part(text) {
   border-radius: 2px;
   box-shadow: var(--focus-ring-soft);
 }
@@ -3025,12 +3023,13 @@ html.has-open-dossier {
 }
 
 .site-footer__disclaimer {
+  grid-column: 2;
   position: relative;
   min-width: 0;
-  max-inline-size: 72ch;
+  max-inline-size: none;
   color: var(--muted-text);
-  font-size: inherit;
-  line-height: inherit;
+  font-size: var(--footer-legal-size);
+  line-height: 1.5;
 }
 
 .site-footer__disclaimer sup {
@@ -3825,15 +3824,16 @@ html.has-open-dossier {
     border-left: 0;
   }
 
-  .site-footer__disclaimer {
-    font-size: inherit;
-  }
-
   .site-footer__texts {
     grid-template-columns: 1fr;
-    gap: var(--space-6);
-    width: 100%;
-    margin-inline: var(--space-0);
+    gap: var(--space-4);
+  }
+
+  .site-footer__services,
+  .site-footer__disclaimer,
+  .site-footer__year {
+    grid-column: 1;
+    grid-row: auto;
   }
 
   .site-footer__credits {
@@ -3845,7 +3845,7 @@ html.has-open-dossier {
   .site-footer__disclaimer {
     max-width: 100%;
     padding-left: 0;
-    line-height: inherit;
+    font-size: var(--footer-legal-size);
   }
 
   .site-footer__disclaimer sup {

@@ -158,7 +158,7 @@ test('desktop context label follows the artists section into participation', asy
   }
 });
 
-test('footer colophon groups links and authorship apart from the legal note at every breakpoint', async ({ page }) => {
+test('footer closing rows share the participation edge and keep the mark beside the name', async ({ page }) => {
   for (const width of [3010, 1440, 879, 390, 320]) {
     await page.setViewportSize({ width, height: width === 879 ? 530 : 900 });
     await page.goto('/?lang=ru');
@@ -166,7 +166,6 @@ test('footer colophon groups links and authorship apart from the legal note at e
     await expect(page.locator('ag-signature')).toHaveAttribute('data-signature-version', '1.0.3');
     const geometry = await page.locator('.site-footer').evaluate((footer) => {
       const services = footer.querySelector('.site-footer__services').getBoundingClientRect();
-      const legal = footer.querySelector('.site-footer__legal').getBoundingClientRect();
       const year = footer.querySelector('.site-footer__year').getBoundingClientRect();
       const disclaimer = footer.querySelector('.site-footer__disclaimer').getBoundingClientRect();
       const block = footer.querySelector('.site-footer__texts').getBoundingClientRect();
@@ -175,42 +174,44 @@ test('footer colophon groups links and authorship apart from the legal note at e
       const host = footer.querySelector('ag-signature');
       const signature = host.getBoundingClientRect();
       const name = host.shadowRoot.querySelector('.name').getBoundingClientRect();
-      const text = host.shadowRoot.querySelector('.text').getBoundingClientRect();
+      const role = host.shadowRoot.querySelector('.role').getBoundingClientRect();
       const mark = host.shadowRoot.querySelector('.mark').getBoundingClientRect();
       const footerRect = footer.getBoundingClientRect();
       return {
         blockGap: block.top - routes.bottom,
-        blockLeftDelta: Math.abs(block.left - routes.left),
-        groupColumnGap: legal.left - services.right,
-        groupRowGap: legal.top - services.bottom,
-        groupTopDelta: Math.abs(legal.top - services.top),
-        legalLeftDelta: Math.abs(legal.left - services.left),
-        legalInternalGap: disclaimer.top - year.bottom,
+        serviceLeftDelta: Math.abs(services.left - routes.left),
+        noteLeftDelta: Math.abs(disclaimer.left - services.left),
+        noteGap: disclaimer.top - services.bottom,
+        yearLeftDelta: Math.abs(year.left - footerRect.left),
+        yearTopDelta: Math.abs(year.top - services.top),
+        yearGap: year.top - disclaimer.bottom,
         signatureGap: signature.top - credits.bottom,
         bottomInset: footerRect.bottom - block.bottom,
         leftDelta: Math.abs(name.left - credits.left),
         markWidth: mark.width,
-        stampGap: text.top - mark.bottom,
-        stampLeftDelta: Math.abs(mark.left - text.left)
+        markNameGap: mark.left - name.right,
+        markNameCenterDelta: Math.abs((mark.top + mark.height / 2) - (name.top + name.height / 2)),
+        roleLeftDelta: Math.abs(role.left - credits.left)
       };
     });
 
     expect(geometry.blockGap).toBeCloseTo(24, 0);
-    expect(geometry.blockLeftDelta).toBeLessThanOrEqual(0.5);
+    expect(geometry.serviceLeftDelta).toBeLessThanOrEqual(0.5);
+    expect(geometry.noteLeftDelta).toBeLessThanOrEqual(0.5);
+    expect(geometry.noteGap).toBeCloseTo(16, 0);
+    expect(geometry.yearLeftDelta).toBeLessThanOrEqual(0.5);
     if (width > 720) {
-      expect(geometry.groupColumnGap).toBeCloseTo(32, 0);
-      expect(geometry.groupTopDelta).toBeLessThanOrEqual(0.5);
+      expect(geometry.yearTopDelta).toBeLessThanOrEqual(0.5);
     } else {
-      expect(geometry.groupRowGap).toBeCloseTo(24, 0);
-      expect(geometry.legalLeftDelta).toBeLessThanOrEqual(0.5);
+      expect(geometry.yearGap).toBeCloseTo(16, 0);
     }
-    expect(geometry.legalInternalGap).toBeCloseTo(8, 0);
-    expect(geometry.signatureGap).toBeCloseTo(16, 0);
+    expect(geometry.signatureGap).toBeCloseTo(12, 0);
     if (width === 879) expect(geometry.bottomInset).toBeCloseTo(32, 0);
     expect(geometry.leftDelta).toBeLessThanOrEqual(0.5);
-    expect(geometry.markWidth).toBeLessThanOrEqual(64);
-    expect(geometry.stampGap).toBeCloseTo(0, 0);
-    expect(geometry.stampLeftDelta).toBeLessThanOrEqual(0.5);
+    expect(geometry.roleLeftDelta).toBeLessThanOrEqual(0.5);
+    expect(geometry.markWidth).toBe(32);
+    expect(geometry.markNameGap).toBeCloseTo(8, 0);
+    expect(geometry.markNameCenterDelta).toBeLessThanOrEqual(0.5);
   }
 });
 
@@ -249,7 +250,7 @@ test('author signature preserves the case link, locales, keyboard and motion con
   await page.locator('.site-footer__weather').focus();
   await page.keyboard.press('Tab');
   await expect(credit).toBeFocused();
-  await expect(signature.locator('.text')).not.toHaveCSS('box-shadow', 'none');
+  await expect(credit).not.toHaveCSS('box-shadow', 'none');
 
   await page.locator('.nav-settings-toggle').click();
   await page.locator('[data-site-settings] [data-theme-mode="dark"]').click();
@@ -289,7 +290,7 @@ test('author signature reflows with 200% text at 320px in every locale', async (
     await signature.scrollIntoViewIfNeeded();
     const bounds = await signature.evaluate((host) => {
       const rect = host.getBoundingClientRect();
-      return [...host.shadowRoot.querySelectorAll('.credit, .mark, .text, .name, .role')].map((element) => {
+      return [...host.shadowRoot.querySelectorAll('.credit, .mark, .name, .role')].map((element) => {
         const child = element.getBoundingClientRect();
         return { left: child.left - rect.left, right: rect.right - child.right, overflow: element.scrollWidth - element.clientWidth };
       });
