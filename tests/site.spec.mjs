@@ -199,7 +199,7 @@ test('footer colophon groups copyright with services and keeps the author lockup
     });
 
     expect(geometry.blockGap).toBeCloseTo(24, 0);
-    expect(geometry.serviceLeftDelta).toBeCloseTo(width > 720 ? 0 : 76, 0);
+    expect(geometry.serviceLeftDelta).toBeLessThanOrEqual(0.5);
     expect(geometry.noteLeftDelta).toBeLessThanOrEqual(0.5);
     expect(geometry.noteGap).toBeCloseTo(8, 0);
     expect(geometry.yearInServices).toBe(true);
@@ -207,8 +207,8 @@ test('footer colophon groups copyright with services and keeps the author lockup
     expect(geometry.yearGap).toBeCloseTo(12, 0);
     expect(geometry.signatureGap).toBeCloseTo(20, 0);
     if (width === 879) expect(geometry.bottomInset).toBeCloseTo(32, 0);
-    expect(geometry.leftDelta).toBeLessThanOrEqual(0.5);
-    expect(geometry.roleLeftDelta).toBeLessThanOrEqual(0.5);
+    expect(geometry.leftDelta).toBeCloseTo(width > 720 ? 0 : 76, 0);
+    expect(geometry.roleLeftDelta).toBeCloseTo(width > 720 ? 0 : 76, 0);
     expect(geometry.markWidth).toBe(64);
     expect(geometry.markTextGap).toBeCloseTo(12, 0);
     expect(geometry.markTextCenterDelta).toBeLessThanOrEqual(0.5);
