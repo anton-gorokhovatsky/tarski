@@ -63,7 +63,7 @@
   /* Matte surfaces */
   --matte-pill-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.38));
   --matte-panel-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.74), rgba(242, 242, 242, 0.56));
-  --matte-lens-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.58), rgba(242, 242, 242, 0.34));
+  --matte-lens-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.52), rgba(250, 250, 250, 0.48));
   --matte-pill-fallback-bg: rgba(242, 242, 242, 0.96);
   --matte-scrim-bg: linear-gradient(90deg, rgba(242, 242, 242, 0.2), rgba(242, 242, 242, 0.66));
   --matte-backdrop-filter: blur(26px) saturate(190%);
@@ -199,7 +199,7 @@
     --artist-image-muted-opacity: 0.52;
     --matte-pill-bg: linear-gradient(135deg, rgba(46, 46, 46, 0.76), rgba(18, 18, 18, 0.58));
     --matte-panel-bg: linear-gradient(135deg, rgba(42, 42, 42, 0.74), rgba(16, 16, 16, 0.58));
-    --matte-lens-bg: linear-gradient(135deg, rgba(42, 42, 42, 0.68), rgba(16, 16, 16, 0.46));
+    --matte-lens-bg: linear-gradient(135deg, rgba(36, 36, 36, 0.64), rgba(28, 28, 28, 0.56));
     --matte-pill-fallback-bg: rgba(16, 16, 16, 0.96);
     --matte-scrim-bg: linear-gradient(90deg, rgba(16, 16, 16, 0.24), rgba(16, 16, 16, 0.72));
     --matte-panel-shadow:
@@ -241,7 +241,7 @@
   --artist-image-muted-opacity: 0.52;
   --matte-pill-bg: linear-gradient(135deg, rgba(46, 46, 46, 0.76), rgba(18, 18, 18, 0.58));
   --matte-panel-bg: linear-gradient(135deg, rgba(42, 42, 42, 0.74), rgba(16, 16, 16, 0.58));
-  --matte-lens-bg: linear-gradient(135deg, rgba(42, 42, 42, 0.68), rgba(16, 16, 16, 0.46));
+  --matte-lens-bg: linear-gradient(135deg, rgba(36, 36, 36, 0.64), rgba(28, 28, 28, 0.56));
   --matte-pill-fallback-bg: rgba(16, 16, 16, 0.96);
   --matte-scrim-bg: linear-gradient(90deg, rgba(16, 16, 16, 0.24), rgba(16, 16, 16, 0.72));
   --matte-panel-shadow:
@@ -516,15 +516,17 @@ a:hover {
   --nav-field-tone: var(--gutter-tone);
   --nav-control-bg: var(--gutter-bg);
   --nav-control-active-bg: var(--gutter-active-bg);
-  --nav-control-shadow: var(--gutter-shadow);
+  /* Compact depth: retain the gutter material without a cloud under the lens. */
+  --nav-control-shadow:
+    0 var(--space-2) var(--space-5) color-mix(in srgb, var(--nav-field-color) 15%, rgba(0, 0, 0, 0.04)),
+    inset 0 0 0 1px var(--nav-lens-edge-color),
+    inset 0 1px 0 color-mix(in srgb, #fff 12%, transparent);
   --nav-control-active-shadow: var(--gutter-active-shadow);
   --nav-lens-bg: var(--matte-lens-bg);
-  --nav-lens-shadow:
-    inset 0 0 0 0.75px color-mix(in srgb, currentColor 4.5%, transparent),
-    inset 0 0.75px 0 color-mix(in srgb, #fff 48%, transparent);
-  --nav-lens-edge-filter:
-    drop-shadow(0 0 0.55px color-mix(in srgb, currentColor 6%, transparent))
-    drop-shadow(0 16px 38px color-mix(in srgb, #000 6.5%, transparent));
+  /* The rim follows the source contour, never the masked rectangle's edges. */
+  --nav-lens-shadow: none;
+  --nav-lens-edge-filter: none;
+  --nav-lens-edge-color: color-mix(in srgb, var(--text) 8%, transparent);
   --nav-lens-backdrop-filter: var(--matte-lens-backdrop-filter);
   --nav-lens-shape: var(--brand-dot-mask);
   --nav-lens-width: calc(var(--nav-shell-width) + 78px);
@@ -553,29 +555,34 @@ a:hover {
   font-feature-settings: "case" 1, "zero" 1, "ordn" 1, "ss01" 1, "ss02" 1, "ss04" 1, "ss05" 1, "ss06" 1, "ss07" 1, "ss08" 1, "numr" 1, "dlig" 1, "frac" 1;
 }
 
-:root[data-effective-theme="dark"] .main-nav {
-  --nav-lens-bg: var(--matte-lens-bg);
-  --nav-lens-shadow:
-    var(--mobile-pill-shadow),
-    inset 0 0 0 1px color-mix(in srgb, #fff 7%, transparent),
-    inset 0 1px 0 color-mix(in srgb, #fff 8%, transparent),
-    inset 0 -1px 0 color-mix(in srgb, #000 22%, transparent);
-  --nav-lens-edge-filter:
-    drop-shadow(0 0 1px color-mix(in srgb, #fff 10%, transparent))
-    drop-shadow(0 1px 0.55px color-mix(in srgb, #fff 6%, transparent))
-    drop-shadow(0 -1px 0.6px color-mix(in srgb, #000 28%, transparent))
-    drop-shadow(0 22px 50px rgba(0, 0, 0, 0.24));
-  --nav-lens-backdrop-filter: var(--matte-lens-backdrop-filter);
-}
-
-.main-nav::after {
-  content: "";
+.main-nav::after,
+.nav-lens-edge {
   position: absolute;
   left: var(--nav-lens-x);
   top: var(--nav-lens-y);
   width: var(--nav-lens-width);
   height: var(--nav-lens-height);
   z-index: 0;
+  transform: rotate(var(--nav-lens-rotation)) scaleX(-1);
+  transform-origin: 52% 54%;
+  pointer-events: none;
+}
+
+.nav-lens-edge {
+  z-index: 1;
+  overflow: visible;
+  fill: none;
+  stroke: var(--nav-lens-edge-color);
+  stroke-width: 1;
+}
+
+.nav-lens-edge use {
+  /* Optical hairline in CSS pixels; the original contour is not inset/scaled. */
+  vector-effect: non-scaling-stroke;
+}
+
+.main-nav::after {
+  content: "";
   border-radius: 0;
   background: var(--nav-lens-bg);
   opacity: 1;
@@ -586,8 +593,6 @@ a:hover {
   -webkit-mask: var(--nav-lens-shape) center / 100% 100% no-repeat;
   mask: var(--nav-lens-shape) center / 100% 100% no-repeat;
   mask-mode: alpha;
-  transform: rotate(var(--nav-lens-rotation)) scaleX(-1);
-  transform-origin: 52% 54%;
   transition:
     background var(--duration-fast) var(--ease-smooth),
     box-shadow var(--duration-fast) var(--ease-smooth),
@@ -596,7 +601,6 @@ a:hover {
     transform var(--duration-fast) var(--ease-smooth),
     -webkit-backdrop-filter var(--duration-fast) var(--ease-smooth),
     backdrop-filter var(--duration-fast) var(--ease-smooth);
-  pointer-events: none;
 }
 
 .main-nav::before,

@@ -63,8 +63,8 @@
     <meta name="twitter:image" content="https://tarski.ru/assets/og-image.png?v=20260704-footer-og" />
     <meta name="twitter:image:alt" content="Tarski — среда связей и вовлекающего искусства" />
     <link rel="icon" href="assets/favicon.svg?v=20260701-caps-favicon" type="image/svg+xml" sizes="any" />
-    <link rel="stylesheet" href="styles.css?v=4c9639511a76" />
-    <link rel="stylesheet" href="settings.css?v=8e1f5eacc608" />
+    <link rel="stylesheet" href="styles.css?v=504925a5f181" />
+    <link rel="stylesheet" href="settings.css?v=88423218bee5" />
   </head>
   <body>
     <noscript><div><img src="https://mc.yandex.ru/watch/110320853" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
@@ -77,6 +77,9 @@
         </div>
 
         <nav class="main-nav is-cover-state" aria-label="Основная навигация">
+          <svg class="nav-lens-edge" viewBox="0 0 314 425" aria-hidden="true" focusable="false">
+            <use href="assets/brand-dot-mask.svg?v=contour#contour" />
+          </svg>
           <span class="nav-label" aria-hidden="true">Меню</span>
           <a href="#about">О проекте</a>
           <a href="#artists">Художники</a>
@@ -686,86 +689,88 @@
           <h2 id="site-settings-title" data-settings-title>Настройки сайта</h2>
           <button class="site-settings__close" type="button" data-settings-close aria-label="Закрыть настройки"></button>
         </header>
-        <p class="site-settings__intro" data-settings-intro>Выберите, как сайт будет отвечать вам.</p>
+        <div class="site-settings__body">
+          <p class="site-settings__intro" data-settings-intro>Выберите, как сайт будет отвечать вам.</p>
 
-        <section class="site-settings__today" data-settings-today>
-          <div class="site-settings__today-head">
-            <div>
-              <p class="site-settings__today-eyebrow" data-settings-today-title>Сегодня · Москва</p>
-              <p class="site-settings__today-weather" data-settings-weather-status>Погода загружается…</p>
+          <section class="site-settings__today" data-settings-today>
+            <div class="site-settings__today-head">
+              <div>
+                <p class="site-settings__today-eyebrow" data-settings-today-title>Сегодня · Москва</p>
+                <p class="site-settings__today-weather" data-settings-weather-status>Погода загружается…</p>
+              </div>
+              <strong class="site-settings__today-temperature" data-settings-weather-temperature>—&#8239;°C</strong>
             </div>
-            <strong class="site-settings__today-temperature" data-settings-weather-temperature>—&#8239;°C</strong>
-          </div>
-          <p class="site-settings__today-care" data-settings-weather-care hidden></p>
-          <div class="site-settings__daylight" data-settings-daylight-chart role="group" aria-label="График светового дня">
-            <svg width="232" height="48" viewBox="0 0 232 48" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">
-              <path class="site-settings__daylight-baseline" d="M 0 41.5 H 232" />
-              <path class="site-settings__daylight-curve" d="M 0 46.5 C 36 46.5 54 7 116 7 C 178 7 196 46.5 232 46.5" />
-              <circle class="site-settings__daylight-marker-halo" data-settings-daylight-marker-halo cx="6" cy="41.5" r="6.5" />
-              <circle class="site-settings__daylight-marker" data-settings-daylight-marker cx="6" cy="41.5" r="3.2" />
-            </svg>
-            <div class="site-settings__daylight-axis">
-              <time data-settings-daylight-sunrise datetime="">—:—</time>
-              <time data-settings-daylight-sunset datetime="">—:—</time>
-            </div>
-          </div>
-          <div class="site-settings__empathy ym-hide-content ym-disable-clickmap" data-empathy-surface>
-            <div class="site-settings__empathy-question" data-empathy-question-state>
-              <p data-empathy-question>Как вы сегодня?</p>
-              <div class="site-settings__empathy-options" data-empathy-options role="group" aria-label="Самочувствие сегодня">
-                <button type="button" data-empathy-answer="calm">Спокойно</button>
-                <button type="button" data-empathy-answer="tired">Усталость</button>
-                <button type="button" data-empathy-answer="tense">Напряжение</button>
-                <button type="button" data-empathy-answer="curious">Любопытно</button>
-                <button type="button" data-empathy-answer="skip">Пропустить</button>
+            <p class="site-settings__today-care" data-settings-weather-care hidden></p>
+            <div class="site-settings__daylight" data-settings-daylight-chart role="group" aria-label="График светового дня">
+              <svg width="232" height="48" viewBox="0 0 232 48" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">
+                <path class="site-settings__daylight-baseline" d="M 0 41.5 H 232" />
+                <path class="site-settings__daylight-curve" d="M 0 46.5 C 36 46.5 54 7 116 7 C 178 7 196 46.5 232 46.5" />
+                <circle class="site-settings__daylight-marker-halo" data-settings-daylight-marker-halo cx="6" cy="41.5" r="6.5" />
+                <circle class="site-settings__daylight-marker" data-settings-daylight-marker cx="6" cy="41.5" r="3.2" />
+              </svg>
+              <div class="site-settings__daylight-axis">
+                <time data-settings-daylight-sunrise datetime="">—:—</time>
+                <time data-settings-daylight-sunset datetime="">—:—</time>
               </div>
             </div>
-            <div class="site-settings__empathy-feedback" data-empathy-feedback aria-live="polite" tabindex="-1" hidden>
-              <div class="site-settings__empathy-feedback-copy">
-                <p data-empathy-feedback-text></p>
-                <p class="site-settings__empathy-storage" data-empathy-storage-confirmation hidden>Ответ сохранён только на этом устройстве.</p>
+            <div class="site-settings__empathy ym-hide-content ym-disable-clickmap" data-empathy-surface>
+              <div class="site-settings__empathy-question" data-empathy-question-state>
+                <p data-empathy-question>Как вы сегодня?</p>
+                <div class="site-settings__empathy-options" data-empathy-options role="group" aria-label="Самочувствие сегодня">
+                  <button type="button" data-empathy-answer="calm">Спокойно</button>
+                  <button type="button" data-empathy-answer="tired">Усталость</button>
+                  <button type="button" data-empathy-answer="tense">Напряжение</button>
+                  <button type="button" data-empathy-answer="curious">Любопытно</button>
+                  <button type="button" data-empathy-answer="skip">Пропустить</button>
+                </div>
               </div>
-              <button type="button" data-empathy-undo>Вернуть</button>
+              <div class="site-settings__empathy-feedback" data-empathy-feedback aria-live="polite" tabindex="-1" hidden>
+                <div class="site-settings__empathy-feedback-copy">
+                  <p data-empathy-feedback-text></p>
+                  <p class="site-settings__empathy-storage" data-empathy-storage-confirmation hidden>Ответ сохранён только на этом устройстве.</p>
+                </div>
+                <button type="button" data-empathy-undo>Вернуть</button>
+              </div>
             </div>
+          </section>
+
+          <div class="site-settings__rows">
+            <section class="site-settings__row">
+              <div class="site-settings__row-copy">
+                <h3 data-settings-language-title>Язык</h3>
+                <p data-settings-language-note>Выбрать язык интерфейса.</p>
+              </div>
+              <div class="site-settings__segmented site-settings__segmented--three site-settings__segmented--language" data-language-switcher role="group" aria-label="Выбор языка">
+                <button type="button" data-language-option="ru" lang="ru" aria-pressed="true">RU</button>
+                <button type="button" data-language-option="en" lang="en" aria-pressed="false">EN</button>
+                <button type="button" data-language-option="ja" lang="ja" aria-pressed="false">JP</button>
+              </div>
+            </section>
+
+            <section class="site-settings__row">
+              <div class="site-settings__row-copy">
+                <h3 data-settings-theme-title>Тема</h3>
+                <p data-settings-theme-note>Следовать световому дню или выбрать вручную.</p>
+              </div>
+              <div class="site-settings__segmented site-settings__segmented--three" data-theme-mode-group role="group" aria-label="Режим темы">
+                <button type="button" data-theme-mode="auto" aria-pressed="true">Авто</button>
+                <button type="button" data-theme-mode="light" aria-pressed="false">День</button>
+                <button type="button" data-theme-mode="dark" aria-pressed="false">Ночь</button>
+              </div>
+            </section>
+
+            <section class="site-settings__row">
+              <div class="site-settings__row-copy">
+                <h3 data-settings-motion-title>Движение</h3>
+                <p data-settings-motion-note>Обычный ритм или более спокойные переходы.</p>
+              </div>
+              <div class="site-settings__segmented" data-motion-mode-group role="group" aria-label="Интенсивность движения">
+                <button type="button" data-motion-mode="system" aria-pressed="true">Системный</button>
+                <button type="button" data-motion-mode="calm" aria-pressed="false">Спокойный</button>
+              </div>
+            </section>
+
           </div>
-        </section>
-
-        <div class="site-settings__rows">
-          <section class="site-settings__row">
-            <div class="site-settings__row-copy">
-              <h3 data-settings-language-title>Язык</h3>
-              <p data-settings-language-note>Выбрать язык интерфейса.</p>
-            </div>
-            <div class="site-settings__segmented site-settings__segmented--three site-settings__segmented--language" data-language-switcher role="group" aria-label="Выбор языка">
-              <button type="button" data-language-option="ru" lang="ru" aria-pressed="true">RU</button>
-              <button type="button" data-language-option="en" lang="en" aria-pressed="false">EN</button>
-              <button type="button" data-language-option="ja" lang="ja" aria-pressed="false">JP</button>
-            </div>
-          </section>
-
-          <section class="site-settings__row">
-            <div class="site-settings__row-copy">
-              <h3 data-settings-theme-title>Тема</h3>
-              <p data-settings-theme-note>Следовать световому дню или выбрать вручную.</p>
-            </div>
-            <div class="site-settings__segmented site-settings__segmented--three" data-theme-mode-group role="group" aria-label="Режим темы">
-              <button type="button" data-theme-mode="auto" aria-pressed="true">Авто</button>
-              <button type="button" data-theme-mode="light" aria-pressed="false">День</button>
-              <button type="button" data-theme-mode="dark" aria-pressed="false">Ночь</button>
-            </div>
-          </section>
-
-          <section class="site-settings__row">
-            <div class="site-settings__row-copy">
-              <h3 data-settings-motion-title>Движение</h3>
-              <p data-settings-motion-note>Обычный ритм или более спокойные переходы.</p>
-            </div>
-            <div class="site-settings__segmented" data-motion-mode-group role="group" aria-label="Интенсивность движения">
-              <button type="button" data-motion-mode="system" aria-pressed="true">Системный</button>
-              <button type="button" data-motion-mode="calm" aria-pressed="false">Спокойный</button>
-            </div>
-          </section>
-
         </div>
       </section>
     </aside>

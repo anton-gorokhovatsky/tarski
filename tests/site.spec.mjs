@@ -433,6 +433,7 @@ test('mobile menu and service panel preserve state, Escape, and focus return', a
       compactPseudoContent: getComputedStyle(menuRoot.querySelector('.mobile-island-surface'), '::before').content,
       expandedBackdrop: getComputedStyle(serviceMaterial).backdropFilter,
       expandedBackground: getComputedStyle(serviceMaterial).backgroundImage,
+      desktopBackground: getComputedStyle(document.querySelector('.main-nav'), '::after').backgroundImage,
       expandedFilter: getComputedStyle(serviceMaterial).filter,
       serviceDepthFilter: getComputedStyle(menuRoot.querySelector('.mobile-service-depth')).filter,
       serviceDepthFill: getComputedStyle(menuRoot.querySelector('.mobile-service-depth'), '::before').backgroundColor,
@@ -459,8 +460,7 @@ test('mobile menu and service panel preserve state, Escape, and focus return', a
   expect(serviceSurface.menuBorderWidth).toBe('0px');
   expect(serviceSurface.compactPseudoContent).toBe('none');
   expect(serviceSurface.compactBackground.match(/linear-gradient/g)).toHaveLength(1);
-  expect(serviceSurface.compactBackground).toContain('0.58');
-  expect(serviceSurface.compactBackground).toContain('0.34');
+  expect(serviceSurface.compactBackground).toBe(serviceSurface.desktopBackground);
   expect(serviceSurface.menuBackdrop).toBe(serviceSurface.compactBackdrop);
   expect(serviceSurface.height).toBeGreaterThanOrEqual(50);
   expect(serviceSurface.height).toBeLessThanOrEqual(54);
@@ -1081,6 +1081,14 @@ test('motion preference is available on desktop and shares one state', async ({ 
   await siteSettings.locator('[data-site-settings-panel]').evaluate(async (panel) => {
     await Promise.all(panel.getAnimations().map((animation) => animation.finished));
   });
+  const settingsHeader = siteSettings.locator('.site-settings__header');
+  const headerBeforeScroll = await settingsHeader.boundingBox();
+  const settingsBody = siteSettings.locator('.site-settings__body');
+  await settingsBody.evaluate((body) => { body.scrollTop = body.scrollHeight; });
+  const headerAfterScroll = await settingsHeader.boundingBox();
+  expect(headerAfterScroll.y).toBeCloseTo(headerBeforeScroll.y, 1);
+  await expect(siteSettings.locator('.site-settings__close')).toBeInViewport();
+  await settingsBody.evaluate((body) => { body.scrollTop = 0; });
   const settingsMaterial = await siteSettings.locator('[data-site-settings-panel]').evaluate((panel) => {
     const style = getComputedStyle(panel);
     return {
@@ -1306,8 +1314,16 @@ test('motion preference is available on desktop and shares one state', async ({ 
     const style = getComputedStyle(element, '::after');
     return { filter: style.filter, shadow: style.boxShadow };
   });
-  expect(desktopLensMaterial.filter).toContain('drop-shadow');
-  expect(desktopLensMaterial.shadow).not.toBe('none');
+  expect(desktopLensMaterial.filter).toBe('none');
+  expect(desktopLensMaterial.shadow).toBe('none');
+  const lensRim = await page.locator('.nav-lens-edge use').evaluate((element) => ({
+    fill: getComputedStyle(element).fill,
+    stroke: getComputedStyle(element).stroke,
+    width: element.getBBox().width,
+  }));
+  expect(lensRim.fill).toBe('none');
+  expect(lensRim.stroke).not.toBe('none');
+  expect(lensRim.width).toBeGreaterThan(300);
 });
 
 test('main mobile menu launches the existing daylight widget', async ({ page }) => {
