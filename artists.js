@@ -60,6 +60,14 @@
   });
 
   const previewLinks = Array.from(artistIndex.querySelectorAll('.artist-index__link'));
+  // Keep keyboard focus intact when scrolling, but limit its preview to a visible name.
+  const previewVisibilityObserver = 'IntersectionObserver' in window
+    ? new IntersectionObserver((entries) => {
+      entries.forEach(({ target, isIntersecting }) => {
+        target.classList.toggle('is-in-viewport', isIntersecting);
+      });
+    })
+    : null;
   let previewIntentTimerId = null;
   let previewIntentLink = null;
 
@@ -90,6 +98,7 @@
   };
 
   previewLinks.forEach((link) => {
+    previewVisibilityObserver?.observe(link);
     link.addEventListener('pointerenter', (event) => {
       if (event.pointerType && event.pointerType !== 'mouse') return;
 
