@@ -1484,6 +1484,49 @@ test('mobile archipelago stays opaque while entering at both scroll placements',
   await expect.poll(() => menu.getAttribute('data-placement-motion-phase')).toBeNull();
 });
 
+for (const theme of ['light', 'dark']) {
+  for (const viewport of [{ width: 390, height: 844 }, { width: 1280, height: 720 }]) {
+    test(`artist keyboard preview stays readable and leaves the footer clear: ${theme} ${viewport.width}px`, async ({ page }) => {
+      await page.setViewportSize(viewport);
+      await page.addInitScript((theme) => localStorage.setItem('tarski-theme', theme), theme);
+      await page.goto('/?lang=ru#artists');
+      await expect(page.locator('html')).toHaveAttribute('data-effective-theme', theme);
+
+      const index = page.locator('.artist-index');
+      const firstName = index.locator('.artist-index__link').first();
+      const name = index.locator('[href="#artist-irhs"]');
+      const previewOpacity = () => index.evaluate((element) => getComputedStyle(element, '::before').opacity);
+
+      await firstName.focus();
+      await page.keyboard.press('Tab');
+      await expect(name).toBeFocused();
+      await expect(name).toHaveCSS('text-decoration-line', 'underline');
+
+      if (viewport.width <= 720) {
+        const textColor = await index.evaluate((element) => getComputedStyle(element).color);
+        await expect(name).toHaveCSS('color', textColor);
+        await expect(name).toHaveCSS('mix-blend-mode', 'normal');
+        await expect(firstName).toHaveCSS('opacity', '1');
+        expect(await index.evaluate((element) => getComputedStyle(element, '::before').display)).toBe('none');
+      } else {
+        await expect.poll(previewOpacity).toBe('0.92');
+      }
+
+      await page.keyboard.press('End');
+      await expect.poll(() => name.evaluate((element) => element.getBoundingClientRect().bottom)).toBeLessThan(0);
+      await expect(name).toBeFocused();
+      await expect.poll(previewOpacity).toBe('0');
+      await expect(page.locator('[data-footer-cta-label]')).toBeInViewport();
+
+      // Tabbing back brings the name into view and restores only the desktop preview.
+      await page.keyboard.press('Shift+Tab');
+      await expect(firstName).toBeFocused();
+      await expect(firstName).toBeInViewport();
+      await expect.poll(previewOpacity).toBe(viewport.width > 720 ? '0.92' : '0');
+    });
+  }
+}
+
 test('artist names remain headings with one keyboard trigger each', async ({ page }) => {
   await page.goto('/?lang=ru#artists');
 
