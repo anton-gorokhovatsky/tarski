@@ -312,6 +312,11 @@
   const text = dossier?.querySelector('[data-artist-dossier-text]');
   const links = dossier?.querySelector('[data-artist-dossier-links]');
   const closeControls = Array.from(dossier?.querySelectorAll('[data-artist-dossier-close]') || []);
+  const artworkViewer = document.querySelector('[data-artwork-viewer]');
+  const artworkImage = artworkViewer?.querySelector('[data-artwork-image]');
+  const artworkSource = artworkViewer?.querySelector('[data-artwork-source]');
+  const artworkClose = artworkViewer?.querySelector('[data-artwork-close]');
+  const artworkStatus = artworkViewer?.querySelector('[data-artwork-status]');
   const cards = Array.from(document.querySelectorAll('.artist-card'));
   const indexLinks = Array.from(document.querySelectorAll('.artist-index__link[href^="#artist-"]'));
   const captionKeys = {
@@ -335,7 +340,7 @@
     ja: 'altJa'
   };
 
-  if (!dossier || !panel || !image || !galleryBlock || !gallery || !credit || !name || !role || !text || !links || !cards.length) return;
+  if (!dossier || !panel || !image || !galleryBlock || !gallery || !credit || !name || !role || !text || !links || !cards.length || !artworkViewer || !artworkImage || !artworkSource || !artworkClose || !artworkStatus) return;
 
   const cardsById = new Map(cards.map((card) => [card.id, card]));
   let activeTrigger = null;
@@ -343,6 +348,8 @@
   let openTimerId = null;
   let closeTimerId = null;
   let galleryImageObserver = null;
+  let artworkTrigger = null;
+  let artworkScrollTop = 0;
 
   const reducedMotion = () => prefersCalmMotion();
   const getLanguage = () => window.tarskiI18n?.getLanguage?.() || document.documentElement.dataset.language || 'ru';
@@ -350,6 +357,67 @@
   const getOpenDetailsPrefix = () => window.tarskiI18n?.t('ui.openDetails') || 'Открыть подробности: ';
   const getLinksGroupLabel = () => window.tarskiI18n?.t('ui.links.group') || 'Ссылки';
   const getCardName = (card) => card.querySelector('.artist-card__name')?.textContent.trim() || 'художника';
+  const artworkCopy = (key) => typeset(window.tarskiI18n?.t(`ui.artwork.${key}`) || '');
+
+  const setArtworkState = (state) => {
+    artworkViewer.dataset.state = state;
+    artworkStatus.hidden = state === 'ready';
+    artworkStatus.textContent = state === 'ready' ? '' : artworkCopy(state === 'error' ? 'error' : 'loading');
+  };
+
+  const closeArtwork = ({ restoreFocus = true } = {}) => {
+    if (!artworkViewer.open) return;
+
+    artworkViewer.close();
+    panel.inert = false;
+    panel.scrollTop = artworkScrollTop;
+    if (restoreFocus && artworkTrigger?.isConnected && dossier.classList.contains('is-open')) {
+      focusWithoutScroll(artworkTrigger);
+    }
+    artworkTrigger = null;
+    artworkSource.removeAttribute('srcset');
+    artworkImage.removeAttribute('src');
+  };
+
+  const openArtwork = (item, data, trigger) => {
+    artworkTrigger = trigger;
+    artworkScrollTop = panel.scrollTop;
+    artworkViewer.querySelector('[data-artwork-title]').textContent = typeset(data.name);
+    const caption = artworkViewer.querySelector('[data-artwork-caption]');
+    const artworkCredit = artworkViewer.querySelector('[data-artwork-credit]');
+    caption.textContent = typeset([item.label, item.caption].filter(Boolean).join(' · '));
+    artworkCredit.textContent = typeset(data.galleryCredit);
+    caption.parentElement.hidden = !caption.textContent && !artworkCredit.textContent;
+    artworkClose.textContent = artworkCopy('back');
+    setArtworkState('loading');
+    artworkImage.alt = item.alt || item.caption || data.name;
+    if (item.avifSrcset) artworkSource.srcset = item.avifSrcset;
+    else artworkSource.removeAttribute('srcset');
+    artworkSource.sizes = '100vw';
+    artworkImage.src = item.src;
+    artworkViewer.showModal();
+    panel.inert = true;
+    focusWithoutScroll(artworkClose);
+    if (artworkImage.complete && artworkImage.naturalWidth) setArtworkState('ready');
+  };
+
+  artworkImage.addEventListener('load', () => {
+    if (artworkViewer.open) setArtworkState('ready');
+  });
+  artworkImage.addEventListener('error', () => {
+    if (artworkViewer.open) setArtworkState('error');
+  });
+  artworkClose.addEventListener('click', () => closeArtwork());
+  artworkViewer.addEventListener('cancel', (event) => {
+    event.preventDefault();
+    closeArtwork();
+  });
+  artworkViewer.addEventListener('keydown', (event) => {
+    if (event.key !== 'Tab') return;
+    // This view has one action; keep both Tab directions on its way back.
+    event.preventDefault();
+    focusWithoutScroll(artworkClose);
+  });
   const getLocalizedCaption = (item) => {
     const language = window.tarskiI18n?.getLanguage?.() || document.documentElement.dataset.language || 'ru';
     const captionKey = captionKeys[language] || captionKeys.ru;
@@ -602,6 +670,8 @@
       focusReturnTarget = trigger
     } = options;
 
+    closeArtwork({ restoreFocus: false });
+
     if (
       !forceRefresh &&
       activeCard === card &&
@@ -632,12 +702,18 @@
       const galleryItem = document.createElement('figure');
       const galleryPicture = document.createElement('picture');
       const galleryImage = document.createElement('img');
+      const galleryOpen = document.createElement('button');
       const gallerySource = item.avifSrcset ? document.createElement('source') : null;
       const galleryLabel = item.label ? document.createElement('span') : null;
       const galleryCaption = item.caption ? document.createElement('figcaption') : null;
 
       galleryItem.className = 'artist-dossier__gallery-item';
       galleryImage.className = 'artist-dossier__gallery-image';
+      galleryOpen.className = 'artist-dossier__gallery-open';
+      galleryOpen.type = 'button';
+      galleryOpen.setAttribute('aria-label', typeset(`${artworkCopy('open')}${item.alt || item.caption || data.name}`));
+      galleryOpen.setAttribute('aria-haspopup', 'dialog');
+      galleryOpen.addEventListener('click', () => openArtwork(item, data, galleryOpen));
 
       if (item.variant && /^[a-z0-9-]+$/i.test(item.variant)) {
         galleryItem.classList.add(`artist-dossier__gallery-item--${item.variant}`);
@@ -669,7 +745,8 @@
       }
 
       galleryPicture.append(galleryImage);
-      galleryItem.append(galleryPicture);
+      galleryOpen.append(galleryPicture);
+      galleryItem.append(galleryOpen);
 
       if (galleryCaption) {
         galleryCaption.className = 'artist-dossier__gallery-caption';
@@ -690,6 +767,9 @@
     image.src = data.imageSrc;
     image.alt = data.imageAlt;
     gallery.replaceChildren(...galleryItems);
+    const galleryHint = galleryBlock.querySelector('[data-artwork-hint]');
+    galleryHint.textContent = artworkCopy('hint');
+    galleryHint.hidden = galleryItems.length === 0;
     observeGalleryImages();
     gallery.hidden = galleryItems.length === 0;
     credit.textContent = typeset(data.galleryCredit);
@@ -732,6 +812,8 @@
     } = options;
 
     if (!dossier.classList.contains('is-open') && !dossier.classList.contains('is-closing')) return;
+
+    closeArtwork({ restoreFocus: false });
 
     const triggerToRestore = getDossierFocusReturnTarget();
 
@@ -813,6 +895,8 @@
   });
 
   window.addEventListener('keydown', (event) => {
+    // The native image dialog owns focus and Escape until it returns to the dossier.
+    if (artworkViewer.open) return;
     if (event.key === 'Escape') {
       if (!dossier.classList.contains('is-open')) return;
 

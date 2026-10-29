@@ -325,6 +325,7 @@
   --cursor-trail-min-distance: 2.4;
 }
 
+
 html.has-open-dossier {
   --cursor-trail-base-width: 0.76;
   --cursor-trail-extra-width: 0.28;
@@ -2416,12 +2417,170 @@ html[data-scene="artists"]:has(.artist-index__link:nth-child(7):is(:hover, :focu
   }
 }
 
+.artist-dossier__gallery-hint {
+  margin: 0 0 var(--space-3);
+  color: var(--muted-text);
+  font-size: var(--type-meta);
+  line-height: 1.35;
+}
+
+.artist-dossier__gallery-open {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  cursor: zoom-in;
+}
+
+.artist-dossier__gallery-open:focus-visible {
+  outline: 2px solid var(--text);
+  outline-offset: var(--space-1);
+}
+
+.artwork-viewer {
+  display: none;
+  width: calc(100vw - var(--space-8));
+  max-width: none;
+  height: calc(100svh - var(--space-8));
+  height: calc(100dvh - var(--space-8));
+  max-height: none;
+  margin: auto;
+  padding: var(--space-4);
+  border: 0;
+  border-radius: var(--corner-dossier);
+  corner-shape: var(--corner-shape-continuous);
+  background: var(--matte-panel-bg);
+  box-shadow: var(--matte-panel-shadow), var(--matte-panel-border);
+  backdrop-filter: var(--matte-panel-backdrop-filter);
+  -webkit-backdrop-filter: var(--matte-panel-backdrop-filter);
+  color: var(--text);
+  font-family: var(--font-sans);
+}
+
+.artwork-viewer[open] {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: var(--space-4);
+}
+
+.artwork-viewer::backdrop {
+  background: var(--matte-scrim-bg);
+  backdrop-filter: blur(10px) saturate(118%);
+  -webkit-backdrop-filter: blur(10px) saturate(118%);
+}
+
+.artwork-viewer__bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-4);
+}
+
+.artwork-viewer__bar p {
+  margin: 0;
+  font-size: var(--type-meta);
+}
+
+.artwork-viewer__close {
+  min-height: var(--space-12);
+  max-width: 100%;
+  margin-left: auto;
+  padding: var(--space-2) var(--space-3);
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-size: var(--type-body);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+  cursor: pointer;
+}
+
+.artwork-viewer__figure {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  min-height: 0;
+  min-width: 0;
+  margin: 0;
+  gap: var(--space-2);
+}
+
+.artwork-viewer__stage,
+.artwork-viewer__stage picture {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+  min-width: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.artwork-viewer__stage {
+  position: relative;
+}
+
+.artwork-viewer__stage img {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.artwork-viewer__status {
+  position: absolute;
+  margin: var(--space-4);
+  max-width: calc(100% - var(--space-8));
+  font-size: var(--type-body);
+  text-align: center;
+}
+
+.artwork-viewer[data-state="loading"] picture,
+.artwork-viewer[data-state="error"] picture {
+  visibility: hidden;
+}
+
+.artwork-viewer__caption {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-4);
+  font-size: var(--type-meta);
+  line-height: 1.35;
+}
+
+.artwork-viewer__caption[hidden],
+.artwork-viewer__status[hidden] {
+  display: none;
+}
+
+@media (max-width: 720px) {
+  .artwork-viewer {
+    width: calc(100vw - var(--space-4));
+    height: calc(100svh - var(--space-4));
+    height: calc(100dvh - var(--space-4));
+    padding:
+      max(var(--space-3), env(safe-area-inset-top))
+      max(var(--space-3), env(safe-area-inset-right))
+      max(var(--space-3), env(safe-area-inset-bottom))
+      max(var(--space-3), env(safe-area-inset-left));
+  }
+}
+
+
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  .artist-dossier__scrim {
+  .artist-dossier__scrim,
+  .artwork-viewer::backdrop {
     background: color-mix(in srgb, var(--page-bg) 86%, transparent);
   }
 
-  .artist-dossier__panel {
+  .artist-dossier__panel,
+  .artwork-viewer {
     background: var(--page-bg);
   }
 }
