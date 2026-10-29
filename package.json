@@ -6,7 +6,7 @@
     "artists:generate": "node tools/generate-artists.mjs",
     "assets:versions": "node tools/sync-asset-versions.mjs",
     "test": "pnpm test:media && pnpm test:generated && pnpm test:versions && pnpm test:core",
-    "test:core": "playwright test --project=chromium tests/accessibility.spec.mjs tests/artists-registry.spec.mjs tests/empathy.spec.mjs tests/performance.spec.mjs tests/site.spec.mjs",
+    "test:core": "playwright test --project=chromium tests/accessibility.spec.mjs tests/artists-registry.spec.mjs tests/artwork-viewer.spec.mjs tests/empathy.spec.mjs tests/performance.spec.mjs tests/site.spec.mjs",
     "test:e2e": "pnpm test:core",
     "test:generated": "node tools/generate-artists.mjs --check",
     "test:media": "node tools/check-media-assets.mjs",

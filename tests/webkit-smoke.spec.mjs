@@ -51,3 +51,31 @@ test('mobile WebKit keeps the menu and settings surface usable', async ({ page }
   await expect(service.locator('[data-theme-mode="auto"]')).toHaveAttribute('aria-pressed', 'true');
   await expect(service.locator('[data-motion-mode="system"]')).toHaveAttribute('aria-pressed', 'true');
 });
+
+test('mobile WebKit returns from an enlarged work to the same dossier position', async ({ page }) => {
+  await page.goto('/?lang=ru#artist-anastasia-dahl');
+  const trigger = page.locator('.artist-dossier__gallery-open').nth(1);
+  const panel = page.locator('#artist-dossier-panel');
+  await trigger.scrollIntoViewIfNeeded();
+  const position = await panel.evaluate((element) => element.scrollTop);
+  await trigger.focus();
+  await page.keyboard.press('Enter');
+  const viewer = page.locator('[data-artwork-viewer]');
+  await expect(viewer).toHaveAttribute('data-state', 'ready');
+  const back = viewer.getByRole('button', { name: 'К работам' });
+  await expect(back).toBeFocused();
+  await page.keyboard.press('Tab');
+  await expect(back).toBeFocused();
+  const geometry = await viewer.locator('img').evaluate((element) => {
+    const rect = element.getBoundingClientRect();
+    return { left: rect.left, right: rect.right, bottom: rect.bottom, width: innerWidth, height: innerHeight };
+  });
+  expect(geometry.left).toBeGreaterThanOrEqual(0);
+  expect(geometry.right).toBeLessThanOrEqual(geometry.width);
+  expect(geometry.bottom).toBeLessThanOrEqual(geometry.height);
+  await page.keyboard.press('Escape');
+  await expect(viewer).not.toBeVisible();
+  await expect(trigger).toBeFocused();
+  expect(await panel.evaluate((element) => element.scrollTop)).toBeCloseTo(position, 0);
+  await expect(page).toHaveURL(/#artist-anastasia-dahl$/);
+});

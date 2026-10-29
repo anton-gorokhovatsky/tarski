@@ -140,6 +140,13 @@
         serviceClose: 'Закрыть настройки сайта',
         openDetails: 'Открыть подробности: ',
         closeDetails: 'Закрыть подробности',
+        artwork: {
+          hint: 'Нажмите на изображение, чтобы рассмотреть его отдельно',
+          open: 'Рассмотреть: ',
+          back: 'К работам',
+          loading: 'Изображение загружается…',
+          error: 'Не удалось загрузить изображение. Вернитесь к работам и попробуйте ещё раз.'
+        },
         links: {
           group: 'Ссылки',
           site: 'Сайт',
@@ -295,6 +302,13 @@
         serviceClose: 'Close site settings',
         openDetails: 'Open details: ',
         closeDetails: 'Close details',
+        artwork: {
+          hint: 'Select an image to view it on its own',
+          open: 'View image: ',
+          back: 'Back to works',
+          loading: 'Loading image…',
+          error: 'The image could not be loaded. Return to the works and try again.'
+        },
         links: {
           group: 'Links',
           site: 'Website',
@@ -505,6 +519,13 @@
         serviceClose: 'サイト設定を閉じる',
         openDetails: '詳細を開く：',
         closeDetails: '詳細を閉じる',
+        artwork: {
+          hint: '画像を選ぶと一枚ずつ表示されます',
+          open: '画像を見る：',
+          back: '作品に戻る',
+          loading: '画像を読み込んでいます…',
+          error: '画像を読み込めませんでした。作品に戻って、もう一度お試しください。'
+        },
         links: {
           group: 'リンク',
           site: 'ウェブサイト',
